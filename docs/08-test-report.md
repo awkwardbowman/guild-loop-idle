@@ -1,3 +1,28 @@
+# Foundation Test Report — 0.3
+
+November 5, 2026. Current preparation results; earlier 0.2 results follow as historical evidence.
+
+- `npm test`: **61 passed, 0 failed**.
+- `npm run build`: TypeScript and Vite production build passed.
+- New-player integration: opening unlock chain → first recruitment → trail → archive → three-check floors → later dungeon unlock; skill and specialization progression; saved retry cooldown resumes deterministically.
+- Regression scenario: developed guild still completes 245 floor clears and 206 returns over 3,747 game seconds, with recruitment/upgrades and valid saves.
+
+| Group | Verified behavior |
+|---|---|
+| Progression | Fresh save has Story/Guild/Info only, no starting members; hidden work does not execute; prerequisite and repeat-action guards; unlock facts saved with stable timestamps |
+| Attributes | Direct/partial/no-specialty examples; fallback through multiple ancestors; no double-counting; root pool aggregation; cycles and invalid parents rejected |
+| Skills | Distinct speed/success/efficiency; level 99 clamp; practice and last-use fields; decay disabled; specialization growth queued until return |
+| Checks | Attempt and per-second charging; insufficient/zero/exact depletion returns; no unpaid work, free RNG, duplicate rewards or negative balances; weighted retry, cooldown, alternative, injury, gear-loss and return outcomes |
+| Live route | All three archive checks needed before floor loot; check state integrated into active runs, training and return; unaffordable live check returns safely |
+| Saves | v0/v1/v2 migration; retained old roster/seed/current run/loot; v3 state validation; exact cooldown and stochastic continuation; existing guild can enable future check outings without rewriting an active task run |
+| Desktop browser | Fresh opening has only Story/Guild/Info; recruitment unlock, first member, Expeditions thread, trail discovery, Resources/Infrastructure unlock, archive discovery, queue assignment and skill rooms |
+| Browser outcomes | At 00:36:44, 60 member returns; Observation 2, Investigation 3, Lock Picking 2; Finger Dexterity 18.5/77; visible retries and reassessment cooldowns followed by floor loot |
+| Browser reload | Clock, roster/queue, 8-second remaining reset, skills and specialty values retained; no observed game-source console errors |
+
+Actual mobile/touch and exhaustive keyboard acceptance are still open. Full plot, final attribute list, tuning, decay and resource conversion are not complete. Return ETA for stochastic checks is approximate and marked ~. Preparation is for review; no production rollout is claimed.
+
+## Historical 0.2 report
+
 # Redesign Test Report — 0.2
 
 November 5, 2026. Current results supersede the historical fixed-day baseline below.

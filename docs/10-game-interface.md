@@ -41,3 +41,11 @@ These are provisional, not final game balance: 30-day months, 12-month years, ep
 - Pin/unpin persists through save/reload.
 - Inputs have labels; replacement dialogs support Escape, focus trapping and cancel.
 - UI state never implies that traits, penalties, supplies refunds or skill trees already work.
+
+## 0.3 progression visibility
+
+00 Story is the first main tab, with only unlocked story threads shown. Fresh saves expose Story, Guild and the utility Info tab; no roster, dungeons or resources are pre-unlocked. Guild starts with a Begin your story control. Story opens recruitment; accepting the first member reveals Members and the Expeditions story thread; discovering the trail reveals Activities; returning reveals Resources and Infrastructure. Later milestones offer the archive and ridge. These actions are functional placeholders, not final narrative writing.
+
+Members gains skill levels/practice and specialization values/potential after the skills feature becomes available. Dungeon details match the active route rules. Skill-based expedition time is an estimate, shown with ~, because random failures and cooldowns prevent an exact return prediction. Legacy task routes retain exact estimates.
+
+Existing saves keep their former features through a migration event. Story → Guild offers Train for trap rooms to enable the check system for future archive outings; already active routes continue under their saved rules. No reset is required.

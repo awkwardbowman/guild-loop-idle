@@ -36,3 +36,7 @@ Keep each mechanic's detailed definition in its topic file. Record material chan
 The baseline uses React, TypeScript, and Vite with browser-owned versioned saves and file export/import. Source: awkwardbowman/guild-loop-idle. Vercel is the intended hosting target; Convex is deferred to optional cloud sync. See the build plan for prototype defaults and the test report for actual verification.
 
 Current version: 0.2 game-interface and bottomless-dungeon redesign. The original website-like dashboard and fixed-day simulation are superseded. See 04, 06, 07 and 10 for current rules.
+
+| [11-progression-and-check-foundations.md](11-progression-and-check-foundations.md) | Implemented event/unlock, attribute/skill/check and save v3 contracts; provisional formulas and authoring extension points |
+
+Current preparation: version 0.3, pending review; new-player gating and skill-check foundations. Final plot, full attribute tree, decay and gear conversion remain undecided.

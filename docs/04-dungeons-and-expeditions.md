@@ -35,3 +35,20 @@ An early successful return may return unused Gear/Supplies, speeding the next de
 ## Open decisions
 
 Final scaling curves, activity variation at depth, rating semantics, unlock progression, reward uses, default depth policies, warp duration, recovery stats, failure triggers/retention and Gear/Supplies accounting remain to be designed. All present dungeon names, ratings, costs, distributions and timings are prototype content.
+
+## Skill-check resource exhaustion — Agreed next-design rule
+
+This rule is implemented for the skill-check routes in the 0.3 foundation. Classic fixed-task routes remain available for existing saves; already active routes preserve their saved rules.
+
+- Whenever check progress or an attempt requires resources, verify the member can pay the required costs from every contributing core attribute/resource pool.
+- If a required resource is exhausted or insufficient to pay the next required cost, the member gives up the check and returns to the guild. No free attempts, unpaid progress, or negative resources.
+- A positive balance may still be insufficient: 2 Dexterity cannot pay a required cost of 3 Dexterity.
+- Finger Dexterity consumes the underlying Dexterity pool, not an additional child pool. Checks involving multiple core resources require all their costs.
+- Giving up does not complete the check or award its success reward. Resource-based return is distinct from future penalized failure; do not automatically add loot-loss or longer-reset penalties.
+- Per-second versus per-attempt charging remains open. Enforce affordability at every actual charging point.
+
+Future gear may convert resources inside dungeons, potentially based on affinities. Rates, triggers, affinity effects and gear requirements remain undecided. No conversion or automatic resource substitution is available initially.
+
+## Prepared sample check route
+
+The archive can use a three-stage trap room: notice, find the trigger, disarm. Work, payment, rolls, failure tables, learned skills and return behavior are implemented. All three checks must succeed before awarding floor loot. Pending specialization growth applies on return, while skill practice can improve during the outing. See 11-progression-and-check-foundations.md for provisional formulas, current rollout and save behavior.

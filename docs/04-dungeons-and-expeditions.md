@@ -1,52 +1,37 @@
 # Dungeons and Expeditions
 
-Updated November 5, 2026.
+Updated November 5, 2026. Current bottomless-dungeon redesign supersedes fixed dungeon completion and daily expedition resets.
 
-## Dungeon definitions — Agreed direction
+## Agreed mechanics
 
-Each dungeon has different resource requirements. Dungeon tasks determine which adventurer stats are used and trained. A dungeon also has its own loot pool.
+- Every dungeon is bottomless, with its own resource demands, activities and random loot pool.
+- Each successive floor takes longer, demands more resources/activity effort, and offers greater rewards.
+- Players can set a dungeon-wide maximum depth that applies to every adventurer.
+- A member's dungeon assignment also has its own personal maximum depth. Both limits apply; the smaller limit determines where that member stops.
+- The member carries dungeon rewards and brings them back when surviving the expedition.
+- Current stats are depleted by tasks; zero forces retreat. Completed dungeon tasks train maximums toward affinity for later runs.
+- Each member has an independent reset cooldown before departing again. A future member stat likely controls that delay.
 
-The exact resource model is open: requirements may involve stat depletion, guild support, or both. Do not assume every dungeon shares the same costs or training profile.
+## Current playable defaults (provisional)
 
-## Individual runs — Agreed
+One outing attempts one dungeon entry. Floor 1 uses the original task sequence; each later floor repeats those tasks with scale = 1 + 0.2 × (floor − 1). Each task duration rounds up after scaling. Stat drain and training use the scale without rounding. Floor gold rounds to the nearest integer. A completed floor rolls one weighted item type from that dungeon's pool, with quantity equal to the floor number.
 
-- Each adventurer undertakes their own loops.
-- Each run has a limited amount of time before the adventurer must warp home.
-- Current stat values are consumed during the run.
-- Any stat reaching zero forces a retreat.
-- Training grows maximum stats for future runs toward the adventurer's affinities.
-- Successful runs bring back random loot from that dungeon's pool.
+Blank limits mean unlimited. Positive integer depth limits are validated. A cap edited during an active expedition applies at the next floor boundary: a member already partway through a floor finishes that floor first. Personal limits are snapshotted at dispatch; editing an assignment changes future outings. There is no content floor ceiling; the input guard of 1,000,000 is an implementation bound.
 
-## Return reasons
+Loot and gold stay in carried state until return. Growth is applied once on return from completed, survived tasks using the run's starting maximum. Survived floors are counted when cleared, independently from when loot is banked.
 
-| Reason | Trigger | Known result |
-|---|---|---|
-| Success | Dungeon completion condition is met | Return random loot from the dungeon pool; stat progression benefits later runs |
-| Retreat | Any current stat reaches zero | Run ends; loot and training retention rules still open |
-| Timed warp | The adventurer's allowed expedition time expires | Adventurer warps home; partial reward and training rules still open |
+Return reasons: reached depth, stat retreat, manual recall, or the temporary 300-second per-outing warp timer. Returns reset only that member; midnight does not recall anyone. All current returns retain previously earned loot/training. Incomplete/lethal tasks do not grant training or floor rewards. Successful final-task resolution precedes timeout; lethal resolution precedes reward. Depth completion at the timer boundary is logged once as successful return.
 
-Retreat and timed warp are not currently defined as death or permanent loss. There is no approved death mechanic.
+Reset is temporarily 12 seconds per member. Current stats refill on the next dispatch. Dispatch consumes the dungeon's gear cost once per outing. Gear regenerates continuously, up to guild capacity. Gear refunds and a separate supplies pool are not implemented.
 
-## Tasks and assignment — Partially specified
+See 06-queues-and-assignment.md for continuous scheduling and 10-game-interface.md for controls.
 
-Task-specific depletion and training support matching recruits to dungeons. The exact stat list has not been chosen. Strength, Endurance, and Perception were illustrative examples only.
+## Future agreed direction
 
-An ordered guild-member dispatch queue is required for the initial setup: members are considered at the start of a day in player-defined order. Future assignment preferences include dungeon minimum/maximum Stat Affinity thresholds, skipping nonmatching members before assigning a dungeon. See 06-queues-and-assignment.md.
+A separate dungeon failure mechanic will drop a percentage of the member's carried loot, automatically warp them to the guild, and impose a longer recovery/reset. Loot retention may depend on a member stat. Distinguish this future failure from the current safe retreat/recall behavior. Percentage, stat, trigger and cooldown multiplier are undecided; no penalties are enabled now.
 
-The initial setup also requires a basic ordered dungeon queue per adventurer, with simple add/remove/reorder controls and no advanced rules. Queue advancement and restart behavior remain open. This does not require queues for individual actions inside a dungeon. Automatic repeat, manual recall, and executing multiple dungeon entries in one run remain undecided.
+An early successful return may return unused Gear/Supplies, speeding the next departure. Exact reservation, consumption and refund rules remain open. Do not mint refunded resources until that accounting is designed.
 
-## Loot — Agreed direction
+## Open decisions
 
-Successful dungeon completion rolls from that dungeon's loot pool. Exact item types, drop weights, number of rolls, rarity, duplicate handling, inventory capacity, and uses of loot are open.
-
-## Resolution questions
-
-- What counts as dungeon completion: a fixed task sequence, progress threshold, boss, or another condition?
-- Can a dungeon be completed several times within one run?
-- If the final task depletes a stat to zero, does retreat take precedence over completion?
-- If completion coincides with the time limit, which result takes precedence?
-- Are task costs deterministic, random, or partially revealed?
-- Can adventurers cooperate in parties, or are all assignments solo?
-- Is the warp limit independent from all stat pools?
-- How do guild gear costs apply at dispatch, during tasks, and at return?
-- Does time advance while the app is closed, and what are the limits?
+Final scaling curves, activity variation at depth, rating semantics, unlock progression, reward uses, default depth policies, warp duration, recovery stats, failure triggers/retention and Gear/Supplies accounting remain to be designed. All present dungeon names, ratings, costs, distributions and timings are prototype content.

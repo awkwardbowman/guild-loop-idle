@@ -19,7 +19,7 @@ Updated November 5, 2026.
 
 Any current stat reaching zero causes retreat. These stats therefore act as expedition resource pools as well as measures of ability.
 
-Current values refill for a new run. Recovery delay or cost is not yet specified. Growth improves the maximum for the next run; it should not be assumed to refill the current run's depleted pool.
+Current values refill for a new run. Each member now has an independent reset cooldown; the playable default is 12 seconds, with a future member stat likely controlling duration. Growth improves the maximum for the next run; it should not be assumed to refill the current run's depleted pool.
 
 ## Dungeon-driven training — Agreed direction
 
@@ -64,3 +64,9 @@ Max gain = Dungeon training × (1 − Max Value / Effective Affinity)
 Keep the adventurer's rolled affinity conceptually separate from guild-derived bonuses so individual identity can be preserved. This separation is a documentation/modeling proposal.
 
 Still open: global versus stat-specific bonuses, whether bonuses affect existing recruits, unlock costs, and whether future modifiers can multiply as well as add.
+
+## Traits — Future agreed direction
+
+Traits will determine or modify member stats and related properties. Example only: **Pampered** might increase reset time and gear requirements in exchange for an advantage elsewhere. The benefit is deliberately undecided. No trait list, rolls, numerical modifiers, interactions, or balance is approved yet; traits are documented only, not applied in the prototype.
+
+The current implementation uses completed-task training, accumulated until return and evaluated against the starting maximum, nonnegative gain clamped to affinity. Failed/partial tasks award no training; earlier completed training is retained on retreat. These are working defaults pending tuning. See 04-dungeons-and-expeditions.md.

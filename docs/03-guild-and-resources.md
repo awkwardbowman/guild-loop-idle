@@ -10,7 +10,7 @@ How priorities are expressed is open: weighted allocation, ordered priorities, t
 
 ## Adventurer dispatch priority — Agreed
 
-The player maintains an ordered list of guild members. At the start of a day, adventurers are considered for dispatch in that order. This member ordering is a separate control from the guild master's recruitment/infrastructure priorities. Detailed scheduling and future eligibility rules are defined in 06-queues-and-assignment.md.
+The player maintains an ordered list of guild members. The continuous-time prototype considers eligible members in roster order whenever support becomes available, superseding the old day-start-only dispatch default. This member ordering is a separate control from the guild master's recruitment/infrastructure priorities. Detailed scheduling and future eligibility rules are defined in 06-queues-and-assignment.md.
 
 ## Support resources — Agreed direction
 
@@ -44,3 +44,11 @@ Guild-master upgrades will eventually improve affinity. An additive modifier is 
 - Specific buildings or resource types.
 - A later guild prestige/reset system.
 - Automatic spending rules or recruitment automation.
+
+## Resource interface and future returns
+
+Resources has its own main tab. Players can pin chosen resources to the collapsible left-sidebar resource display. See 10-game-interface.md.
+
+The baseline separates member roster capacity and simultaneous expedition capacity, consumes gear once on dispatch, and regenerates gear continuously to its cap. These are provisional accounting choices. Early successful returns may eventually refund unused Gear/Supplies to speed future departures; refund percentages, supply units, caps and reservation accounting are undecided and not implemented.
+
+Guild is the main guildmaster tab, including a reserved future skill-tree area. Affinity upgrades belong to that future development; no tree nodes or costs are currently approved.

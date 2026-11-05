@@ -19,22 +19,26 @@ React, TypeScript, and Vite. Entire simulation and saves run in the player's bro
 | 6 — Main game test | Run multiple complete days, recruit, edit routes, upgrade, save/load, continue | Scripted integration playthrough plus real browser playtest; record observed failures and fixes | Test report records actual outcomes, limitations, and repeatable commands |
 | 7 — Next-phase review | Review pacing and planning decisions; propose next work from observed play | Compare against original requirements and playtest findings | Prioritized backlog with no invented feature approvals |
 
-## Working defaults for this prototype
+## Current redesign phases — November 5, 2026
 
-These resolve open questions for a testable baseline. They are implementation choices, not permanent design decisions.
+| Phase | Build | Validation gate |
+|---|---|---|
+| R1 | Continuous calendar, bottomless floors, global/personal caps, carried loot, individual reset, cycling queues | Timer/rollover, scaling/cap precedence, depletion/boundary ordering, cooldown/retry and ETA tests |
+| R2 | Save schema v2 with deterministic carried state and migration of v0/v1 | Mid-floor roundtrip, corrupt fields, recovery, safe old-run conversion without duplicate loot |
+| R3 | Game-first 2:8:2 shell, collapsible status, required tabs/subtabs, pins, right event log | Desktop browser flow: tabs, caps, queues, live sorted status, banked loot, cooldown, pin persistence |
+| R4 | Main-game session and final review | Whole-game simulation, browser console check, production build, recorded actual outcomes |
 
-- Three stats: Might, Agility, Focus. Each has current, max, and affinity.
-- Start with three distinctive members, room for five recruits, and two simultaneous expeditions.
-- A day lasts 60 simulated seconds. Manual Start day; optional automatic next day. Pause and 1×/4× speeds. No offline catch-up in baseline; closed/hidden play pauses.
-- At day start, refill member pools and snapshot each route. Scan members in player order. Skip those without a route, enough gear, or a deployment slot. No dispatch retries during that day.
-- Gear is consumable on dispatch and on entry to each later dungeon. It regenerates during the day up to its cap, including while members are active. No gear refund on return.
-- Each member follows their dungeon queue in order within one expedition, carrying depleted pools forward. Successful dungeons grant one weighted random loot item and gold. Route completion, a depleted stat, unavailable gear for the next dungeon, or a 35-second expedition timer returns that member. Each new day restarts the route at entry one.
-- Dungeon tasks have fixed durations, stat costs, and training rewards. Costs resolve on completion. A task that depletes a stat triggers retreat before rewards/training for that task. A fully resolved task at the warp boundary may complete before the timer returns the member.
-- Training from completed surviving tasks persists even after later retreat/warp. Sum training per stat and apply growth at return using the run's starting maximum: training × max(0, 1 − max / affinity), capped at affinity. Growth never refills an active run.
-- Three dungeons emphasize different stats; one is initially difficult. All numeric content is temporary balance data.
-- Guild priority selects recruitment or infrastructure. Both accumulate work only during active days; recruitment generates one pending candidate, infrastructure produces upgrade materials. Upgrades spend gold/materials to improve expedition slots, roster capacity, gear capacity, or gear regeneration. Affinity upgrades remain future scope.
-- Queue edits, recruiting, dismissals, and upgrades are planning-phase actions, so in-progress routes cannot change underneath the simulation.
-- Save format v1 stores deterministic random state, active runs, task progress, inventory, recruitment, upgrades, and reports. Explicit import requires a review/replace step. Unsupported future versions fail clearly. A minimal legacy v0 migration is exercised by fixtures; no historical player saves exist yet.
+R1–R4 replace the 0.1 fixed-day dashboard behavior. Earlier phase entries describe the historical build workflow, not current mechanics.
+
+## Current working defaults
+
+Three stats: Might, Agility, Focus. Three starting members, five roster places, two concurrent expeditions. Epoch 01/01/0001 with 30-day months, 12-month years and 24-hour days; 1× realtime, 5×/20× test speeds. Hidden/closed game pauses; no offline catch-up.
+
+Per-member outing: one dungeon queue entry, personal cap snapshotted, global cap live at floor boundaries, 300-second recall ward, 12-second reset, continuous dispatch retries in roster order. Stats refill on departure. Gear charged once per outing, regenerates continuously, no refunds yet. Queue cycles on return; active assignments survive future queue edits.
+
+Floor scaling, carried loot, growth timing and result precedence are documented in 04-dungeons-and-expeditions.md; scheduling in 06; interface in 10. Recruitment, infrastructure and upgrades work while time runs. Save v2 includes personal cooldowns, carried rewards, global depth caps and pinned resources. Migrating old runs applies earned training and returns the member without regranting old banked rewards.
+
+Traits, skill tree, failure loot penalties, stat-driven reset and returned supplies are future scope, not current implementation. All numerical balance values remain provisional.
 
 ## Completion discipline
 

@@ -1,4 +1,40 @@
-# Baseline Test Report
+# Redesign Test Report — 0.2
+
+November 5, 2026. Current results supersede the historical fixed-day baseline below.
+
+## Current checks
+
+- `npm test`: **37 passed, 0 failed**.
+- `npm run build`: TypeScript and Vite production build succeeded.
+- Continuous main-game scenario: 3,747 game seconds, 245 floor clears, 206 member returns, four recruited members, guild upgrades and 2,280 gold. This is deterministic test evidence, not a balance recommendation.
+
+| Functional group | Cases and observations | Result |
+|---|---|---|
+| Calendar | 24-hour day; month/year rollover; midnight preserves active outing; immutable deterministic stepping | Passed |
+| Bottomless dungeons | Increasing floor costs/time/rewards; personal/global cap precedence; unlimited cap; cap edits at boundaries | Passed |
+| Resolution | Carried loot banks once on return; exact-zero retreat; no incomplete-floor reward; training retained from earlier tasks; timer/success/lethal precedence | Passed |
+| Scheduling | Roster order, gear skips/retries, independent resets, mid-day capacity reuse, queue cycling and active snapshot | Passed |
+| Growth/progression | Affinity clamp and tier averages; recruitment, capacity, priorities and all infrastructure effects | Passed |
+| Save v2 | Mid-outing deterministic roundtrip; carried loot, caps/cooldowns/pins validated; corrupt data rejected; backup recovery; v0/v1 conversion without duplicate rewards | Passed |
+| Desktop browser | Game-first 2:8:2 layout visually inspected; Guild/Members/Activities/Resources/Info; internal duty placeholder; global cap 2 versus personal cap 3 returns at floor 2 | Passed |
+| Status/pins/queues | Dungeon list sorted by return ETA; member selection; queue reorder/personal depth; collapse/re-expand active list; pin Heartwood and persist after reload | Passed |
+| Main-game browser | Existing prototype save migrated; live play produced multiple returns, floor 2 completion, stat growth, individual resets and next-queue departures | Passed |
+| Browser save files | Exported v2 active save, imported it, confirmed replacement, reloaded; same clock 00:02:06, active task, queue/caps and pins restored | Passed |
+| Console | No observed game-source exceptions. Browser extension emitted unrelated metadata errors | Passed with external noise |
+
+## Source delivery status
+
+Implementation is tested in the workspace. Maya explicitly approved pushing the redesign to the public GitHub main branch on November 5, 2026. This report accompanies the redesign source commit. No production deployment has been completed.
+
+## Limits and next checks
+
+Actual mobile/touch-device and full keyboard-only acceptance remain open. Responsive CSS is implemented, not evidence of device validation. No Vercel deployment or production URL has been verified. The calendar epoch, floor scaling, 300s warp, 12s reset and economy remain provisional. Skill tree, traits, failure penalties and Gear/Supplies refunds are documented future scope.
+
+## Historical 0.1 report
+
+The following describes the previous implementation only. Its 60-second day, 35-second warp, daily routes and visual dashboard have been replaced.
+
+### Baseline Test Report
 
 November 5, 2026. First playable baseline, version 0.1.0.
 

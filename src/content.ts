@@ -22,9 +22,10 @@ export const DUNGEONS: Dungeon[] = [
  ], loot: [{ id: 'ore', name: 'Ember ore', weight: 8 }, { id: 'crystal', name: 'Sun crystal', weight: 2 }] }
 ];
 export const dungeonById = (id: string) => DUNGEONS.find(d => d.id === id)!;
-export const DAY_SECONDS = 60;
-export const WARP_SECONDS = 35;
-export const VERSION = 1;
+export const DAY_SECONDS = 86400;
+export const WARP_SECONDS = 300;
+export const RESET_SECONDS = 12;
+export const VERSION = 2;
 export type Upgrade = 'slots' | 'quarters' | 'gear' | 'regen';
 export const UPGRADE_INFO: Record<Upgrade, { name: string; description: string; gold: number; materials: number }> = {
  slots: { name: 'Expedition desk', description: '+1 simultaneous expedition', gold: 24, materials: 2 },

@@ -1,47 +1,24 @@
 # Guild Loops Idle
 
-A local-first incremental guild game. Recruit distinctive adventurers, order their dungeon queues, and help them return stronger each day.
+Game-focused guild management incremental built in React, TypeScript and Vite. Continuous fictional time; distinctive members; bottomless dungeon outings with global/personal depth caps; individual recovery; guild upgrades and player-owned saves.
 
-## Run locally
-
-Requires Node.js 24 (the test suite uses native TypeScript stripping).
+## Run
 
 ```sh
 npm ci
 npm run dev
-```
-
-```sh
 npm test
 npm run build
 ```
 
-Production output is `dist/`. Deploy on Vercel using the Vite preset, build command `npm run build`, and output directory `dist`. No environment variables, database, or account system is required.
+The desktop interface uses 2:8:2 columns: collapsible live status, central functional tabs, and an event log. Guild, Members, Activities, Resources and Info contain the game controls. The in-game Help explains current working rules.
 
-## Playable baseline
+## Saves
 
-- Ordered daily member dispatch and simple dungeon queues with repeated entries.
-- Three stat pools per member, individual affinities, persistent training on return.
-- Three dungeons, task costs, timed recall, retreat, weighted loot, and gold.
-- Shared gear capacity/regeneration and simultaneous expedition slots.
-- Recruitment/infrastructure priorities, candidate recruitment, and guild upgrades.
-- Local autosaves, recovery snapshot, versioned JSON export/import, and safe replacement confirmation.
-- Pausing, 4× speed, optional automatic next day, and expedition reports.
+Local autosave plus versioned JSON export/import and backup recovery. Save schema v2 migrates v0/v1 without replaying already banked loot. Browser play is paused on reload and hidden/closed tabs do not accrue progress. No database/account required; optional sync is future work.
 
-The game pauses when hidden. No offline progress or cloud sync yet. Loot is collected in the storeroom; item spending/crafting is future work. Numeric balance and scheduling defaults are provisional; see the build plan.
+## Design and validation
 
-## Source structure
+See [docs/README.md](docs/README.md), the phased [build plan](docs/07-build-plan.md), [test report](docs/08-test-report.md), [interface requirements](docs/10-game-interface.md) and [next phase](docs/09-next-phase.md). Current balance values are provisional. Traits, penalized failures, returned supplies and the skill tree are documented future mechanics.
 
-| Path | Purpose |
-|---|---|
-| `src/content.ts` | Dungeon definitions and balance constants |
-| `src/engine.ts` | Seeded simulation and state transitions |
-| `src/persistence.ts` | Save validation, import/export, local backup |
-| `src/main.tsx` | React interface and browser timing |
-| `src/style.css` | Responsive guild dashboard |
-| `tests/` | Engine, save, and full-game integration cases |
-| `docs/` | Design, build plan, verification, next-phase backlog |
-
-`npm test` uses no database or browser and is deterministic. Browser acceptance steps are recorded separately in `docs/08-test-report.md`. GitHub Actions validates tests and the production build on pushes and pull requests.
-
-No license has been selected yet. Public repository visibility does not itself grant an open-source license.
+Vercel target: Vite build command `npm run build`, output `dist`. Hosting is not configured in this repo.

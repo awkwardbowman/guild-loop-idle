@@ -24,7 +24,7 @@ The guild is conceptually a persistent prestige layer. A later guild reset syste
 2. Recruit adventurers with semi-random stats and individual growth potential.
 3. Assign adventurers to dungeons, subject to guild support limits.
 4. Resolve dungeon tasks, consuming current stats and generating stat training based on the dungeon.
-5. Return through success, stat depletion, or the expedition's time limit.
+5. Descend bottomless floors to a personal/global stopping depth; return through success, stat depletion, recall, or the expedition time limit.
 6. Carry stat growth into the next run; successful dungeon runs return random loot from that dungeon's pool.
 7. Improve the guild and refine assignments to sustain more adventurers and tackle harder content.
 
@@ -38,4 +38,4 @@ The guild is conceptually a persistent prestige layer. A later guild reset syste
 
 ## Not yet specified
 
-Exact controls for expedition plans, repeat automation, offline progression, run duration, stat names, dungeon structure, and the broader content progression remain open. The game is inspired by a reference game's loop concept; it does not yet inherit that game's specific systems.
+The current tabbed interface is specified in 10-game-interface.md; bottomless dungeons in 04-dungeons-and-expeditions.md and queue execution in 06-queues-and-assignment.md. Final balance, offline progression and broader content progression remain open. The game is inspired by a reference game's loop concept; it does not yet inherit that game's specific systems.

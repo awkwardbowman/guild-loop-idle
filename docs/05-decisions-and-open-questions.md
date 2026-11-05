@@ -20,7 +20,7 @@ Updated November 5, 2026. Source: the initial game-design conversation with Maya
 | D12 | Agreed | Successful dungeon runs return random loot from that dungeon's pool |
 | D13 | Future | Guild-master upgrades improve affinity; additive bonuses are a possible approach |
 | D14 | Agreed | Maintain requirements and mechanics in Markdown in the Guild Loops Idle Drive folder |
-| D15 | Agreed | Initial setup includes an ordered guild-member queue; dispatch considers members in that order at the start of a day |
+| D15 | Revised | Ordered guild-member priority remains; the continuous-time prototype now retries dispatch as members/support become available |
 | D16 | Future | Dungeon assignment preferences can specify minimum/maximum Stat Affinity thresholds and skip members who do not match |
 | D17 | Agreed | Initial functionality needs both guild-member dispatch order and a bare-bones dungeon queue per adventurer |
 | D18 | Agreed | Keep initial dungeon queues simple; defer affinity filters, thresholds, and advanced assignment rules |
@@ -28,10 +28,22 @@ Updated November 5, 2026. Source: the initial game-design conversation with Maya
 | D20 | Future | Cloud service may synchronize saves, but local play does not depend on it |
 | D21 | Agreed | Build in phases, write and validate test cases after functional groups, then playtest the main game and plan the next phase |
 
+| D22 | Agreed | Game-first 2:8:2 layout; collapsible left status, center functional tabs and right event log |
+| D23 | Agreed | Fictional continuous day/month/year and hour:minute:second clock; realtime speed available; final epoch TBD |
+| D24 | Agreed | Bottomless dungeons; global stopping depth and personal assignment depth both apply |
+| D25 | Agreed | Deeper floors cost more time/resources and offer larger rewards carried until surviving return |
+| D26 | Agreed | Independent member reset cooldown before redeployment; eventual stat likely controls duration |
+| D27 | Future | Penalized failure loses a percentage of loot, auto-warps and applies longer reset; retention stat/formula TBD |
+| D28 | Future | Early return may recover unused Gear/Supplies to accelerate departure |
+| D29 | Future | Traits determine member properties; Pampered may increase reset/gear needs with an undecided benefit |
+| D30 | Agreed | Guild, Members, Activities (Dungeons + TBD internal assignments), Resources and final Info tabs |
+
+The 0.1 visual design was rejected as too website-like. Replaced with a game-focused interface. Fixed dungeon completion, 60-second days and manual daily restart are superseded defaults. Current authoritative rules are in 04, 06, 07 and 10. Historical baseline tests remain historical, not proof of the redesign.
+
 ## Next design decisions
 
 1. Choose the initial stat list and what consuming each stat means.
-2. Define a dungeon's task structure, completion rule, stat costs, and training rewards.
+2. Tune bottomless-floor task structure, scaling curves, stat costs and training rewards; depth controls and current completion defaults are in 04.
 3. Decide training retention and any loot retention after retreat or timed warp.
 4. Define capacity and gear semantics: roster versus deployed limits, consumption, reservation, and regeneration.
 5. Define execution details for the approved member dispatch queue and per-adventurer dungeon queues. Dungeon queue ordering is required; advancement, restart/resume, repeat settings, and recall remain open.

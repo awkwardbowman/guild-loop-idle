@@ -9,7 +9,7 @@ const memberQueue:StoryLocation={tab:'Members',label:'Members → select a membe
 const dungeonCatalog:StoryLocation={tab:'Activities',label:'Activities → Dungeons'};
 const skills:StoryLocation={tab:'Members',label:'Members → select a member → Skills and Attribute specializations'};
 const EVENT_TEXT:Record<EventId,{title:string;description:string;locations:StoryLocation[]}>= {
- guild_founded:{title:'The guild is established',description:'Your guild is ready for its first recruits.',locations:[{tab:'Guild',label:'Guild'},goalsLocation]},
+ guild_founded:{title:'The guild is established',description:'The guild has opened its doors. Your first member is waiting to join you.',locations:[{tab:'Guild',label:'Guild'},goalsLocation]},
  recruitment_opened:{title:'Recruitment is open',description:'The guild can now search for candidates. Resume time to advance recruitment, then review each applicant.',locations:[{tab:'Guild',label:'Guild → Guild priorities → Recruitment'},{tab:'Guild',label:'Guild → Recruitment'}]},
  first_member_recruited:{title:'Your first member joins',description:'Member management is now available. Review their stats and plan their dungeon queue. A new expedition goal is available.',locations:[{tab:'Members',label:'Members → select a member'},goalsLocation]},
  trail_discovered:{title:'Briarwood Trail is discovered',description:'Your members can now explore the trail. Choose it in a member’s dungeon queue; adjust the global depth limit in Activities.',locations:[memberQueue,dungeonCatalog]},
@@ -24,7 +24,6 @@ const EVENT_TEXT:Record<EventId,{title:string;description:string;locations:Story
 export function currentGoals(p:Progression):StoryGoal[]{
  const goals:StoryGoal[]=availableStoryActions(p).map(a=>({id:a.id,title:a.title,description:a.description,action:a.id,location:goalsLocation}));
  if(hasEvent(p,'legacy_access'))return goals;
- if(hasEvent(p,'recruitment_opened')&&!hasEvent(p,'first_member_recruited'))goals.push({id:'recruit_member',title:'Recruit your first member',description:'Keep Recruitment selected in Guild priorities and resume time. Once a candidate arrives, recruit them from the Recruitment panel.',location:{tab:'Guild',label:'Guild → Recruitment'}});
  if(hasEvent(p,'trail_discovered')&&!hasEvent(p,'first_floor_cleared'))goals.push({id:'clear_trail',title:'Clear your first dungeon floor',description:'Assign Briarwood Trail in a member’s dungeon queue and resume time. A personal max depth of 1 brings them home after the first floor.',location:memberQueue});
  if(hasEvent(p,'first_floor_cleared')&&!hasEvent(p,'first_return'))goals.push({id:'return_home',title:'Bring an expedition home',description:'Let a member reach their stopping depth, or use Recall safely to bring them back with their earned loot.',location:{tab:'Members',label:'Members → select an active member → Recall safely'}});
  if(hasEvent(p,'archive_discovered')&&!hasEvent(p,'archive_floor_cleared'))goals.push({id:'clear_archive',title:'Clear an archive floor',description:'Assign Whispering Archive in a member’s dungeon queue. Complete the trap-room checks to clear a floor; members improve through repeated outings.',location:memberQueue});

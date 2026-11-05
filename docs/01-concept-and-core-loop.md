@@ -39,3 +39,22 @@ The guild is conceptually a persistent prestige layer. A later guild reset syste
 ## Not yet specified
 
 The current tabbed interface is specified in 10-game-interface.md; bottomless dungeons in 04-dungeons-and-expeditions.md and queue execution in 06-queues-and-assignment.md. Final balance, offline progression and broader content progression remain open. The game is inspired by a reference game's loop concept; it does not yet inherit that game's specific systems.
+
+## Grounded opening — Current direction
+
+You grew up watching adventurers and wanted to be part of that world. You are not an adventurer yourself, but you believe you can build and lead a guild. One friend shares the idea and becomes its first adventurer. The initial ambition is to make this small guild work and grow it.
+
+The earlier reincarnation/demon-king premise was considered and rejected. Do not introduce a chosen-one destiny, hidden personal powers, a world-saving obligation or a catastrophic starting threat without a new design decision. The opening is optimistic and personal; not being an adventurer does not make the protagonist a failure.
+
+### Implemented first beats
+
+| Step | Story / action | Unlocked |
+|---|---|---|
+| Introduction | Establish the protagonist's interest in adventurers and the friend beside them | Only Story, with Current Goals and Plot |
+| Open the guild | Commit to starting together | Guild and utility Info |
+| Welcome your first member | The friend joins as the guaranteed first member | Members |
+| Prepare to grow | Open ordinary recruitment and discover the first manageable expedition | Existing recruitment / first-dungeon systems |
+
+The friend is temporarily named “Your friend”; no final name, gender, backstory, class, unique trait or authored stat profile is established. Current stats use the prototype seeded recruit generator. The first dungeon remains the prototype trail; names, the exact first job, narrative copy and later opening beats remain open. A newly joined friend has no queued dungeon until discovery, preventing spoilers before the feature unlock.
+
+Existing saves keep established guilds and rosters; they are not reset or given a second founding friend. Opening actions and the friend grant are one-time events. Clock/work cannot start before the guild opens. Save loading remains available from the Story-only screen.

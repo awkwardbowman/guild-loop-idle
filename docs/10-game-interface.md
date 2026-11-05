@@ -44,7 +44,7 @@ These are provisional, not final game balance: 30-day months, 12-month years, ep
 
 ## 0.3 progression visibility
 
-00 Story is the first main tab, with only unlocked story threads shown. Fresh saves expose Story, Guild and the utility Info tab; no roster, dungeons or resources are pre-unlocked. Guild starts with a Begin your story control. Story opens recruitment; accepting the first member reveals Members and the Expeditions story thread; discovering the trail reveals Activities; returning reveals Resources and Infrastructure. Later milestones offer the archive and ridge. These actions are functional placeholders, not final narrative writing.
+00 Story is the first main tab, with only unlocked story threads shown. Fresh saves now expose only Story; Guild and utility Info unlock after Open the guild, and Members unlocks when the friend joins. Dungeons and resources stay locked. Guild starts with a Begin your story control. Story opens recruitment; accepting the first member reveals Members and the Expeditions story thread; discovering the trail reveals Activities; returning reveals Resources and Infrastructure. Later milestones offer the archive and ridge. These actions are functional placeholders, not final narrative writing.
 
 Members gains skill levels/practice and specialization values/potential after the skills feature becomes available. Dungeon details match the active route rules. Skill-based expedition time is an estimate, shown with ~, because random failures and cooldowns prevent an exact return prediction. Legacy task routes retain exact estimates.
 
@@ -59,3 +59,7 @@ Story now has two fixed top-level subtabs:
 This replaces the previous Guild/Expeditions Story thread selector. Future content threads can be grouped within these two views. Plot is derived from saved progression facts, not the bounded live event log, so old milestones remain after the log rolls over. Uncompleted future milestones stay hidden. No new save fields or migration are needed. Existing migrated guilds show their retained access without inventing historical completion events.
 
 Source: src/story.ts provides goal/history projections and location metadata; StoryPanel.tsx renders the views.
+
+## Story-only opening gates
+
+Fresh launch and reload select Story. Before founding, no other main tab is rendered, the clock controls are disabled, no guild work runs, and Plot has an introductory empty state. Load a save remains a utility control rather than another tab. Opening reveals Guild/Info; welcoming the guaranteed friend reveals Members. Recruitment now looks for additional adventurers, after the friend has joined. Dungeon queues remain empty until discovery; add controls are disabled when no dungeon is unlocked.\n

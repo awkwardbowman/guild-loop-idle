@@ -10,3 +10,7 @@ November 5, 2026. Implemented functional preparation is described in 11-progress
 6. Validate mobile/touch and keyboard-only flows; then review release to the hosted game.
 
 Future design: disuse decay (metadata exists; disabled), traits, stat-driven reset, guildmaster skill tree/limited affinity improvements, Gear/Supplies refunds, resource-conversion gear, punitive failure loot-loss, internal duties, offline progress and optional cloud sync.
+
+## Immediate narrative work
+
+Use the grounded two-friends premise in 01-concept-and-core-loop.md. Next choose the friend's identity, the first modest job and the next few concrete guild-building goals. The live opening now begins with Story only; opening the guild and welcoming the friend unlock management progressively. No final narrative or unique friend build is fixed yet.\n

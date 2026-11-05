@@ -14,9 +14,9 @@ Temporary opening sequence:
 
 | Fact/action | Result |
 |---|---|
-| Guild founded | Story (00), Guild and utility Info visible; no starting roster |
-| Open recruitment | Recruitment work enabled |
-| Accept first recruit | Members and Expeditions story thread available |
+| No completed events | Story only; no roster, hidden tabs or running clock |\n| Open the guild | Guild and utility Info become available |
+| Welcome your friend | Guaranteed first member; Members available |\n| Open recruitment | Recruitment work enabled for additional members |
+| Founding friend joined | First expedition goal available under Current Goals |
 | Survey outskirts | Activities and Briarwood Trail available |
 | Return from first outing | Resources and Infrastructure available |
 | Clear first floor, investigate archive | Archive, member skill display and archive trap checks available |
@@ -102,3 +102,7 @@ Story now has two fixed top-level subtabs:
 This replaces the previous Guild/Expeditions Story thread selector. Future content threads can be grouped within these two views. Plot is derived from saved progression facts, not the bounded live event log, so old milestones remain after the log rolls over. Uncompleted future milestones stay hidden. No new save fields or migration are needed. Existing migrated guilds show their retained access without inventing historical completion events.
 
 Source: src/story.ts provides goal/history projections and location metadata; StoryPanel.tsx renders the views.
+
+## Opening revision
+
+The grounded premise and opening gates are authoritative in 01-concept-and-core-loop.md. A fresh progression object has no completed events. Existing v3 saves with an established guild retain access. The friend grant is a guarded story action; normal applicants cannot become the first member in a fresh game. No schema fields changed. Unfounded state must contain no members, candidate or active runs and must remain in planning.\n

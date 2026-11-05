@@ -1,3 +1,13 @@
+# Story-only Opening Validation
+
+November 5, 2026. Current suite: **70 tests passed, 0 failed**. Production build passed.
+
+Verified one-time founding and guaranteed first-friend recruitment, Story-only visibility and persistence, blocked clock/work before founding, no premature normal recruiting, and no queued dungeon before discovery. Existing guild and legacy save regressions pass.
+
+Desktop browser: reset the disposable preview guild; reload showed Story as the only main tab, disabled time controls, an opening narrative and Load a save. Open the guild revealed Guild/Info and the welcome-friend goal; welcoming the friend revealed Members with a single member named Your friend. This is a temporary display name. Final opening copy, friend identity/stats and first job remain open.
+
+## Earlier Story-tab validation
+
 # Story Subtabs Validation
 
 November 5, 2026. Current change: Story now separates Current Goals from Plot.

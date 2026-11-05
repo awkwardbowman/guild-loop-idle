@@ -49,3 +49,13 @@ These are provisional, not final game balance: 30-day months, 12-month years, ep
 Members gains skill levels/practice and specialization values/potential after the skills feature becomes available. Dungeon details match the active route rules. Skill-based expedition time is an estimate, shown with ~, because random failures and cooldowns prevent an exact return prediction. Legacy task routes retain exact estimates.
 
 Existing saves keep their former features through a migration event. Story → Guild offers Train for trap rooms to enable the check system for future archive outings; already active routes continue under their saved rules. No reset is required.
+
+## Story subtabs — Current Goals and Plot
+
+Story now has two fixed top-level subtabs:
+1. **Current Goals** shows actionable unlocks and ongoing goals (recruit a member, clear a floor, return home, clear the archive). Every goal states where to act. Completed goals leave the current list.
+2. **Plot** is the durable chronological account of completed milestones and unlocks. Each entry shows the saved day/time, what changed, exact tab/panel locations and buttons to open the relevant main tab. Story destinations open Current Goals; Activities destinations open Dungeons.
+
+This replaces the previous Guild/Expeditions Story thread selector. Future content threads can be grouped within these two views. Plot is derived from saved progression facts, not the bounded live event log, so old milestones remain after the log rolls over. Uncompleted future milestones stay hidden. No new save fields or migration are needed. Existing migrated guilds show their retained access without inventing historical completion events.
+
+Source: src/story.ts provides goal/history projections and location metadata; StoryPanel.tsx renders the views.

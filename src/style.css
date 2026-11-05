@@ -10,3 +10,5 @@
 .milestones{padding-left:0;list-style:none;color:#a4b29f;font-size:12px;line-height:2}.story-action button{margin-top:10px}.skill-detail{display:block;color:var(--muted);font-size:10px;margin-top:6px}.specialization{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:12px;padding:12px 0}.specialization>small{width:100%;color:var(--muted)}
 
 .room-heading{margin-top:20px}
+
+.story-location{font-size:11px;color:#b9c6d4}.plot-entry time{display:block;font-size:10px;color:var(--accent);margin-bottom:10px;font-variant-numeric:tabular-nums}.unlock-locations{margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}.unlock-locations>b{display:block;font-size:11px;color:#b6c7b9;margin-bottom:9px}.unlock-locations>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0}.unlock-locations span{font-size:11px;line-height:1.6;color:#a7b6c6}.unlock-locations button{font-size:10px;flex-shrink:0}@media(max-width:760px){.unlock-locations>div{align-items:flex-start;flex-direction:column;gap:6px}}

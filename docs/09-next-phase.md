@@ -2,7 +2,7 @@
 
 November 5, 2026. Implemented functional preparation is described in 11-progression-and-check-foundations.md; actual verification is in 08-test-report.md.
 
-1. Review the prepared branch and test the fresh-player opening. Existing saves retain access; Story → Guild → Train for trap rooms enables future archive checks without resetting.
+1. Review the prepared branch and test the fresh-player opening. Existing saves retain access; Story → Current Goals → Train for trap rooms enables future archive checks without resetting.
 2. Define real opening plot, event IDs and unlock beats. Current story actions are functional placeholders.
 3. Select core attribute pools and the first specialization branches. Existing Might/Agility/Focus map provisionally to Strength/Dexterity/Intelligence; Constitution and a complete D&D-like list are not silently established.
 4. Tune work, success, resource efficiency, practice thresholds, training and failure tables using the three-check archive. Current values are test defaults.

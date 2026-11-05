@@ -70,3 +70,13 @@ Still open: global versus stat-specific bonuses, whether bonuses affect existing
 Traits will determine or modify member stats and related properties. Example only: **Pampered** might increase reset time and gear requirements in exchange for an advantage elsewhere. The benefit is deliberately undecided. No trait list, rolls, numerical modifiers, interactions, or balance is approved yet; traits are documented only, not applied in the prototype.
 
 The current implementation uses completed-task training, accumulated until return and evaluated against the starting maximum, nonnegative gain clamped to affinity. Failed/partial tasks award no training; earlier completed training is retained on retreat. These are working defaults pending tuning. See 04-dungeons-and-expeditions.md.
+
+## Attribute and skill foundation — Agreed direction, prepared in 0.3
+
+Core attributes are expendable resource pools with member-specific growth potential. Specializations are capabilities beneath those attributes, not extra resource bars. Finger Dexterity spends the underlying Dexterity pool. Multiple contributing core attributes each pay their part of a check's cost. No mandatory Physical grouping is established; the final root attribute list and tree are still open.
+
+Learned skills are a separate tree/catalog, all capped at level 99. Lock Picking uses 75% Finger Dexterity and 25% Intelligence in the sample definition. Specialization fallback extends through ancestors, retaining less contribution at each step, without counting the same capability repeatedly. Each check can configure speed, success and resource efficiency separately, with different contributing skills/ratios. Intelligence-heavy speed and dexterity-heavy success are intentionally supported.
+
+Skill deterioration through disuse is future agreed direction. Save records include last-used timestamps; decay is disabled. Grace period, rate, retained minimum and recovery remain undecided. Attribute affinity improvements stay limited/future, not a routine skill reward.
+
+The technical contract, provisional formulas, sample progression and save v3 behavior are in 11-progression-and-check-foundations.md. These do not finalize the complete attribute tree or balance.

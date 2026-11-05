@@ -13,9 +13,13 @@ npm run build
 
 The desktop interface uses 2:8:2 columns: collapsible live status, central functional tabs, and an event log. Guild, Members, Activities, Resources and Info contain the game controls. The in-game Help explains current working rules.
 
+## Progression and checks
+
+New guilds open with Story, Guild and Info, then unlock features through saved events. Members have capped learned skills and attribute specializations; the archive demonstrates notice → locate trigger → disarm with separate speed, success and resource-efficiency channels. Failed costs cause return. Temporary formulas and extension points are documented in [the foundation contract](docs/11-progression-and-check-foundations.md).
+
 ## Saves
 
-Local autosave plus versioned JSON export/import and backup recovery. Save schema v2 migrates v0/v1 without replaying already banked loot. Browser play is paused on reload and hidden/closed tabs do not accrue progress. No database/account required; optional sync is future work.
+Local autosave plus versioned JSON export/import and backup recovery. Save schema v3 migrates v0/v1/v2, preserving existing access, rosters and active task outings. Existing guilds can enable skill-based future archive expeditions from Story → Guild → Train for trap rooms. Browser play is paused on reload and hidden/closed tabs do not accrue progress. No database/account required; optional sync is future work.
 
 ## Design and validation
 

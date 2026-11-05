@@ -43,3 +43,15 @@ Traits, skill tree, failure loot penalties, stat-driven reset and returned suppl
 ## Completion discipline
 
 Do not mark tests passed until run. Keep regression cases for discovered failures. Record commands and results in 08-test-report.md. Save working design additions in the existing Drive folder and include a source copy under docs/. Keep the code and test suite in GitHub. If hosting or browser verification is unavailable, report the specific limitation rather than claiming completion.
+
+## Phase F — Progression and check-system preparation
+
+| Group | Build | Gate |
+|---|---|---|
+| F1 | Durable event registry and derived visibility; opening Story threads and guarded unlock actions | Fresh save starts without a roster; hidden recruitment/dungeons do not execute; prerequisites and repeat clicks are safe |
+| F2 | Member skill profiles, extensible attribute ancestry and root resource mapping | Deep fallback and no double-counting; no child resource bars; level 99 clamp |
+| F3 | Independent speed/success/efficiency, work accumulation and configurable failure tables | Charge every required pool, return on insufficient cost, no free progress/RNG/reward; retry/cooldown/alternate/injury/loss outcomes |
+| F4 | Archive sample room integration and save v3 | All three checks required for floor loot; pending specialization training applies on return; seed/cooldown restores exactly; old outings retain rules |
+| F5 | Whole-game and desktop browser validation; record open design decisions | Automated opening-to-later-content scenario and browser playtest; no claim of final plot/balance or mobile coverage |
+
+Temporary values and authoring contracts are in 11-progression-and-check-foundations.md. Prepare as a draft review branch before updating the live game.

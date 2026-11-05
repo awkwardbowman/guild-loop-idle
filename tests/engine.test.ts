@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {initialGame,startDay,advance,growth,setQueue,setDungeonLimit,moveMember,changePriority,acceptCandidate,buyUpgrade,recruit,recall,toggleMember,togglePin,returnETA,calendar,taskDuration} from '../src/engine.ts';
+import {sandboxGame as initialGame,startDay,advance,growth,setQueue,setDungeonLimit,moveMember,changePriority,acceptCandidate,buyUpgrade,recruit,recall,toggleMember,togglePin,returnETA,calendar,taskDuration} from '../src/engine.ts';
 import {STATS,DUNGEONS} from '../src/content.ts';
 function solo(depth:number|null=1){const g=initialGame();for(const m of g.members)m.enabled=false;g.members[0].enabled=true;g.members[0].queue=[{dungeonId:'wood',maxDepth:depth}];for(const s of STATS)g.members[0].stats[s].current=g.members[0].stats[s].max=50;return g;}
 test('C01 calendar has 24 hour days, month/year rollover, no real clock coupling',()=>{assert.deepEqual(calendar(1,3661),{date:'01 / 01 / 0001',time:'01:01:01'});assert.equal(calendar(31,0).date,'01 / 02 / 0001');assert.equal(calendar(361,0).date,'01 / 01 / 0002');let g=startDay(solo(3));g.elapsed=86395;g=advance(g,5);assert.equal(g.day,2);assert.equal(g.elapsed,0);assert.equal(g.active[0].elapsed,5);});

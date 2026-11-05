@@ -38,6 +38,9 @@ Updated November 5, 2026. Source: the initial game-design conversation with Maya
 | D29 | Future | Traits determine member properties; Pampered may increase reset/gear needs with an undecided benefit |
 | D30 | Agreed | Guild, Members, Activities (Dungeons + TBD internal assignments), Resources and final Info tabs |
 
+| D31 | Agreed | Upcoming skill checks force return when required resources are exhausted or insufficient to pay the next cost; no unpaid progress or success reward |
+| D32 | Future | Gear may convert resources inside dungeons, potentially based on affinities; no conversion initially |
+
 The 0.1 visual design was rejected as too website-like. Replaced with a game-focused interface. Fixed dungeon completion, 60-second days and manual daily restart are superseded defaults. Current authoritative rules are in 04, 06, 07 and 10. Historical baseline tests remain historical, not proof of the redesign.
 
 ## Next design decisions
@@ -66,7 +69,7 @@ A useful candidate vertical slice would exercise recruitment, ordered daily memb
 
 - Baseline implementation: React, TypeScript, and Vite; local automatic saves plus versioned JSON import/export.
 - Source repository: awkwardbowman/guild-loop-idle.
-- Vercel is the intended deployment target. Hosting has not yet been configured.
+- Maya reported deployment at https://guild-loop-idle.vercel.app/ on November 5, 2026. Hosted gameplay has not yet been independently verified.
 - No account, database, or server is required for local play. Convex is deferred to optional cloud sync.
 - Phased implementation defaults are recorded in 07-build-plan.md. These resolve open questions provisionally; the earlier topic files preserve the distinction between approved requirements and permanent undecided rules.
 - Verification results are in 08-test-report.md; next steps are in 09-next-phase.md.
@@ -80,3 +83,18 @@ These are review considerations, not additional approved mechanics:
 - Specify growth rounding and boundary behavior before implementing the formula.
 - Resolve simultaneous completion, retreat, and timeout deterministically.
 - Preserve accrued progress through save/load and repeated return processing once persistence is implemented.
+
+## Progression and skills — November 5, 2026
+
+| ID | Status | Decision |
+|---|---|---|
+| D33 | Agreed | Save completed events as durable facts; derive feature visibility from them |
+| D34 | Agreed | New players begin with the guild; add 00 Story with feature/content threads appearing as unlocked |
+| D35 | Agreed | Core attributes are pools; specializations consume their underlying root pool, not a child pool |
+| D36 | Agreed | Specialization fallback extends through ancestry with diminishing contribution |
+| D37 | Agreed | Learned skills have a universal level cap of 99 and determine effective resource use |
+| D38 | Agreed | Check speed, success and efficiency can use different skills or ratios |
+| D39 | Future | Skills can deteriorate from disuse; decay parameters undecided |
+| D40 | Working defaults | 0.3 supplies a small unlock chain, three sample skills and an archive trap room for testing; plot and final balance remain open |
+
+Functional preparation is implemented and tested. See 11-progression-and-check-foundations.md for technical contracts and 08-test-report.md for actual checks. Source is prepared for a review branch, not a production rollout.

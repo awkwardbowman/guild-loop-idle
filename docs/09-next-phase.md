@@ -1,24 +1,12 @@
-# Next Phase
+# Next Phase — After 0.3 Foundations
 
-Updated November 5, 2026 after Maya requested a game-focused redesign. The old dashboard/60-second-day pacing plan is superseded.
+November 5, 2026. Implemented functional preparation is described in 11-progression-and-check-foundations.md; actual verification is in 08-test-report.md.
 
-## Current priorities
+1. Review the prepared branch and test the fresh-player opening. Existing saves retain access; Story → Guild → Train for trap rooms enables future archive checks without resetting.
+2. Define real opening plot, event IDs and unlock beats. Current story actions are functional placeholders.
+3. Select core attribute pools and the first specialization branches. Existing Might/Agility/Focus map provisionally to Strength/Dexterity/Intelligence; Constitution and a complete D&D-like list are not silently established.
+4. Tune work, success, resource efficiency, practice thresholds, training and failure tables using the three-check archive. Current values are test defaults.
+5. Expand the skill/check catalog and room alternatives with content validation and save migrations.
+6. Validate mobile/touch and keyboard-only flows; then review release to the hosted game.
 
-1. Maya playtest of the 2:8:2 game layout and continuous dungeon/reset loop. Validate whether density, status and queues suit actual play.
-2. Real mobile/touch-device validation and keyboard navigation, especially narrow queue/depth editors. Desktop browser verification is recorded in 08.
-3. Vercel deployment when its connection is available; no database needed.
-4. Decide how dungeon loot feeds guild progression. Inventory currently accumulates with no crafting sink.
-5. Tune floor time/cost/reward scaling, initial member stats, gear throughput and cooldowns from observed play. Current numbers are placeholders.
-
-## Future groups requiring design first
-
-- Failure: trigger, lost-loot percentage/retention stat and longer-reset formula.
-- Gear/Supplies returned on early successful completion: reservation/consumption/refund accounting.
-- Traits: influence stats and properties; Pampered example recorded in 02, benefit unspecified.
-- Member reset stat and guildmaster affinity skill tree.
-- Internal assignment/training activities.
-- Dungeon discovery/unlocks, rating semantics and floor activity variation.
-- Affinity assignment filters and queue fairness under scarce supplies.
-- Optional cloud sync and offline simulation, separately designed. Local saves remain complete.
-
-For each group: build → write meaningful test cases → validate and fix → play main game → update reports and next steps.
+Future design: disuse decay (metadata exists; disabled), traits, stat-driven reset, guildmaster skill tree/limited affinity improvements, Gear/Supplies refunds, resource-conversion gear, punitive failure loot-loss, internal duties, offline progress and optional cloud sync.

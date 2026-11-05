@@ -1,0 +1,70 @@
+# Decisions and Open Questions
+
+Updated November 5, 2026. Source: the initial game-design conversation with Maya on this date.
+
+## Decision log
+
+| ID | Status | Decision |
+|---|---|---|
+| D01 | Agreed | Browser incremental game about managing a guild, inspired by Idle Loops |
+| D02 | Agreed | Adventurers perform the loops; the guild master persists and does not reset initially |
+| D03 | Agreed | Guild-master priorities include recruitment and infrastructure |
+| D04 | Agreed | Recruits have semi-random stats and should be distinctive |
+| D05 | Agreed | Guild capacity, gear capacity, and gear regeneration gate simultaneous expeditions |
+| D06 | Agreed | Dungeons differ in resource requirements and have individual loot pools |
+| D07 | Agreed | Any current stat reaching zero forces retreat; each run also has a timed warp home |
+| D08 | Agreed | Dungeon tasks determine stat training, growing maximums for subsequent runs |
+| D09 | Agreed | Each stat has Current Value, Max Value, and Stat Affinity |
+| D10 | Agreed | Higher adventurer tiers have higher average affinities |
+| D11 | Working model | Growth scales with dungeon training and the normalized gap between Max Value and Affinity |
+| D12 | Agreed | Successful dungeon runs return random loot from that dungeon's pool |
+| D13 | Future | Guild-master upgrades improve affinity; additive bonuses are a possible approach |
+| D14 | Agreed | Maintain requirements and mechanics in Markdown in the Guild Loops Idle Drive folder |
+| D15 | Agreed | Initial setup includes an ordered guild-member queue; dispatch considers members in that order at the start of a day |
+| D16 | Future | Dungeon assignment preferences can specify minimum/maximum Stat Affinity thresholds and skip members who do not match |
+| D17 | Agreed | Initial functionality needs both guild-member dispatch order and a bare-bones dungeon queue per adventurer |
+| D18 | Agreed | Keep initial dungeon queues simple; defer affinity filters, thresholds, and advanced assignment rules |
+| D19 | Agreed | Players own their saves: browser persistence and versioned export/import; no mandatory database |
+| D20 | Future | Cloud service may synchronize saves, but local play does not depend on it |
+| D21 | Agreed | Build in phases, write and validate test cases after functional groups, then playtest the main game and plan the next phase |
+
+## Next design decisions
+
+1. Choose the initial stat list and what consuming each stat means.
+2. Define a dungeon's task structure, completion rule, stat costs, and training rewards.
+3. Decide training retention and any loot retention after retreat or timed warp.
+4. Define capacity and gear semantics: roster versus deployed limits, consumption, reservation, and regeneration.
+5. Define execution details for the approved member dispatch queue and per-adventurer dungeon queues. Dungeon queue ordering is required; advancement, restart/resume, repeat settings, and recall remain open.
+   - Define day length, whether dispatches run concurrently, and whether returned members can redeploy during a day.
+   - Define behavior when a member cannot be equipped, and whether any skipped member is reconsidered later.
+   - For future affinity filters, define stat selection, base versus effective affinity, inclusive bounds, and dungeon fallback order.
+6. Define recruitment generation, tier distributions, and initial maximums relative to affinities.
+7. Decide how time, recovery, background progress, and offline progress work.
+8. Specify loot uses and the first guild upgrade costs.
+
+No immediate answers are required to preserve the current design. These are an agenda for future discussion, not blockers for documentation.
+
+## Proposed first playable prototype — Not yet approved
+
+An earlier assistant suggestion was one guild, three adventurer slots, one explorable region, and a small action set. Those counts and that content scope have not been accepted.
+
+A useful candidate vertical slice would exercise recruitment, ordered daily member dispatch, basic per-adventurer dungeon queues, support-limited deployment, dungeon stat consumption, retreat/success/warp, between-run stat growth, and dungeon-specific loot. Exact scope should be agreed before treating it as an implementation plan.
+
+## Technical state
+
+- Baseline implementation: React, TypeScript, and Vite; local automatic saves plus versioned JSON import/export.
+- Source repository: awkwardbowman/guild-loop-idle.
+- Vercel is the intended deployment target. Hosting has not yet been configured.
+- No account, database, or server is required for local play. Convex is deferred to optional cloud sync.
+- Phased implementation defaults are recorded in 07-build-plan.md. These resolve open questions provisionally; the earlier topic files preserve the distinction between approved requirements and permanent undecided rules.
+- Verification results are in 08-test-report.md; next steps are in 09-next-phase.md.
+
+## Balance and implementation cautions
+
+These are review considerations, not additional approved mechanics:
+
+- Avoid rewarding impossible-run spam more than meaningful dungeon progress unless intentional.
+- Preserve specialist identities as recruitment tiers increase.
+- Specify growth rounding and boundary behavior before implementing the formula.
+- Resolve simultaneous completion, retreat, and timeout deterministically.
+- Preserve accrued progress through save/load and repeated return processing once persistence is implemented.

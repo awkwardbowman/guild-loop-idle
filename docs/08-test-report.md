@@ -1,3 +1,25 @@
+# Story-only Opening Validation
+
+November 5, 2026. Current suite: **70 tests passed, 0 failed**. Production build passed.
+
+Verified one-time founding and guaranteed first-friend recruitment, Story-only visibility and persistence, blocked clock/work before founding, no premature normal recruiting, and no queued dungeon before discovery. Existing guild and legacy save regressions pass.
+
+Desktop browser: reset the disposable preview guild; reload showed Story as the only main tab, disabled time controls, an opening narrative and Load a save. Open the guild revealed Guild/Info and the welcome-friend goal; welcoming the friend revealed Members with a single member named Your friend. This is a temporary display name. Final opening copy, friend identity/stats and first job remain open.
+
+## Earlier Story-tab validation
+
+# Story Subtabs Validation
+
+November 5, 2026. Current change: Story now separates Current Goals from Plot.
+
+- Automated suite: **67 passed, 0 failed**, including six semantic story cases: fresh goals versus completed history, ongoing recruitment guidance, dungeon goal progression, chronological save-restored history, archive destinations without duplicate unlock entries, and migrated guilds.
+- Production build passed.
+- Desktop browser verified both subtabs, the available Survey the ridge goal, saved milestone times, chronological plot entries, unlock locations, and Go to Activities opening the dungeon catalog.
+- Plot uses saved progression facts rather than the live log. No gameplay balance, save schema or migration changed. Main-game regression scenarios continue to pass.
+- Mobile/touch remains unverified. This change is prepared on a review branch, not merged into production.
+
+## Earlier foundation validation
+
 # Foundation Test Report — 0.3
 
 November 5, 2026. Current preparation results; earlier 0.2 results follow as historical evidence.

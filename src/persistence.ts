@@ -27,13 +27,14 @@ export function validateGame(input: unknown): Game {
  const g = input as unknown as Game;
  requireValue(g.version === VERSION, 'unsupported format version');
  requireValue(integer(g.seed,0,4294967295) && integer(g.nextId,1) && integer(g.day,1) && integer(g.elapsed,0,DAY_SECONDS-1), 'clock or random state');
- requireValue(object(g.progression)&&object(g.progression.completed)&&Object.hasOwn(g.progression.completed,'guild_founded')&&Object.entries(g.progression.completed).every(([id,stamp])=>EVENT_IDS.includes(id as typeof EVENT_IDS[number])&&object(stamp)&&integer(stamp.day,1,g.day)&&integer(stamp.time,0,DAY_SECONDS-1)&&(stamp.day<g.day||stamp.time<=g.elapsed)), 'progression events');
+ requireValue(object(g.progression)&&object(g.progression.completed)&&(Object.keys(g.progression.completed).length===0||Object.hasOwn(g.progression.completed,'guild_founded'))&&Object.entries(g.progression.completed).every(([id,stamp])=>EVENT_IDS.includes(id as typeof EVENT_IDS[number])&&object(stamp)&&integer(stamp.day,1,g.day)&&integer(stamp.time,0,DAY_SECONDS-1)&&(stamp.day<g.day||stamp.time<=g.elapsed)), 'progression events');
  requireValue(g.phase === 'running' || g.phase === 'planning', 'phase');
  const v = g.guild; requireValue(object(v), 'guild');
  requireValue(integer(v.gold) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
  requireValue((v.priority==='recruitment'||v.priority==='infrastructure') && integer(v.work,0,19) && object(v.upgrades) && ['slots','quarters','gear','regen'].every(k=>integer((v.upgrades as Record<string,number>)[k],0,100)), 'guild work or upgrades');
  requireValue(Array.isArray(g.members) && g.members.length <= v.rosterCap, 'roster capacity'); g.members.forEach(validateMember);
  for(const m of [...g.members,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.skills).every(s=>s.lastUsedAt===null||s.lastUsedAt<=(g.day-1)*DAY_SECONDS+g.elapsed), 'future skill timestamp');
+ if(!Object.hasOwn(g.progression.completed,'guild_founded'))requireValue(g.members.length===0&&g.candidate===null&&g.active.length===0&&g.phase==='planning','unopened guild');
  const ids = g.members.map(m=>m.id); requireValue(new Set(ids).size === ids.length, 'duplicate members');
  if (g.candidate !== null) { validateMember(g.candidate); requireValue(!ids.includes(g.candidate.id), 'candidate already in roster'); ids.push(g.candidate.id); }
  requireValue(ids.every(id=>Number(id.split('-')[1])<g.nextId), 'next member ID');

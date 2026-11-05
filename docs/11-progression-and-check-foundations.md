@@ -14,9 +14,9 @@ Temporary opening sequence:
 
 | Fact/action | Result |
 |---|---|
-| Guild founded | Story (00), Guild and utility Info visible; no starting roster |
-| Open recruitment | Recruitment work enabled |
-| Accept first recruit | Members and Expeditions story thread available |
+| No completed events | Story only; no roster, hidden tabs or running clock |\n| Open the guild | Guild and utility Info become available |
+| Welcome your friend | Guaranteed first member; Members available |\n| Open recruitment | Recruitment work enabled for additional members |
+| Founding friend joined | First expedition goal available under Current Goals |
 | Survey outskirts | Activities and Briarwood Trail available |
 | Return from first outing | Resources and Infrastructure available |
 | Clear first floor, investigate archive | Archive, member skill display and archive trap checks available |
@@ -68,7 +68,7 @@ Room state saves check index, work, cooldown, attempts, status and last outcome.
 
 ## Live integration and compatibility
 
-Fresh games enable the trap route when the archive is discovered. Existing v0–v2 saves receive `legacy_access`, retaining formerly available content and rosters. Story → Guild → Train for trap rooms lets an existing guild enable the new archive route for future departures. Each active run snapshots its task/check rules; changing unlocks does not rewrite an in-progress route. No reset is required.
+Fresh games enable the trap route when the archive is discovered. Existing v0–v2 saves receive `legacy_access`, retaining formerly available content and rosters. Story → Current Goals → Train for trap rooms lets an existing guild enable the new archive route for future departures. Each active run snapshots its task/check rules; changing unlocks does not rewrite an in-progress route. No reset is required.
 
 Legacy task routes remain as the other sample dungeons. Check-room floors scale work, cost, damage and training with the existing linear floor multiplier. Their return estimates are marked ~; they are planning estimates, not predictions of random outcomes.
 
@@ -84,7 +84,7 @@ Version 3 adds progression facts, skill profiles, specialties, active room state
 | `src/skill-system.ts` | Attribute/skill/check definitions, validators, fallback, charging and room stepper |
 | `src/engine.ts` | Recruitment profiles, guarded actions, dungeon integration, seeded rolls, returns |
 | `src/persistence.ts` | v3 validation, historical migrations, export/import and backups |
-| `src/StoryPanel.tsx` | Unlocked story threads, actions and milestones |
+| `src/StoryPanel.tsx` | Current Goals and chronological Plot with unlock destinations |
 | `src/SkillPanel.tsx` | Skill practice and specialization display |
 | `src/DungeonPanel.tsx` | Dungeon details reflecting current route rules |
 | `tests/foundations.test.ts` | New progression, fallback, checks, migrations and whole-game cases |
@@ -92,3 +92,17 @@ Version 3 adds progression facts, skill profiles, specialties, active room state
 ## Next design work
 
 Choose real opening plot and content beats; final root pools and attribute tree; skill catalog/practice rates; scaling, cost and success formulas; affinity ceilings; decay; traits; gear conversion; failure penalties and resource refunds. Every addition should reuse definitions, include a save migration when needed, and pass a whole-game scenario before release.
+
+## Story subtabs — Current Goals and Plot
+
+Story now has two fixed top-level subtabs:
+1. **Current Goals** shows actionable unlocks and ongoing goals (recruit a member, clear a floor, return home, clear the archive). Every goal states where to act. Completed goals leave the current list.
+2. **Plot** is the durable chronological account of completed milestones and unlocks. Each entry shows the saved day/time, what changed, exact tab/panel locations and buttons to open the relevant main tab. Story destinations open Current Goals; Activities destinations open Dungeons.
+
+This replaces the previous Guild/Expeditions Story thread selector. Future content threads can be grouped within these two views. Plot is derived from saved progression facts, not the bounded live event log, so old milestones remain after the log rolls over. Uncompleted future milestones stay hidden. No new save fields or migration are needed. Existing migrated guilds show their retained access without inventing historical completion events.
+
+Source: src/story.ts provides goal/history projections and location metadata; StoryPanel.tsx renders the views.
+
+## Opening revision
+
+The grounded premise and opening gates are authoritative in 01-concept-and-core-loop.md. A fresh progression object has no completed events. Existing v3 saves with an established guild retain access. The friend grant is a guarded story action; normal applicants cannot become the first member in a fresh game. No schema fields changed. Unfounded state must contain no members, candidate or active runs and must remain in planning.\n

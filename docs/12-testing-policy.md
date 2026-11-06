@@ -1,5 +1,5 @@
 # Guild Loops — Risk-based test and release policy
-Updated 2026-11-06. Authoritative implementation: `test-policy.json`, `scripts/test-policy.mjs`, and `.github/workflows/validate.yml`.
+Updated 2026-11-06 (reconciled after gameplay PR #7 merge). Authoritative implementation: `test-policy.json`, `scripts/test-policy.mjs`, and `.github/workflows/validate.yml`.
 
 ## Principle
 Do not run every automated test after every small change. Select tests by blast radius, criticality, and release intent. A small high-risk change (save validation, reward integrity, central simulation) can merit the full suite; a large cosmetic change may need only smoke, UI checks and a production build. Never represent an unexecuted test as passing.
@@ -10,7 +10,7 @@ Do not run every automated test after every small change. Select tests by blast 
 - **P2 — Feature/content:** opening, progression unlocks, authored rooms, requests, reports, shops and other feature behavior. Run when content or behavior changes, or for content releases.
 - **P3 — Presentation:** sorting, UI details, filters and cosmetic affordances. Run relevant tests and verify the UI in browser when a visual change is made.
 
-The JSON catalog registers each test ID with a file-level default and P0 overrides. Cases can belong to multiple subsystem groups. The catalog currently describes the **134 cases on main (v0.4.0)**. New tests in an existing file inherit its default and produce a notice; new files default to P1/core and should be classified. CI change detection selects every case in a modified test file, including new cases. Keep stable IDs in test names (`D01`, `S04`, etc.). Three event-log tests were assigned `EL01`–`EL03`.
+The JSON catalog registers each test ID with a file-level default and P0 overrides. Cases can belong to multiple subsystem groups. The catalog currently describes **147 cases on main after the Endurance/Skills gameplay merge**, including 41 P0 cases and 12 smoke cases. New tests in an existing file inherit its default and produce a notice; new files default to P1/core and should be classified. CI change detection selects every case in a modified test file, including new cases. Keep stable IDs in test names (`D01`, `S04`, etc.). Three event-log tests were assigned `EL01`–`EL03`.
 
 ## Commands
 | Action | Command | Tests selected |

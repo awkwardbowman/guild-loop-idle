@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Guild Loops test catalog. Suite defaults plus explicit P0 overrides classify every registered case. New cases inherit suite defaults and must be reviewed.",
+  "description": "Guild Loops test catalog. Suite defaults plus explicit P0 overrides classify every registered case. Updated for the merged Endurance/Skills gameplay PR (147 tests).",
   "criticalIds": [
     "AT06",
     "AT07",
@@ -35,9 +35,14 @@
     "S09",
     "T06",
     "T08",
-    "WR03",
-    "WR04",
-    "WR09"
+    "WR09",
+    "SE05",
+    "SE06",
+    "SE07",
+    "SE10",
+    "SE13",
+    "SE14",
+    "SE18"
   ],
   "smokeIds": [
     "C02",
@@ -50,8 +55,8 @@
     "S02",
     "S04",
     "T06",
-    "WR03",
-    "WR04"
+    "SE05",
+    "SE18"
   ],
   "suites": {
     "tests/attributes.test.ts": {
@@ -305,16 +310,38 @@
         "economy"
       ],
       "ids": [
-        "WR01",
-        "WR02",
-        "WR03",
-        "WR04",
-        "WR05",
         "WR06",
         "WR07",
         "WR08",
         "WR09",
         "WR10"
+      ]
+    },
+    "tests/specialization-endurance.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks"
+      ],
+      "ids": [
+        "SE01",
+        "SE02",
+        "SE03",
+        "SE04",
+        "SE05",
+        "SE06",
+        "SE07",
+        "SE08",
+        "SE09",
+        "SE10",
+        "SE11",
+        "SE12",
+        "SE13",
+        "SE14",
+        "SE15",
+        "SE16",
+        "SE17",
+        "SE18"
       ]
     }
   },
@@ -597,6 +624,64 @@
     ],
     "T08": [
       "economy"
+    ],
+    "SE01": [
+      "attributes",
+      "ui"
+    ],
+    "SE02": [
+      "attributes"
+    ],
+    "SE03": [
+      "equipment"
+    ],
+    "SE04": [
+      "attributes"
+    ],
+    "SE05": [
+      "save"
+    ],
+    "SE06": [
+      "progression"
+    ],
+    "SE07": [
+      "save"
+    ],
+    "SE08": [
+      "content"
+    ],
+    "SE09": [
+      "content"
+    ],
+    "SE10": [
+      "save"
+    ],
+    "SE11": [
+      "guild"
+    ],
+    "SE12": [
+      "guild"
+    ],
+    "SE13": [
+      "save"
+    ],
+    "SE14": [
+      "save"
+    ],
+    "SE15": [
+      "integration",
+      "progression",
+      "content"
+    ],
+    "SE16": [
+      "attributes"
+    ],
+    "SE17": [
+      "guild",
+      "progression"
+    ],
+    "SE18": [
+      "save"
     ]
   }
 }

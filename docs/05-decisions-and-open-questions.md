@@ -1,3 +1,14 @@
+# Approved depth-limit simplification and room threshold behavior — Nov 6 2026
+
+- **Remove per-unit/per-assignment Depth Limit.** One shared limit per dungeon, with an **inheritable global default** (default Unlimited) and explicit local override (Unlimited or positive integer room count). Current v8 has both dungeon-wide `dungeonLimits` and per-member `queue[].maxDepth` / active `personalLimit`; only the new shared policy is authoritative once implemented. Do not merge inconsistent old member limits into a new group cap during migration.
+- Put **Depth Limit** and **Insufficient Skill Threshold** together in expanded dungeon settings; put their defaults in Guild → Settings → Dungeon Defaults. Inheritance follows live global changes; local overrides remain fixed. Existing depth limit room-boundary behavior stays, distinct from ten-room canonical floors for XP and ordinary recall.
+- **Agreed threshold behavior:** on entering each random room, compute member's effective weighted work rate as a percentage of the room's reference work rate. If below the configured percentage, let them try **30 game seconds**; incomplete → that room's failure mode. A quick completion continues. Proposed default 1%, 0% disables. This is a failure inside a floor, not a safe retreat. Prior preflight-only suggestion withdrawn.
+- **Independent manual recall:** request waits for a full ten-room floor boundary or its own 30-second stuck-run failsafe. Handle simultaneous timeout events once. Need to finalize exact penalties for recall timeout and room failure catalog; numeric floor scaling / reference speed remain balance decisions.
+
+This design is documented, NOT live in v8.
+
+---
+
 # Under discussion: insufficient skill auto-bail — November 6, 2026
 
 A configurable **Insufficient Skill Threshold** is requested for underqualified dungeon entrants. Proposal: **1% default, 0% off**, inherited global setting with per-dungeon overrides near depth limits. Compute ratio of actual member weighted effective work-per-second against an authored normal room reference work-per-second, NOT their personal affinity/potential. Clyde can deliberately struggle in a 90% Power/10% Finesse room; the small 0.01 fallback still produces low progress, and the actual ratio (not simply a missing Skill flag) decides whether he trips the threshold.

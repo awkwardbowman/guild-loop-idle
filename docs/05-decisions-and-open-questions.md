@@ -1,3 +1,15 @@
+# Finalized mechanic clarifications — November 6, 2026 (planned, not in v8)
+
+- The only **consumable dungeon resource** is overall **Endurance Capacity**, **not** the underlying Constitution Attribute. Max Capacity derives from the owned Constitution Skill values; a Con-1 character owns at least one of Toughness, Endurance or Vitality.
+- Clearing **a complete floor** grants **general Constitution XP**, on top of usual check/room attribution. The existing game counts individual rooms as `run.floor`; the design's canonical floor is ten rooms. Do not count every room as a full-floor XP event. Open balance issue: 1-room beginner depth limit prevents whole-floor XP until later; decide how general Constitution XP feeds effective combined Con Skill values or total Capacity, and how early endurance growth works.
+- Equipment strictly transforms effective check value in the order **Catchup first → Flat second → Percent last**. Catchup N is no-downside: max(V,(V+N)/2). Need multiple-item stacking choice. Eligibility is unchanged by equipment.
+- Manual recall is **queued until the next full-floor boundary** for a safe exit. Hard **30-second fallback** allows interrupting a stuck/slow floor; it is not an ordinary safe exit and doesn't grant floor-clear XP. Between floors, safe recall may resolve immediately. Existing depth limit exits stay unchanged. Whether 30s are game-time versus wall-time, and exactly which loss/penalty to assign on fallback interruption, remain open (game-time recommended).
+- Current `engine.ts` instantly recalls, increments a field called `floor` per room, and tracks depth caps in rooms. These must be reconciled in implementation without corrupting old saves.
+
+Older document sections proposing a directly depleted Constitution root stat, a universal safe return on CON exhaustion, or per-room Constitution XP are superseded. Current behavior unchanged.
+
+---
+
 # Confirmed dungeon and character progression corrections — November 6, 2026 (planned, not live)
 
 1. **Constitution is the only consumable Attribute**, and Soul/Luck are explicitly non-consumable. All other Attributes affect effectiveness without resource drainage; the previous multi-pool parent-cost model is superseded.

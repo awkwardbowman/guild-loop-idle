@@ -1,3 +1,17 @@
+# Current PR #7 interface (November 6, 2026)
+
+Character Skills shows five selected Attributes by five selected Disciplines, exactly 25 positions. Only catalog-authored pairs populate cells; other positions are empty. Five row totals, five column totals and a grand total count each populated Skill once. Discipline header glyphs are black on a light backing; Skill glyphs use Attribute colors. Only numeric Value text uses red/yellow/green training colors. Keyboard focus/hover expose a text description, and tapping/clicking selects persistent details. Potential remains unknown pending a future reveal unlock. Composite Skills has its own tab and browser.
+
+Guild adds Settings → Dungeon Defaults for Depth Limit and Insufficient Skill Threshold. Expanded dungeon cards contain both per-dungeon controls, including inherit/override, explicit Unlimited and 0% Off. Member controls no longer include personal limits. Assignments show the separate Endurance Capacity meter, low-skill efficiency/grace countdown, pending recall and its independent countdown. Recall is disabled once queued, and return history distinguishes exceptional outcomes.
+
+Info explains all root/Discipline symbols, the grid, totals, capabilities, Composite prerequisites, band boundaries, fallback, gear order, Con-1, non-consumable Attributes, endurance/growth, rooms vs ten-room floors, threshold benchmark and outcomes, recall, shared settings and legacy behavior. Main How to play text agrees with this contract. Desktop and mobile verification are recorded in [08](08-test-report.md).
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Finalized dungeon settings layout and threshold behavior — Nov 6 2026 (DESIGN ONLY)
 
 In **Guild → Settings → Dungeon Defaults**, expose:

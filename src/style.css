@@ -107,3 +107,14 @@
 .purchase-ready>button{color:#8ad5a0;border-color:#53785e}.purchase-bought>button{color:#74808e}.sidebar .resource-mini b{white-space:nowrap;font-size:10px}
 
 .assignment-option{padding:12px 0;border-top:1px solid var(--border)}.assignment-option .panel-heading{flex-wrap:wrap}.waiting-queue{padding-left:24px}.waiting-queue li{padding:6px 0}
+
+.skill-matrix {border-collapse:collapse;width:100%;min-width:500px;}
+.skill-matrix th,.skill-matrix td {padding:.55rem;border:1px solid var(--border,#334155);text-align:center;}
+.skill-matrix caption {text-align:left;padding:.5rem;font-weight:600;}
+.skill-matrix .skill-cell {display:inline-flex;gap:.35rem;align-items:center;background:transparent;border:0;padding:.35rem;}
+.skill-matrix .skill-value {font-variant-numeric:tabular-nums;font-weight:700;}
+.skill-value.training-red {color:#ff8585;}.skill-value.training-yellow {color:#ffe082;}.skill-value.training-green {color:#75e5a1;}
+.skill-matrix thead .activity-symbol {background:#dce2e8;border-radius:4px;padding:3px;}
+.dungeon-settings {display:flex;flex-wrap:wrap;gap:.75rem;align-items:end;}
+.dungeon-settings h4,.dungeon-settings p {flex-basis:100%;}
+.dungeon-settings label {display:grid;gap:.35rem;max-width:260px;}

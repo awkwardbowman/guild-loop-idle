@@ -1,3 +1,25 @@
+# Current PR #7 implementation — specialization and Endurance (November 6, 2026)
+
+Maya authorized implementing the full scope and choosing documented provisional defaults. Every saved character now has exactly five Attribute and five Discipline selections. The existing 27 authored pairs remain the full Skill catalog; a selected 5×5 has empty undefined intersections. Terminology: roots = Attributes, activity groups = Disciplines, pairwise specializations = Skills, learned abilities = Composite Skills. Save IDs remain stable.
+
+| Character | Attributes | Disciplines |
+|---|---|---|
+| Arya | Strength, Dexterity, Constitution, Speed, Perception | Combat, Dungeoneering, Exploration, Crafting, Travel & Logistics |
+| Clyde | Dexterity, Constitution, Perception, Intelligence, Luck | Crafting, Exploration, Management, Recovery & Support, Trade |
+| Guild Master | Perception, Intelligence, Charisma, Soul, Luck | Crafting, Social, Trade, Recovery & Support, Management |
+
+**Provisional generation:** other recruits/legacy actors choose the five highest saved root affinities, with catalog-order ties. Disciplines maximize the number of authored pairs on those roots, with catalog-order ties; if Constitution is selected but lacks a matching Discipline, the last Discipline becomes Recovery & Support. Picks are persisted and currently fixed. Generation consumes no extra RNG. No-Charisma guildmasters cannot perform Recruitment work; Scavenging requires selected Perception; future Research remains unimplemented.
+
+**Provisional values:** an owned Skill has Value `1 + saved specialization.value`, Potential `1 + saved specialization.affinity`. This treats existing trained points as additional learning and preserves them. A selected Attribute fallback is `max(1, saved root.max)`; an unselected Attribute contributes 0.01. No absent weight is redistributed. Completed room checks train only selected roots and owned Skills, using the existing capped diminishing-return growth on home arrival. Successful Composite XP/new learning requires every authored component Skill to be owned; existing learned abilities survive migration. Green includes exactly 90%; yellow starts at 75%. Potential stays unknown until a future reveal feature.
+
+Only the separate run Endurance Capacity drains in new room outings. Con-1 means owning Toughness, Endurance or Vitality, independent of equipment. General Constitution XP is stored separately: one XP per ten successfully cleared rooms within a canonical floor, adding 0.01 per XP to each owned Constitution Skill Value and Potential. This increases future departure capacity without refilling the current meter. It does not spend or mutate the Constitution Attribute. Detailed runtime/migration contract: [11](11-progression-and-check-foundations.md).
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Accepted endurance growth clarification — November 6, 2026 (DESIGN ONLY)
 
 The character **does not spend Constitution itself**. The dungeon resource is an **overall Endurance Capacity**, provisionally derived from the character's owned Constitution Skills (Toughness + Endurance + Vitality, using effective values). A character needs any one owned Constitution Skill for Con-1 dungeon entry. Only this **run-specific capacity meter** drains at an authored per-room rate. The nine Attributes, including Constitution, Soul and Luck, remain non-consumable performance/training statistics in this revised design.

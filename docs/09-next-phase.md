@@ -1,91 +1,11 @@
-# Confirmed settings design — global dungeon defaults, no member-specific depth caps (Nov 6 2026)
+# Next phase after PR #7 — November 6, 2026
 
-**Approved for next implementation PR; not in v8:** simplify Depth Limit to a shared per-dungeon setting, optionally inheriting a **global default** (initial Unlimited). Remove the current per-member/assignment limit and its UI. Use one dungeon settings area for both **Depth Limit** and **Insufficient Skill Threshold**; the latter inherits candidate global 1% unless explicitly overridden (0% disables). Put global defaults under Guild → Settings → Dungeon Defaults, per-dungeon controls in expanded dungeon settings.
+The full five/five specialization, Skills grid/totals, separate endurance, full-floor Constitution growth, queued recall, insufficient-skill room grace and shared dungeon settings scope is implemented for review in save v9. Maya authorized the provisional details. See [11](11-progression-and-check-foundations.md) for formulas/migration and [08](08-test-report.md) for executed validation.
 
-**Threshold behavior confirmed:** when entering **each generated room**, compute actor predicted actual work/second versus the room reference work/second; if ratio below selected threshold, grant **30 game seconds** to finish. Incomplete at deadline → invoke **that room's authored failure outcome**; completion inside grace → continue. This can fail mid-canonical-floor without breaking the rule against safe running. Manual recall is independent: queued until safe full-floor boundary, with separate 30-second exceptional fallback. Timeouts resolving together must never double-award/fail.
+1. Playtest/tune the provisional five/five picks, baseline-plus-training values, 0.05 endurance rate, 10-work/second room benchmark and 0.01-per-floor-XP Constitution growth. Test early characters under room limits below ten: these intentionally receive no full-floor bonus; normal successful-check practice still applies.
+2. Define Leather Crafting's recipe inputs, outputs and duration, then implement recipe execution. The lesson, learner and purchase gate exist; recipes remain deferred as requested.
+3. Design Potential reveal, additional Composite teaching/prerequisites, generated character balance and rarity/tier stat budgets. Existing trained points and learned abilities are preserved; no respec flow is introduced.
+4. Author more varied room failures/content and any loot loss, death, revival or recovery-stat rules before adding them. Current outcomes are explicit forced-return or injury, retaining completed cargo.
+5. Define future Speed tick intervals, Scouting and Movement action bonuses, later training/decay, gear variants and magic. Formula hooks support Catchup/Flat/Percent, but no new gear items or tick interval mechanics are implied.
 
-**Migration:** effectiveLimit currently `min(global dungeon limit, run.personalLimit)`; remove per-assignment caps rather than merging unequal member caps into a dungeon restriction. Preserve per-dungeon caps as overrides; global missing=Unlimited. Depth limits continue counting rooms and keep existing boundary exits, while floor-clear XP and safe manual recall use ten-room canonical floor boundaries. Add tests for inherited updates, overrides, explicit Unlimited, old saves, active runs, adjacent timeout races, and role-specific progress.
-
----
-
-# New design option: Insufficient Skill Threshold — November 6, 2026 (not implemented)
-
-Add a configurable **Insufficient Skill Threshold** to dungeon settings, proposed as inherited global default with per-dungeon override. Initial candidate threshold **1%**, 0%=disabled. The ratio must compare estimated effective work rate (after actual Skill/Attribute/0.01 baseline fallback, weighted check contributions, Catchup→Flat→Percent gear and any tick-speed effect) against a **room-authored reference work rate**, rather than a member's own personal Potential. A 90% Power/10% Finesse room should be severely slow for Clyde but still attemptable unless projected efficiency is truly below threshold.
-
-Do not allow arbitrary free escape mid-floor. Recommended: check qualification before committing to an entire **canonical floor** (ten rooms); return at a safe boundary if below threshold. If a floor is already underway, ordinary recall remains queued to a full-floor boundary, while a 30-second exceptional interruption still requires explicit failure semantics. **Implementation question:** current engine randomly rolls individual rooms and uses variable `floor` as room index, so exact floor-level preflight requires pre-generation or an explicit aggregate estimate. Per-room preflight inside ten-room floors is not equivalent to safe floor-boundary bail. Threshold behavior and exact interaction with a 30s attempt/grace need final determination.
-
-Explain control, efficiency denominator, missing-Skill fallback, floor vs room behavior and outcomes in Info. Persist per-dungeon override and global default, with validation; test Clyde/Arya, weak builds, disallowed actions, depth limits, queued recall and XP accounting. Do not label complete or implement until approved.
-
----
-
-# Confirmed next-PR design: Endurance capacity, full-floor training, gear order and recall — November 6, 2026
-
-**Approved direction (not implemented):** Constitution is **not a directly drained Attribute**. Dungeon runs consume a separate overall **Endurance Capacity** derived from available Constitution Skills (Toughness, Endurance and Vitality); Con-1 eligibility still requires at least one such Skill. Every room's per-second endurance drain is independent of the weighted work requirements and scales with floor depth. Soul/Luck and all Attributes are non-consumable.
-
-**On successfully clearing a full canonical floor**, award **general Constitution XP**, in addition to normal per-check/per-room Skill and Attribute training. Do not credit a failed partial floor or repeat award on save reload. Since the current engine calls each *room* a `floor`, a canonical floor must be explicitly derived from **10 cleared rooms** before making a bonus/recall decision. Full-floor-only XP might be inaccessible to early characters capped at room 1: address as balance, not by silently awarding every-room bonus. Define how general Constitution XP actually increases the derived Endurance maximum.
-
-**Gear order** on each applicable check value: first catchup (no reductions; Catchup N = max(V,(V+N)/2)), then flat, then percent. Multi-bonus stacking still needs a rule. Gear never grants eligibility.
-
-**Recall** replaces instant safe exit with a queued request; wait until **the next completed full-floor boundary** for safe return. A **30-second hard fallback** stops a run stuck/slow inside a floor, but is an exceptional interruption and should not count as a safe successful clear or award floor XP; specific failure/penalty remains to author. If already between floors, allow immediate safe recall. Preserve existing depth limit logic. Suggested timer basis: 30 *game/simulation* seconds (not yet specified by the user). Save/reload, pause, room-to-floor conversion and regression tests are required.
-
-This design supersedes earlier notes describing `Constitution depletion` as spending the Constitution stat itself, immediate recall, generic safe return on fatigue, or full-floor XP at every room. No PR has been opened or gameplay modified by these docs.
-
----
-
-# Updated next-PR scope: single Constitution drain and Skill totals — Nov 6 2026
-
-**New agreed direction, NOT implemented; this supersedes the older text below suggesting zero work from unselected Attributes, charging other stats, and mandatory Constitution check weights.**
-
-- Dungeon entry **Con-1**: own any one of Toughness/Endurance/Vitality. Guild Master lacks Constitution. Clyde's suggested scavenger picks provide Vitality. Mandatory Combat/Power checks are NOT gated behind Combat Composite.
-- Every room drains **one combined Constitution endurance pool at a flat rate per elapsed game second**, scaled by depth/floor, separately from arbitrary weighted Skill requirements. Provisional capacity = sum of the character's owned Constitution Skills. Only Constitution consumes; Soul, Luck and all other Attributes are non-consumable. A missing Skill falls back to selected Attribute; absent Attribute produces tiny **0.01 baseline work**, not zero, with no weight renormalization.
-- If CON runs out within a room, use the **failure mode authored for that room**, never silently choose a universal safe retreat. Work, loot, injury, death/loss/revival consequences, and special exit/recall behavior require proper tests/specification.
-- Speed/Agility may later affect dungeon tick intervals; Scouting area finding and Movement city travel speed are other possible authored benefits. A Discipline-specific check can use the sum of available component Skills, such as Dungeoneering = Force + Finesse + Agility.
-- UI: 5×5 grid includes five **row totals**, five **column totals** and a bottom-right **grand total**, each populated Skill counted once; Info Skills teaches totals and all progress/endurance rules. Numeric Value coloring remains number-only with no added status icon.
-- Later gear variants: additive percent, additive flat numeric bonus, and **Catchup N** applying at least `max(V,(V+N)/2)` to low values, with no lowering stronger stats and **no unlocking missing activities/Composite Skills/Con-1**.
-- Next coding PR must update room progress calculations, endurance pool and flat rates, failure outcomes, guards, migration, stats display, ETA predictions and regression tests. Earlier proposed other-stat depletion and per-room mandatory CON-weight authoring are withdrawn. Leather Crafting recipe definition remains separate future design work. No PR created by this design change.
-
----
-
-# Additional next-PR design discussion — Constitution endurance and activity gates (Nov 6, 2026)
-
-**Design discussion, no implementation/PR.** The player prefers Clyde as a non-Combat scavenger; proposed 5 Attributes DEX / CON / PER / INT / LCK and Disciplines Crafting / Exploration / Management / Recovery & Support / Trade. Arya must have Power; Guild Master cannot have Constitution. Do not require Power or Combat Composite for generic dungeon participation. A check's authored weighted Skill falls back to its selected Attribute when the Skill is absent; with no selected Attribute, that share contributes zero and the remaining weights are not normalized. The user wants some Constitution cost in every floor, with Constitution depletion as the general expedition failure condition. Since the actual unit is a room, confirm scope and rebalance before implementation.
-
-Current mandatory Combat level-1 gating and atomic abort on any depleted non-Constitution pool conflict with this design; change these intentionally, with deterministic tests, rather than simply removing Skill flags. For all-role safety, non-Constitution depletion should zero only that contribution if Constitution is to control the return; prevent free work/zero-progress stalls. Ordinary exhaustion vs injury is an open distinction.
-
-Suggested action-level (not whole-tab) minimum Attribute specializations: Charisma→Recruitment, Intelligence→future Research, Perception→Scavenging, Constitution→Dungeons; Strength/Dexterity/Speed weighted heavily in dungeon progress; Luck/Soul primarily situational. Guild Master can conduct Recruitment/Research independently of member mix. See docs/02 and 04 for full constraints.
-
----
-
-# Next PR planning: character specialization and Info Skills — November 6, 2026
-
-**Design requested, no implementation or PR opened.** Add alongside the Leather Crafting work queue: all characters choose five of nine **Attributes** and five of nine **Disciplines**, with baseline 1 and no normal training outside their picks. Their pairwise capabilities become **Skills** (Power = Strength + Combat); advanced learned abilities become **Composite Skills**. Constitution selected is a required dungeon gate. Guild Master selects Perception, Intelligence, Charisma, Soul and Luck (no physical specialties and no dungeon access; five Disciplines TBD). Character display becomes a fixed 5×5 matrix with neutral black Discipline glyphs, Attribute-tinted Skill glyphs, Value/Potential reveal and training-ratio coloring **directly on the numeric Value text only, with no added status icon**. Only catalog-authored Skill intersections are populated; undefined cells such as Perception × Combat are simply blank. The labels Attributes, Disciplines, Skills and Composite Skills are approved.
-
-**The Info tab must include a Skills section explaining every symbol and this entire mechanism, including the 5×5 grid, skill tiers, combination rules, specializations, dungeon eligibility and color legend.** See docs/02-adventurers-and-stat-growth.md and docs/10-game-interface.md for the detailed planned contract.
-
-**Resolved:** the 5×5 is always 25 positions but only the currently authored 27 global Skill pairs can populate it. No new pairings are implied, and missing intersections are empty. Numeric Skill Value text gets red/yellow/green, with no extra status icon. **Still resolve before implementation:** specific 5/5 character picks, generated recruits, Composite Skill prerequisites, baseline/stat budget interactions, Guild Master disciplines, saved progression migrations and the inclusive 90% color boundary. Do not change gameplay or claim implemented until a later PR passes migration and UI tests.
-
----
-
-# Backlog implemented — November 6, 2026
-
-Single dungeon assignments, queued statuses/counts/lists, simplified member controls, per-member/dungeon history, newest-first Plot and separate rarity/tier metadata are implemented in save v8. The pending discovered-skills and weighted-engine/shop commits are included in this delivery.
-
-Remaining decisions are crafting recipe inputs/outputs/duration and execution, cross-rarity stat budgets/recruit generation, and a jointly rarity/tier/depth-aware loot curve. Materials beyond existing IDs and Threadless renaming remain later content. None of these blocks the implemented backlog. Current Common stats, prices and drops are retained. Validate balance through playtesting before changing them.
-
-# Immediate next work
-
-The v7 weighted room/shop/storage pass supersedes prior opening balance and global slot purchase plans below. Crafting recipe inputs, outputs and duration are explicitly deferred to Maya’s next pass. The Leather Crafting skill, chosen learner, equipment purchase gate and first activity entry are ready. Next: define that recipe/action, then playtest/tune deterministic work weights, injury incidence, boss frequency, single treasure draws and early quest pacing. Do not reintroduce success RNG or generic Constitution exertion.
-
-# Next Phase — After the Emberveil Opening
-
-November 5, 2026. The Arya/Clyde opening, weighted room engine, budgeted loot, Gavin/Stillmere chain, equipment templates/loadouts, Chips economy, caps and Guild subtabs are implemented on the review branch. Verification is in 08.
-
-1. Playtest pacing: first return, first armor, first herb and five-herb referral. The seeded automated path reached Stillmere in about 56 game minutes; this is a test outcome, not a finalized pacing target.
-2. Tune room/check weights, rarity, work, costs, carrying caps, storage prices and equipment bonuses while preserving the distinct roles of Arya and Clyde.
-3. Refine archive/delve flavor and specialized checks beyond the first dungeon; keep group and room weights independently authored.
-4. Design later training so members can learn currently missing skills without rewarding failed-check spam.
-5. Specify actual death triggers and a governing recovery stat before implementing the 4× to 2× travel revival timer.
-6. Author guildmaster spell actions and storage compression, then worker assignments and per-storage-tab auto-selling. No passive automation or compression is enabled yet.
-7. Choose Pebs/Bowls denomination ratios when needed; current accounting uses Chips only.
-
-Skill decay, traits, equipment resource conversion, guildmaster affinity upgrades, offline progress and optional cloud sync remain future systems. Existing saves are preserved, not force-normalized to the new tier budgets.
+Current storage, shops, request pacing, single assignments, queues/history, discovered Composites and independent rarity/tier data remain. Cross-rarity scaling, depth-aware loot balance, Pebs/Bowls ratios, compression, assigned auto-selling and offline/cloud sync are still future work. Review the PR before updating the live game.

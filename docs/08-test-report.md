@@ -1,3 +1,27 @@
+# PR #7 / save v9 validation — November 6, 2026
+
+Executed in the managed workspace against the complete review tree:
+
+- `npm ci --cache /workspace/work/npm-cache`: installed the locked dependencies successfully. The first default-cache attempt could not create the environment’s home cache; using a writable workspace cache resolved it without changing the lockfile.
+- `npm test`: **147 tests passed**, zero failures. Eighteen new specialization/endurance cases cover role picks, all 25 grid positions/totals, exact 75%/90% bands, 0.01 fallback without renormalization, gear order/stacking and eligibility, root-stat non-consumption, per-floor endurance rates, authored failure and healing, ten-success floor XP, no partial/skipped-floor XP, queued recall, exact/adjacent grace deadlines, live inherited settings, explicit Unlimited/Off, room-boundary caps, v8 migration, malformed imports, ETA immutability, faster work paying fewer endurance seconds, and exact final-tick funding.
+- Existing regression fixtures now use dungeon-wide caps for bounded trips, reconstruct retired fields when testing historical migrations, and assert queued recall/separate endurance rather than superseded instantaneous recall/weighted pool costs. Old task/check routes, opening through the craft lesson and Stillmere referral, resources, shops, trades, capacity, history and persistence still pass.
+- `npm run build`: TypeScript and Vite production build passed (62 modules).
+- `git diff --check`: passed.
+
+## Browser → simulation → autosave → reload
+
+Ran Playwright with the installed headless Chromium against local Vite at 1440×1000 and 390×844. Verified the real three-step fresh opening; Guild Settings changing global room limit to 20 and threshold to 3%; dungeon inherited summary; explicit Unlimited and 0% Off; both overrides surviving reload; five grid rows, 25 Skill positions, five row totals, five column totals and grand total; keyboard focus and click/tap descriptions with hidden Potential; removal of personal cap controls; separate endurance, low-skill grace and queued recall displays; disabled repeated Recall; and both saved timer origins surviving reload. Mobile document width was 390px at a 390px viewport, with the grid scrolling inside its own container. No JavaScript page errors occurred.
+
+The existing external Google Fonts request reported `ERR_CERT_AUTHORITY_INVALID` in headless Chromium and the existing missing favicon reported 404. These were resource diagnostics, not simulation/rendering errors; browser assertions used the working fallback font. No TLS validation was bypassed. No API/database layer exists: gameplay and saves remain browser-local.
+
+## Limits
+
+The mechanics and chosen numeric defaults remain provisional; this is deterministic regression and browser acceptance, not final balance approval. Recipe execution, death/revival, Potential reveal, actual Speed tick intervals, offline progress and sync remain future work. Legacy task/check outings intentionally keep historical work/pool rules. This pass does not deploy or merge the game.
+
+---
+
+## Earlier validation reports
+
 # Backlog validation — November 6, 2026
 
 134 automated tests pass; TypeScript and Vite production build pass; git diff --check passes. New cases cover one-destination replacement/rejection, actual roster waiting order, queued counts, independent member/dungeon history and return reason, save v7→v8 route migration with preserved active state/stats/RNG, malformed rarity/history/route rejection, tiers above the former ceiling, Common T1 equipment access, material metadata and newest-first deterministic Plot ordering. Superseded multi-queue/old Plot assertions were replaced with current behavior checks.

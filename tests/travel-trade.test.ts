@@ -1,10 +1,11 @@
+import {legacyEnvelope} from './legacy-save.ts';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {sandboxGame,initialGame,completeStoryAction,startDay,advance,recall,sellResource,returnETA,toggleMember,setQueue} from '../src/engine.ts';
 import {parseSave,exportSave} from '../src/persistence.ts';
 import {LOCATIONS,travelSeconds} from '../src/locations.ts';
 import {DUNGEONS,STATS,STAT_INFO} from '../src/content.ts';
-function expedition(){const g=sandboxGame();for(const member of g.members)member.enabled=false;g.members[0].enabled=true;for(const stat of STATS)g.members[0].stats[stat].current=g.members[0].stats[stat].max=50;return startDay(g);}
+function expedition(){const g=sandboxGame();g.dungeonLimits.wood=1;for(const member of g.members)member.enabled=false;g.members[0].enabled=true;for(const stat of STATS)g.members[0].stats[stat].current=g.members[0].stats[stat].max=50;return startDay(g);}
 function trading(){let g=advance(expedition(),40);g=toggleMember(g,g.members[0].id);g.inventory={timber:10,herb:4};return g;}
 test('T01 local trip takes 15 seconds each way; no work, payment or recovery before its stage',()=>{
  let g=expedition();const seed=g.seed,max=g.members[0].stats.strength.max;
@@ -41,12 +42,12 @@ test('T07 concurrent trades survive saves; invalid quantities and unavailable re
 });
 test('T08 imports reject broken routes, timers, duplicate trade IDs and depleted exploring members',()=>{
  const mutations=[(g:any)=>g.active[0].stage='teleporting',(g:any)=>g.active[0].destinationLocationId='nowhere',(g:any)=>g.active[0].travelRemaining=-1,(g:any)=>g.active[0].travelRemaining=16,(g:any)=>g.homeLocationId='nowhere',(g:any)=>g.active[0].stage='returning'];
- for(const mutate of mutations){const raw=JSON.parse(exportSave(expedition()));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(raw)));}
- let g=advance(expedition(),15);for(const stat of STATS.filter(stat=>STAT_INFO[stat].consumable)){const raw=JSON.parse(exportSave(g));raw.game.members[0].stats[stat].current=0;assert.throws(()=>parseSave(JSON.stringify(raw)));}
- g=sellResource(trading(),'timber',1);for(const mutate of [(g:any)=>g.trades[0].remaining=0,(g:any)=>g.trades.push(g.trades[0]),(g:any)=>g.trades[0].resourceId='chips']){const raw=JSON.parse(exportSave(g));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(raw)));}
+ for(const mutate of mutations){const raw=JSON.parse(exportSave(expedition()));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(legacyEnvelope(raw))));}
+ let g=advance(expedition(),15);for(const stat of STATS.filter(stat=>STAT_INFO[stat].consumable)){const raw=JSON.parse(exportSave(g));raw.game.members[0].stats[stat].current=0;assert.throws(()=>parseSave(JSON.stringify(legacyEnvelope(raw))));}
+ g=sellResource(trading(),'timber',1);for(const mutate of [(g:any)=>g.trades[0].remaining=0,(g:any)=>g.trades.push(g.trades[0]),(g:any)=>g.trades[0].resourceId='chips']){const raw=JSON.parse(exportSave(g));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(legacyEnvelope(raw))));}
 });
 test('T09 v3 active outings migrate in place without replaying outbound travel or losing carried loot',()=>{
  const g=advance(expedition(),24),raw=JSON.parse(exportSave(g));raw.version=raw.game.version=3;delete raw.game.homeLocationId;delete raw.game.trades;delete raw.game.nextTradeId;
  for(const run of raw.game.active)for(const key of ['stage','originLocationId','destinationLocationId','travelRemaining','outboundSeconds','returnSeconds','outcome'])delete run[key];
- const migrated=parseSave(JSON.stringify(raw));assert.equal(migrated.active[0].stage,'exploring');assert.equal(migrated.active[0].progress,g.active[0].progress);assert.equal(migrated.seed,g.seed);assert.deepEqual(migrated.active[0].loot,g.active[0].loot);assert.equal(migrated.active[0].returnSeconds,15);if(g.candidate)g.candidate.origin='legacy';assert.deepEqual(advance(migrated,16),advance({...g,active:g.active.map(run=>({...run,outboundSeconds:0}))},16));
+ const migrated=parseSave(JSON.stringify(legacyEnvelope(raw)));assert.equal(migrated.active[0].stage,'exploring');assert.equal(migrated.active[0].progress,g.active[0].progress);assert.equal(migrated.seed,g.seed);assert.deepEqual(migrated.active[0].loot,g.active[0].loot);assert.equal(migrated.active[0].returnSeconds,15);if(g.candidate)g.candidate.origin='legacy';assert.deepEqual(advance(migrated,16),advance({...g,active:g.active.map(run=>({...run,outboundSeconds:0}))},16));
 });

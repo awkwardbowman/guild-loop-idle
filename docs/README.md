@@ -1,3 +1,13 @@
+# Current review delivery — PR #7 / save v9
+
+November 6, 2026. Five/five character selections, sparse 5×5 Skills grid/totals and separate Composite Skills are implemented, together with run-specific Endurance Capacity, successful ten-room Constitution XP, queued recall, 30-game-second room-grace failures and inherited dungeon defaults. Individual depth caps are retired. Maya authorized provisional defaults; details and migration are in [11](11-progression-and-check-foundations.md), UI in 10, and executed validation in 08. The older “planned/not implemented” sections below are history superseded by the current v9 sections. Recipe execution and final balance remain future work.
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Current delivery — November 6, 2026
 
 Save v8 adds single assignments, queue visibility, per-dungeon member history, newest-first Plot and separate rarity/tier classification. See 06 for assignments, 10 for UI, 02/03 for classification, 08 for verification and 09 for remaining work. Weighted engine/shop and discovered-skill changes are included in this delivery.

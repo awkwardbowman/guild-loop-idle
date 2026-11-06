@@ -1,3 +1,28 @@
+# Planned specialization redesign — November 6, 2026 (design only, NOT implemented)
+
+## Terminology and structure
+- **Attributes**: the nine existing roots: Strength, Dexterity, Constitution, Speed, Perception, Intelligence, Charisma, Soul, Luck.
+- **Disciplines**: the nine existing activity groups: Combat, Dungeoneering, Exploration, Crafting, Social, Trade, Travel & Logistics, Recovery & Support, Management. This replaces ambiguous "Types"/"Skills" labels for the activity axis.
+- **Skills**: pairwise Attribute + Discipline combinations. Example: Strength + Combat = Power. The existing 27 named specializations are renamed to Skills, without automatically rewriting save IDs.
+- **Composite Skills**: separate learned capabilities drawing on multiple authored Skills (e.g. Lock Picking). Replace "learned skills" nomenclature with Composite Skills.
+
+## Character affinities
+Every character specializes in five of the nine Attributes and five of the nine Disciplines. All unselected Attributes and Disciplines retain baseline competence **1** but are normally untrainable. Only Skills consistent with a character's selected axes are trainable; Composite Skill learning requires matching authored Skill prerequisites. Exactly how prerequisites are checked remains to be specified.
+
+Selecting **Constitution** as one of the five Attributes is required to enter a dungeon; baseline Constitution 1 is not sufficient. This is an eligibility check, separate from ordinary resource depletion once deployed.
+
+The **Guild Master** chooses the five nonphysical Attributes: Perception, Intelligence, Charisma, Soul and Luck. Strength, Dexterity, Constitution and Speed are baseline only. The Guild Master cannot dungeon-run; the five Guild Master Disciplines still need deciding. Innate magic remains exclusive to the Guild Master.
+
+## Skill matrix and visual conventions
+Display each character's five selected Attributes against five selected Disciplines in a compact **5×5 matrix**. Each defined Skill cell shows trained **Value**; on hover/focus/tap, show **Potential**, but only after the relevant unlock (otherwise unknown). Discipline-only symbols are neutral **black**, not individually keyed to a red Combat icon. Each Skill uses the Discipline symbol tinted by its Attribute color: Power uses the Strength-colored Combat glyph.
+
+Color-code Skill numeric Value based on Value/Potential: red below 75%; yellow at or above 75% and below 90%; green at or above 90% as the proposed boundary convention. The user's wording "above 90%" leaves equality exactly 90% to confirm. Accessibility must not depend on hue alone. Keep the run-specific Current/Max Attribute resource pools distinct from training Value/Potential.
+
+## Blocking design questions for the next implementation PR
+The current game authors **27 named pairs in the full 9×9 matrix**, not every pairing. A selected 5×5 may have undefined intersections. Decide whether to author those Skills or leave absent/locked cells; do not auto-create 25 trainable Skills. Specify Arya, Clyde and normal recruit five/five picks; how baseline 1 interacts with the existing 10^tier budgets and resource pools; how Composite Skill prerequisite membership works; which five Disciplines belong to Guild Master; whether selection can change; and safe migration of already-trained stats, skills, active trips and legacy saves. **Retain v8 behavior until implemented and tested.**
+
+---
+
 # Current classification — November 6, 2026
 
 Rarity is the broad class; Tier is a separate, open-ended positive rank within it. Both are stored and displayed for members and recruitment candidates. Arya and Clyde are Common T1 and retain affinity total 10, starting maximum total 9, learned identities and normal starter equipment access. Existing saves receive Common classification without rewriting stats. No tier boundary automatically changes rarity; future Rare recruits should have correspondingly higher tiers, not an assumed Rare T1. Current Common recruitment keeps its prior distribution and provisional 10^tier budget. Cross-rarity affinity curves and recruitment distributions remain future balance work. The tier-10 validation ceiling is removed; safe-integer serialization limits are technical guards, not content progression limits.

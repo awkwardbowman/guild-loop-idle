@@ -79,3 +79,8 @@ The calendar shows Emberveil as the home location. Active expedition tiles and m
 ### Main stats, attributes and guildmaster
 
 The Guild page shows the guildmaster’s own nine-stat profile and innate-magic designation. Member/candidate stats show all nine roots. Luck is displayed as a modifier with maximum/affinity rather than a consumable fraction. The attribute panel offers By main stat and By activity views, exposing all 27 attributes with their root, grouping, trained value, affinity and effective fallback. Learned skills remain a separate panel. Ordinary members rely on relics/artifacts for magical effects.
+
+
+### Dungeon attribute matching
+
+The dungeon catalog has a member-comparison selector, an Attribute emphasis summary with percentages, an expandable per-check breakdown and relative importance, and the selected member’s advisory weighted capability. Individual check outcomes and resource availability remain decisive; this is not a success-probability estimate.

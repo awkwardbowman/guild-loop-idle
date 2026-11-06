@@ -75,7 +75,7 @@ The current implementation uses completed-task training, accumulated until retur
 
 The accepted main stats and their 27 specializations are listed below. A specialization is a capability beneath a main stat, not an extra resource bar. Finesse spends underlying Dexterity when used to fund work. Multiple contributing roots each pay their part of a check cost. Not every stat must be consumed in a dungeon; Luck is explicitly a modifier. No Physical wrapper is established.
 
-Learned skills are a separate tree/catalog, all capped at level 99. Lock Picking uses 75% Finesse and 25% Intelligence in the current definition. Specialization fallback extends through ancestors, retaining less contribution at each step, without counting the same capability repeatedly. Each check can configure speed, success and resource efficiency separately, with different contributing skills/ratios. Intelligence-heavy speed and dexterity-heavy success are intentionally supported.
+Learned skills are a separate tree/catalog, all capped at level 99. Lock Picking uses 75% Finesse and 25% Design (under Intelligence) in the current definition. Specialization fallback extends through ancestors, retaining less contribution at each step, without counting the same capability repeatedly. Each check can configure speed, success and resource efficiency separately, with different contributing skills/ratios. Intelligence-heavy speed and dexterity-heavy success are intentionally supported.
 
 Skill deterioration through disuse is future agreed direction. Save records include last-used timestamps; decay is disabled. Grace period, rate, retained minimum and recovery remain undecided. Attribute affinity improvements stay limited/future, not a routine skill reward.
 
@@ -127,3 +127,10 @@ Provisional defaults: guildmaster ordinary stats start at 12/60 maximum/affinity
 ## v5 compatibility
 
 Might maps to Strength, old Agility to Dexterity, and Focus to Intelligence. Old Finger Dexterity values and pending training map to Finesse. Newly added roots and attributes initialize deterministically, with existing trained attributes, skill levels, affinity, current pools, carried training, trip/trade timers and RNG preserved. Historical v0–v4 conversions remain supported. Luck never creates a spendable child pool.
+
+
+## Dungeon-specific checks and member matching
+
+The accepted 27 attributes form the common foundation. Every dungeon can author its own ordered check series with different combinations. Each check has relative importance within the dungeon and weighted attributes within the check, each normalized to 100%. The overall dungeon attribute mix sums check importance × that check’s attribute weights. These planning weights are separate from live check speed, success, efficiency and resource charging; learned skill proficiency and affordability still determine actual outcomes.
+
+The dungeon catalog displays the weighted attribute mix, per-check importance and combinations, plus an advisory weighted-capability score for a selected member. The score combines effective attributes with the planning mix; it is not a success probability or resource-survival guarantee. Initial profiles are provisional examples. The archive’s mix derives from its actual learned-skill dependencies; the starter and delve planning profiles accompany their existing fixed-task routes until their full bespoke check content is authored.

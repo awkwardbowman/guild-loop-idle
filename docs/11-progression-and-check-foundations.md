@@ -38,7 +38,7 @@ Provisional recursive fallback at retention `r`:
 
 An empty child under 100 parent at 50% retention gets 50; an empty grandchild gets 25. Child 40 under parent 100 gets 70. Perfect child 100 under parent 100 remains 100, not 150. General capability units and behavior across unequal caps require later balance review.
 
-Every learned skill stores level (0–99), experience and last-used game-second timestamp. Definitions link weighted attribute contributions and a specialization retention ratio. Current samples: Observation, Investigation and Lock Picking. Lock Picking uses 75% Finesse and 25% Intelligence. Disuse metadata is recorded during funded work; decay is explicitly disabled.
+Every learned skill stores level (0–99), experience and last-used game-second timestamp. Definitions link weighted attribute contributions and a specialization retention ratio. Current samples: Observation, Investigation and Lock Picking. Lock Picking uses 75% Finesse and 25% Design. Disuse metadata is recorded during funded work; decay is explicitly disabled.
 
 Temporary practice thresholds: next level costs `10 × (current level + 1)` XP. Successful checks grant 2 XP to each distinct contributing skill; level 99 retains zero overflow XP. Failed attempts record use without granting success practice. These are test defaults, not a final training design.
 
@@ -113,6 +113,11 @@ See 02-adventurers-and-stat-growth.md for the accepted matrix and provisional de
 
 Successful checks collect pending training for contributing specialization attributes, taking the strongest contribution per attribute across speed/success/efficiency so the same use is not counted three times. Explicit authored training can supply a higher amount. Training applies once on arrival home, with the existing diminishing affinity-gap formula. Failed checks grant no successful attribute practice. Learned skill experience still updates during exploration.
 
-The archive now draws on Observation/Scouting for noticing, Planning/Observation for investigation, and Finesse/Intelligence for lock picking; resource costs resolve to their root pools. Checks can reference any accepted attribute without creating a child resource pool.
+The archive now draws on Observation/Scouting for noticing, Planning/Observation for investigation, and Finesse/Design for lock picking; resource costs resolve to their root pools. Checks can reference any accepted attribute without creating a child resource pool.
 
 Schema v5 migrates v0–v4, preserving historical roots, learned skills, old Finesse training, active routes/loot and pending trades. New fields initialize deterministically. Journey/trade behavior is described in 04. Stats/profile completeness, attribute ceilings, non-consumable behavior and guildmaster identity are validated.
+
+
+## Dungeon profile authoring
+
+`src/dungeon-profiles.ts` owns unique ordered planning check profiles, positive normalized per-check importance and per-attribute weights, aggregate attribute mixes and an advisory member-fit function. Definitions only accept the shared 27 specialization IDs; malformed/duplicate weights fail validation. The archive derives its profile from the actual check channels; starter/delve profiles prepare their future bespoke check routes while retaining existing fixed-task gameplay. Planning profiles do not rewrite resource costs or success probabilities. Additional dungeon mechanics should reuse these attributes and author unique live checks separately.

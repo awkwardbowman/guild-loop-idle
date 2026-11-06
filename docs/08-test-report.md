@@ -1,3 +1,7 @@
+# Dungeon attribute-profile validation
+
+November 5, 2026. **94 tests passed, 0 failed**; TypeScript/Vite production build passed. Every dungeon has a distinct planning-check sequence, normalized attribute/importance weights, and a member-comparison score. New cases verify exact profile coverage, archive dependencies, weighted fit without mutation, and invalid-profile rejection. Planning profiles are advisory; bespoke live check content for the starter/delve remains future work.
+
 # Nine-stat / 27-attribute validation
 
 November 5, 2026. **90 tests passed, 0 failed**; TypeScript/Vite production build passed. Current results supersede historical counts below.

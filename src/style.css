@@ -49,3 +49,8 @@
 .attribute-group{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
 .attribute-group h3{color:var(--accent);margin-bottom:3px}
 .strength progress::-webkit-progress-value{background:#b68a7e}.dexterity progress::-webkit-progress-value{background:#88a99c}.intelligence progress::-webkit-progress-value{background:#8b9dbf}
+
+.dungeon-comparison{display:flex;align-items:center;gap:12px;margin-bottom:18px;font-size:12px;color:var(--muted)}
+.dungeon-attribute-mix{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:3px;font-size:11px}
+.attribute-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.dungeon-check-profile{padding:8px 0}.dungeon-check-profile small{display:block;margin-top:6px;color:var(--muted);line-height:1.6}

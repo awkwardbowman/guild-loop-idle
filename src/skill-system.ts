@@ -7,7 +7,7 @@ export type SkillDefinition={id:string;name:string;affinities:{attribute:string;
 export const SKILLS: SkillDefinition[]=[
  {id:'observation',name:'Observation',affinities:[{attribute:'observation',weight:.75},{attribute:'scouting',weight:.25}],specialization:.5},
  {id:'investigation',name:'Investigation',affinities:[{attribute:'planning',weight:.75},{attribute:'observation',weight:.25}],specialization:.5},
- {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finesse',weight:.75},{attribute:'intelligence',weight:.25}],specialization:.5}
+ {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finesse',weight:.75},{attribute:'design',weight:.25}],specialization:.5}
 ];
 export type Specialization={value:number;affinity:number};
 export type LearnedSkill={level:number;experience:number;lastUsedAt:number|null};

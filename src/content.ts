@@ -8,9 +8,9 @@ export type Dungeon = { id: string; locationId: LocationId; name: string; subtit
 const p = (strength:number,dexterity:number,intelligence:number):Pools=>({...zeroPools(),strength,dexterity,intelligence});
 export const DUNGEONS: Dungeon[] = [
  { id: 'wood', locationId: 'catacombs', name: 'Ritual Catacombs', subtitle: 'NEAR EMBERVEIL', description: 'Beneath a forgotten shrine, faded ritual marks and broken stones recall an age a thousand years gone. Small creatures now shelter in its quiet passages.', gear: 2, gold: 8, accent: 'green', tasks: [
-  { name: 'Clear the fallen branches', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
-  { name: 'Cross the tangled ravine', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
-  { name: 'Track the woodland prowler', duration: 4, cost: p(2,2,3), training: p(1,1,2) }
+  { name: 'Shift the fallen masonry', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
+  { name: 'Cross the broken crypt', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
+  { name: 'Track the crypt scavenger', duration: 4, cost: p(2,2,3), training: p(1,1,2) }
  ], loot: [{ id: 'timber', name: 'Heartwood', weight: 7 }, { id: 'herb', name: 'Silverleaf', weight: 3 }] },
  { id: 'ruins', locationId: 'old_quarter', name: 'Whispering Archive', subtitle: 'THE OLD QUARTER', description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, gold: 14, accent: 'blue', tasks: [
   { name: 'Decipher the outer seal', duration: 4, cost: p(1,1,5), training: p(.5,.5,3) },

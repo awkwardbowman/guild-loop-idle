@@ -110,3 +110,5 @@ Functional preparation is implemented and tested. See 11-progression-and-check-f
 - The earlier three-pool root model is superseded by schema v5; numerical starting values are implementation defaults.
 - Setting inspiration is Threadless roughly 1,000 years later: a small Emberveil beginning to revive, with Ritual Catacombs nearby. Local travel takes 15 seconds each way; sales take 15 seconds and commit items immediately.
 - A death/revival recovery timer from 4× travel toward 2× travel with diminishing stat benefits is agreed direction; governing stat, scaling and death triggers remain undecided and unimplemented.
+
+- The 27 attributes are the shared foundation for most activities. Dungeons will have unique specialized check sequences and weighted combinations, displayed beside the dungeon for member selection. Each dungeon/check can assign different relative importance. Authored planning weights are separate from actual speed/success/efficiency/cost channels.

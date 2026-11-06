@@ -103,3 +103,11 @@ An expedition follows outbound → exploring → returning → home/reset. It oc
 Resources → Trade supports quantity-based sales. Starting a sale removes the committed inventory immediately and creates an independent trade timer; gold is credited once after **15 game seconds**. Multiple sales can proceed concurrently (100 pending trades maximum), with no adventurer or expedition slot requirement. Current per-item prices in `SALE_VALUES` are provisional test values, separate from timing. Price and duration are snapshotted for pending sales. Shop purchases and town-development balancing are separate pending work.
 
 All timers use the normal game clock: pausing freezes them; game speed affects them; closed/hidden play does not advance them. Schema v4 stores journeys and trades. Older active outings migrate in place as exploring, without replaying outbound travel or losing carried rewards, then use the new return leg. New fields and timers are validated on save/import.
+
+## Per-dungeon capacity — November 5, 2026
+
+Every authored dungeon has maxConcurrent, currently 1 for each. Outbound trips reserve a place, exploration keeps it, and starting home frees it for the next eligible member in roster order. The independent guild expedition cap still includes homeward trips. Members waiting for a full dungeon stay idle; their queue entry is not skipped. Active saved trips are retained and stop further departures while at/above cap.
+
+## Compact dungeon event policy
+
+Only assignment additions/removals, failed dungeon returns, successful boss-room completions and successful treasure-room completions enter Dungeon history. Optional skips, attempts, retries, normal room clears, travel and successful routine returns do not. Reward events store actual full-room drops, independently of display text; unfinished/skipped rooms do not receive a clear event. Manual recall and cargo/depth/time-limit returns are not marked failed. A resource-exhaustion retreat is marked failed once on arrival, using the shared healing icon. Display rarity is Common for all current rooms and drops; probability weighting remains independently tuned.

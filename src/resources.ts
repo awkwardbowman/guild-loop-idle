@@ -1,14 +1,14 @@
 export const RESOURCES=[
- {id:'chips',name:'Chips',size:1,cap:80,rarity:0,sale:0},
- {id:'leather',name:'Leather Scraps',size:1,cap:12,rarity:0,sale:1},
- {id:'hide',name:'Animal Hides',size:2,cap:8,rarity:1,sale:2},
- {id:'ore',name:'Ore',size:2,cap:8,rarity:1,sale:2},
- {id:'herb',name:'Herbs',size:3,cap:5,rarity:2,sale:3},
- {id:'materials',name:'Building Materials',size:1,cap:10,rarity:0,sale:1},
- {id:'timber',name:'Heartwood',size:1,cap:12,rarity:0,sale:1},
- {id:'ink',name:'Living Ink',size:2,cap:8,rarity:1,sale:2},
- {id:'relic',name:'Ward Fragments',size:3,cap:5,rarity:2,sale:3},
- {id:'crystal',name:'Sun Crystals',size:3,cap:5,rarity:2,sale:4}
+ {id:'chips',name:'Chips',size:1,cap:80,rarity:0,depthBias:0,sale:0},
+ {id:'leather',name:'Leather Scraps',size:1,cap:12,rarity:0,depthBias:0,sale:1},
+ {id:'hide',name:'Animal Hides',size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'ore',name:'Ore',size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'herb',name:'Herbs',size:3,cap:5,rarity:0,depthBias:2,sale:3},
+ {id:'materials',name:'Building Materials',size:1,cap:10,rarity:0,depthBias:0,sale:1},
+ {id:'timber',name:'Heartwood',size:1,cap:12,rarity:0,depthBias:0,sale:1},
+ {id:'ink',name:'Living Ink',size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'relic',name:'Ward Fragments',size:3,cap:5,rarity:0,depthBias:2,sale:3},
+ {id:'crystal',name:'Sun Crystals',size:3,cap:5,rarity:0,depthBias:2,sale:4}
 ] as const;
 export const resourceById=(id:string)=>RESOURCES.find(resource=>resource.id===id)!;
 export const initialStorage=()=>Object.fromEntries(RESOURCES.map(resource=>[resource.id,{cap:resource.cap,level:0}]));
@@ -27,7 +27,7 @@ export function rollLoot(entries:LootEntry[],budget:number,depth:number,random:(
  const result:Record<string,number>={};let remaining=budget;
  while(remaining>0){
   const choices=pool.filter(entry=>resourceById(entry.id).size<=remaining&&(entry.id==='chips'||eligible(entry.id)));
-  const weights=choices.map(entry=>entry.id==='chips'?1:rarityWeight(entry.weight,resourceById(entry.id).rarity,depth));
+  const weights=choices.map(entry=>entry.id==='chips'?1:rarityWeight(entry.weight,resourceById(entry.id).depthBias,depth));
   const value=random();if(!Number.isFinite(value)||value<0||value>=1)throw Error('Invalid loot roll');
   let roll=value*weights.reduce((sum,weight)=>sum+weight,0),index=choices.length-1;
   for(let i=0;i<choices.length;i++)if((roll-=weights[i])<0){index=i;break;}

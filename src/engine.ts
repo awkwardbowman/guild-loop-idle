@@ -6,7 +6,7 @@ import {STAT_INFO,zeroPools} from './attributes.ts';
 import {travelSeconds,locationById} from './locations.ts';
 import type {LocationId} from './locations.ts';
 import {EVENT_TEXT} from './story.ts';
-import {reportSection} from './sections.ts';
+import {reportSection,isDungeonEvent} from './sections.ts';
 import type {Section} from './sections.ts';
 import { freshProgression, hasFeature, hasEvent, dungeonUnlocked, recordEvent, availableStoryActions, STORY_ACTIONS } from './progression.ts';
 import type { Progression, StoryActionId, EventId } from './progression.ts';
@@ -17,15 +17,18 @@ import type { Pools, Upgrade } from './content.ts';
 export type StatValues = { current: number; max: number; affinity: number };
 export type Assignment = { dungeonId: string; maxDepth: number | null };
 export type Member = SkillProfile & { origin:'legacy'|'recruit'|'arya'|'clyde';equipped:string[];carryCapacity:number;bestRoom:number; id: string; name: string; tier: number; stats: Record<keyof Pools, StatValues>; queue: Assignment[]; queueIndex: number; cooldown: number; resetSeconds: number; enabled: boolean; runs: number };
-export type Run = { stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks' | 'rooms';generated:GeneratedRoom|null;loadout:string[];carryCapacity:number; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; chips: number };
-export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
+export type Run = { stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks' | 'rooms';generated:GeneratedRoom|null;loadout:string[];carryCapacity:number; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; roomLoot?:Record<string,number>; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; chips: number };
+export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools;drops?:Record<string,number>;rarity?:number };
 export type Trade = {id:number;locationId:LocationId;resourceId:string;quantity:number;chips:number;remaining:number;duration:number};
 export type Guildmaster=SkillProfile & {id:'guildmaster';name:string;stats:Member['stats'];innateMagic:true};
 export type Game = { storage:Record<string,{cap:number;level:number}>;equipment:{unlocked:string[];capacity:number}; guildmaster:Guildmaster; homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { chips: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
 export const zero=zeroPools;
 const copy = <T,>(v: T): T => structuredClone(v);
 function rand(g: Game) { g.seed = (Math.imul(1664525, g.seed) + 1013904223) >>> 0; return g.seed / 4294967296; }
-function log(g: Game, member: string, reason: string, detail: string, growth = zero(), section:Section = reportSection({member,reason})) { g.reports.unshift({ section, day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
+function log(g: Game, member: string, reason: string, detail: string, growth = zero(), section:Section = reportSection({member,reason}),extra:Pick<Report,'drops'|'rarity'>={}) {
+ if(section==='Activities'&&!isDungeonEvent(reason))return;
+ g.reports.unshift({section,day:g.day,time:g.elapsed,member,reason,detail,growth,...extra});g.reports=g.reports.slice(0,100);
+}
 export function recruit(g: Game,legacy=false): Member {
  const tier = rand(g) < .22 ? 2 : 1;
  const names = ['Rowan','Mira','Bram','Sable','Tess','Orin','Jun','Wren','Iris','Ash'];
@@ -83,23 +86,32 @@ function arriveHome(g: Game, run: Run, reason: string, detail: string) {
  refreshDiscoveries(g);
  if (reason === 'Retreated') g.stats.retreats++;
  if (reason === 'Warped home') g.stats.warps++;
- log(g, m.name, reason, `${detail} Banked ${run.chips} chips and ${Object.values(run.loot).reduce((a,b)=>a+b,0)} loot. Reset ${m.resetSeconds}s.`, gains);
+ log(g, m.name, reason==='Retreated'?'Dungeon failed':reason, `${dungeonById(run.dungeonId).name} · ${detail} Banked ${run.chips} chips and ${Object.values(run.loot).reduce((a,b)=>a+b,0)} loot. Reset ${m.resetSeconds}s.`, gains);
  g.active = g.active.filter(r => r !== run);
 }
 function finish(g:Game,run:Run,reason:string,detail:string){
  if(run.stage==='returning')return;
  run.stage='returning';run.travelRemaining=run.returnSeconds;run.outcome={reason,detail};
  // Exploration state is no longer active; preserve carried rewards and pending training.
- run.task=0;run.progress=0;run.room=null;run.generated=null;
+ run.task=0;run.progress=0;run.room=null;run.generated=null;delete run.roomLoot;
  if(!run.travelRemaining){arriveHome(g,run,reason,detail);return;}
  log(g,g.members.find(m=>m.id===run.memberId)!.name,'Returning',`${detail} Travel home: ${run.travelRemaining}s.`);
+}
+/** Departing members reserve a dungeon place; homeward travel releases it. */
+export function dungeonOccupants(g:Game,id:string){return g.active.filter(run=>run.dungeonId===id&&run.stage!=='returning');}
+export function memberActivities(g:Game){
+ const expeditionIds=new Set(g.active.map(run=>run.memberId));
+ const expeditions=g.members.filter(member=>expeditionIds.has(member.id)).length;
+ const healing=g.members.filter(member=>!expeditionIds.has(member.id)&&member.cooldown>0).length;
+ // Trading/crafting currently have no assigned members. Pending sales are guild transactions.
+ return {expeditions,trading:0,crafting:0,healing,recruits:g.candidate?1:0,idle:g.members.length-expeditions-healing};
 }
 function dispatch(g: Game) {
  if(!hasFeature(g.progression,'activities'))return;
  for (const m of g.members) {
   if (!m.enabled || m.cooldown > 0 || !m.queue.length || g.active.some(r=>r.memberId===m.id) || g.active.length >= g.guild.slots) continue;
   const entry = m.queue[m.queueIndex % m.queue.length]; const d = dungeonById(entry.dungeonId);
-  if(!dungeonUnlocked(g.progression,d.id))continue;
+  if(!dungeonUnlocked(g.progression,d.id)||dungeonOccupants(g,d.id).length>=d.maxConcurrent)continue;
   const generated=hasEvent(g.progression,'friends_introduced')||hasEvent(g.progression,'room_routes_enabled');
   if (!generated&&g.guild.gear < d.gear) continue;
   if(!generated)g.guild.gear -= d.gear;
@@ -178,8 +190,8 @@ function tick(g: Game) {
 }
 export function advance(input: Game, seconds: number): Game {
  if(!Number.isInteger(seconds)||seconds<0||seconds>86400) throw Error('Advance must be 0–86400 whole seconds.');
- if(input.phase!=='running'||!seconds||(!hasEvent(input.progression,'guild_founded')&&!hasEvent(input.progression,'legacy_access')))return input;
- const g=copy(input);for(let i=0;i<seconds;i++)tick(g);return g;
+ if(!seconds)return input;
+ const g=copy(input);g.phase='running';dispatch(g);for(let i=0;i<seconds;i++)tick(g);return g;
 }
 export function returnETA(g:Game,run:Run):number {
  if(run.stage==='returning')return run.travelRemaining;
@@ -212,12 +224,18 @@ function explorationETA(g: Game, run: Run): number {
 }
 export function recall(input:Game,id:string):Game {const g=copy(input);const r=g.active.find(r=>r.memberId===id);if(!r||r.stage==='returning')return input;finish(g,r,'Recalled','Manual safe return.');return g;}
 export function changePriority(input:Game,priority:Game['guild']['priority']):Game {if(!hasFeature(input.progression,priority==='recruitment'?'recruitment':'infrastructure')||input.guild.priority===priority)return input;const g=copy(input);g.guild.priority=priority;g.guild.work=0;return g;}
-export function acceptCandidate(input:Game):Game {if(!hasEvent(input.progression,'first_member_recruited')&&!hasEvent(input.progression,'legacy_access'))return input;if(!hasFeature(input.progression,'recruitment')||!input.candidate||input.members.length>=input.guild.rosterCap)return input;const g=copy(input);g.members.push(g.candidate!);if(!g.members.at(-1)!.queue.length&&dungeonUnlocked(g.progression,'wood'))g.members.at(-1)!.queue=[{dungeonId:'wood',maxDepth:1}];g.candidate=null;noteEvent(g,'first_member_recruited');return g;}
+export function acceptCandidate(input:Game):Game {if(!hasEvent(input.progression,'first_member_recruited')&&!hasEvent(input.progression,'legacy_access'))return input;if(!hasFeature(input.progression,'recruitment')||!input.candidate||input.members.length>=input.guild.rosterCap)return input;const g=copy(input);g.members.push(g.candidate!);if(!g.members.at(-1)!.queue.length&&dungeonUnlocked(g.progression,'wood'))g.members.at(-1)!.queue=[{dungeonId:'wood',maxDepth:1}];g.candidate=null;for(const entry of g.members.at(-1)!.queue)log(g,g.members.at(-1)!.name,'Dungeon assignment added',dungeonById(entry.dungeonId).name,zero(),'Activities');noteEvent(g,'first_member_recruited');return g;}
 export function declineCandidate(input:Game):Game {const g=copy(input);g.candidate=null;return g;}
-export function dismiss(input:Game,id:string):Game {if(input.active.some(r=>r.memberId===id))return input;const g=copy(input);g.members=g.members.filter(m=>m.id!==id);return g;}
+export function dismiss(input:Game,id:string):Game {if(input.active.some(r=>r.memberId===id))return input;const g=copy(input);for(const entry of g.members.find(member=>member.id===id)?.queue??[])log(g,g.members.find(member=>member.id===id)!.name,'Dungeon assignment removed',dungeonById(entry.dungeonId).name,zero(),'Activities');g.members=g.members.filter(m=>m.id!==id);return g;}
 export function moveMember(input:Game,id:string,delta:number):Game {const g=copy(input);const i=g.members.findIndex(m=>m.id===id),j=i+delta;if(i<0||j<0||j>=g.members.length)return input;[g.members[i],g.members[j]]=[g.members[j],g.members[i]];return g;}
 export const validDepth=(n:unknown):n is number|null=>n===null||(typeof n==='number'&&Number.isInteger(n)&&n>=1&&n<=1000000);
-export function setQueue(input:Game,id:string,queue:Assignment[]):Game {if(queue.length>20||queue.some(e=>!DUNGEONS.some(d=>d.id===e.dungeonId)||!dungeonUnlocked(input.progression,e.dungeonId)||!validDepth(e.maxDepth)))return input;const g=copy(input);const m=g.members.find(m=>m.id===id);if(!m)return input;m.queue=copy(queue);m.queueIndex=0;return g;}
+export function setQueue(input:Game,id:string,queue:Assignment[]):Game {
+ if(queue.length>20||queue.some(e=>!DUNGEONS.some(d=>d.id===e.dungeonId)||!dungeonUnlocked(input.progression,e.dungeonId)||!validDepth(e.maxDepth)))return input;
+ const g=copy(input),member=g.members.find(member=>member.id===id);if(!member)return input;
+ const count=(entries:Assignment[],dungeonId:string)=>entries.filter(entry=>entry.dungeonId===dungeonId).length;
+ for(const dungeon of DUNGEONS){const delta=count(queue,dungeon.id)-count(member.queue,dungeon.id);for(let i=0;i<Math.abs(delta);i++)log(g,member.name,delta>0?'Dungeon assignment added':'Dungeon assignment removed',dungeon.name,zero(),'Activities');}
+ member.queue=copy(queue);member.queueIndex=0;return g;
+}
 export function setDungeonLimit(input:Game,id:string,depth:number|null):Game {if(!DUNGEONS.some(d=>d.id===id)||!dungeonUnlocked(input.progression,id)||!validDepth(depth))return input;const g=copy(input);g.dungeonLimits[id]=depth;return g;}
 export function toggleMember(input:Game,id:string):Game {const g=copy(input);const m=g.members.find(m=>m.id===id);if(m)m.enabled=!m.enabled;return g;}
 export function togglePin(input:Game,id:string):Game {if(!hasFeature(input.progression,'resources'))return input;if(!['gear',...RESOURCES.map(resource=>resource.id)].includes(id))return input;const g=copy(input);g.pinnedResources=g.pinnedResources.includes(id)?g.pinnedResources.filter(x=>x!==id):[...g.pinnedResources,id];return g;}
@@ -236,7 +254,7 @@ export function completeStoryAction(input:Game,id:StoryActionId):Game {
  const g=copy(input);
  if(action.id==='found_guild'){
   g.members.push(startingFriend(g,'arya'),startingFriend(g,'clyde'));noteEvent(g,action.event);noteEvent(g,'first_member_recruited');noteEvent(g,'trail_discovered');
-  for(const member of g.members)member.queue=[{dungeonId:'wood',maxDepth:null}];return g;
+  for(const member of g.members){member.queue=[{dungeonId:'wood',maxDepth:null}];log(g,member.name,'Dungeon assignment added',dungeonById('wood').name,zero(),'Activities');}return g;
  }
  if(action.id==='revisit_catacombs'){if(g.members.length+2>g.guild.rosterCap)return input;g.members.push(startingFriend(g,'arya'),startingFriend(g,'clyde'));for(const member of g.members.filter(member=>member.origin==='arya'||member.origin==='clyde'))member.queue=[{dungeonId:'wood',maxDepth:null}];}
  noteEvent(g,action.event);if(action.event==='archive_discovered')noteEvent(g,'skill_checks_enabled');return g;
@@ -303,7 +321,7 @@ function tickGenerated(g:Game,run:Run){
  if(!run.generated){
   const exertion=roomExertion(run.floor,run.loadout);
   if(member.stats.constitution.current<=exertion){finish(g,run,'Retreated',`Too tired to enter room ${run.floor}.`);return;}
-  member.stats.constitution.current-=exertion;run.generated=rollRoom(run.dungeonId,()=>rand(g));
+  member.stats.constitution.current-=exertion;run.generated=rollRoom(run.dungeonId,()=>rand(g));run.roomLoot={};
   log(g,member.name,'Room entered',`Room ${run.floor} · ${roomById(run.dungeonId,run.generated.id).name}.`);
  }
  const definition=roomById(run.dungeonId,run.generated.id),check=definition.checks[run.generated.index];
@@ -319,10 +337,14 @@ function tickGenerated(g:Game,run:Run){
   for(const [id,amount]of Object.entries(result.specializationTraining))run.specializationTraining[id]=(run.specializationTraining[id]??0)+amount;
   const remaining=run.carryCapacity-cargoSize(run.loot,run.chips),canHarvest=member.skills.harvesting.level>=1;
   const rewards=roomRewards(check,run.floor,remaining,canHarvest,()=>rand(g));
+  run.roomLoot??={};for(const [id,amount]of Object.entries(rewards))run.roomLoot[id]=(run.roomLoot[id]??0)+amount;
   for(const [id,amount]of Object.entries(rewards))if(id==='chips')run.chips+=amount;else run.loot[id]=(run.loot[id]??0)+amount;
   log(g,member.name,'Check succeeded',`${check.name} · ${Object.entries(rewards).map(([id,amount])=>`${amount} ${resourceById(id).name}`).join(', ')}.`);
   run.generated.index++;run.generated.work=0;run.progress=0;
-  if(run.generated.index>=definition.checks.length)resolvedRoom(g,run,false);
+  if(run.generated.index>=definition.checks.length){
+   if(definition.group==='boss'||definition.group==='treasure')log(g,member.name,definition.group==='boss'?'Boss room beaten':'Treasure room cleared',`${dungeonById(run.dungeonId).name} · Room ${run.floor} · ${definition.name}`,zero(),'Activities',{drops:{...run.roomLoot},rarity:definition.rarity});
+   delete run.roomLoot;resolvedRoom(g,run,false);
+  }
  }
  if(g.active.includes(run)&&run.stage==='exploring'&&run.elapsed>=WARP_SECONDS)finish(g,run,'Warped home','Exploration time limit reached.');
 }

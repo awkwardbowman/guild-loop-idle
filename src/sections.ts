@@ -21,3 +21,8 @@ export function reportSection(report:{section?:Section;member:string;reason:stri
 export function filterReports<T extends {section?:Section;member:string;reason:string}>(reports:T[],sections:readonly Section[]):T[]{
  return reports.filter(report=>sections.includes(reportSection(report)));
 }
+
+export const DUNGEON_EVENTS=['Dungeon assignment added','Dungeon assignment removed','Dungeon failed','Boss room beaten','Treasure room cleared'] as const;
+export const isDungeonEvent=(reason:string)=>DUNGEON_EVENTS.some(event=>event===reason);
+/** Also hide verbose history from saves written before compact dungeon logs. */
+export const visibleReport=(report:{section?:Section;member:string;reason:string})=>reportSection(report)!=='Activities'||isDungeonEvent(report.reason)||report.reason==='Retreated';

@@ -1,21 +1,30 @@
+import {ResourceName} from './ResourceName.tsx';
 import React,{useState} from 'react';
 import type {Game} from './engine.ts';
-import {setDungeonLimit} from './engine.ts';
+import {setDungeonLimit,setQueue,dungeonOccupants} from './engine.ts';
 import {DUNGEONS} from './content.ts';
 import {dungeonUnlocked,hasEvent} from './progression.ts';
-import {roomDungeon,ROOM_GROUPS} from './rooms.ts';
-import {SPECIALIZATIONS} from './attributes.ts';
-import {SKILLS,effectiveAttribute} from './skill-system.ts';
+import {roomDungeon} from './rooms.ts';
+import {SKILLS} from './skill-system.ts';
 import {travelSeconds} from './locations.ts';
 import {resourceById} from './resources.ts';
+import {dungeonStatMix,skillStatMix} from './stat-presentation.ts';
+import {StatSymbol,StatSymbols} from './StatSymbols.tsx';
 export function DungeonPanel({game,onChange}:{game:Game;onChange:React.Dispatch<React.SetStateAction<Game>>}){
  const [selected,setSelected]=useState('');const member=game.members.find(member=>member.id===selected)??game.members[0];const modern=hasEvent(game.progression,'friends_introduced')||hasEvent(game.progression,'room_routes_enabled');
- const name=(id:string)=>SPECIALIZATIONS.find(attribute=>attribute.id===id)?.name??id;
- return <><label className="dungeon-comparison">Compare member<select aria-label="Compare dungeon member" value={member?.id??''} onChange={event=>setSelected(event.target.value)}>{game.members.map(member=><option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
- {DUNGEONS.filter(dungeon=>dungeonUnlocked(game.progression,dungeon.id)).map(dungeon=>{const route=roomDungeon(dungeon.id);return <section className="panel dungeon" key={dungeon.id}><div className="panel-heading"><h3>{dungeon.name}</h3><span className="badge">{modern?'No gear required':'Established route'}</span></div><p>{dungeon.description}</p><p className="muted">{travelSeconds(game.homeLocationId,dungeon.locationId)}s outbound · {travelSeconds(dungeon.locationId,game.homeLocationId)}s home · 10 rooms per floor</p>
- {!modern&&<p className="muted">Your established guild keeps its saved task routes. Meet Arya and Clyde in Current Goals to explore weighted room routes.</p>}
- <div className="room-group-weights"><h3>Room group weights</h3><div className="attribute-tags">{ROOM_GROUPS.map(group=><span className="badge" key={group}>{group}: {route.groups[group]}</span>)}</div><p className="muted">A group is rolled first, then a room within that group. Doubling a group’s weight doubles its chance relative to the others.</p></div>
- <details><summary>Rooms, checks and loot</summary>{ROOM_GROUPS.map(group=><div className="attribute-group" key={group}><h3>{group}</h3>{route.rooms.filter(room=>room.group===group).map(room=><article className="dungeon-check-profile" key={room.id}><b>{room.name} · weight {room.weight} · {room.mandatory?'Mandatory':'Optional'}</b>{room.checks.map(check=><div key={check.id}><p>{check.name} · {SKILLS.find(skill=>skill.id===check.skill)?.name}{check.requiredLevel>0?` level ${check.requiredLevel}+`:''}</p><small>{check.attributes.map(attribute=>`${name(attribute.attribute)} ${Math.round(attribute.weight*100)}%`).join(' · ')}</small>{member&&<small>{member.name}: {member.skills[check.skill].level<check.requiredLevel?'Cannot perform this check':`capability ${check.attributes.reduce((sum,attribute)=>sum+attribute.weight*effectiveAttribute({...member,gear:0},attribute.attribute,.5),0).toFixed(2)}`}</small>}<small>Loot weights: Chips 1 · {check.loot.map(entry=>`${resourceById(entry.id).name} ${entry.weight} (size ${resourceById(entry.id).size})`).join(' · ')}</small></div>)}</article>)}</div>)}</details>
- <div className="dungeon-bottom"><p>Difficulty grows ×1.04 per room. Loot budgets grow linearly. Optional failures skip; mandatory failures retry until resources cannot fund progress.</p><label className="depth">Global room limit<input aria-label={`${dungeon.name} global room limit`} type="number" min="1" max="1000000" placeholder="Unlimited" value={game.dungeonLimits[dungeon.id]??''} onChange={event=>{const raw=event.target.value;if(raw===''||Number.isInteger(Number(raw)))onChange(g=>setDungeonLimit(g,dungeon.id,raw===''?null:Number(raw)));}}/></label></div>
+ const [added,setAdded]=useState('');
+ return <><label className="dungeon-comparison">Assign member<select aria-label="Dungeon assignment member" value={member?.id??''} onChange={event=>{setSelected(event.target.value);setAdded('');}}>{game.members.map(member=><option key={member.id} value={member.id}>{member.name}</option>)}</select></label>
+ {DUNGEONS.filter(dungeon=>dungeonUnlocked(game.progression,dungeon.id)).map(dungeon=>{
+ const route=roomDungeon(dungeon.id),mix=dungeonStatMix(dungeon.id);
+ const skillIds=[...new Set(route.rooms.flatMap(room=>room.checks.map(check=>check.skill)))];
+ const loot=modern?['chips',...new Set(route.rooms.flatMap(room=>room.checks.flatMap(check=>check.loot.map(entry=>entry.id))))]:['chips',...dungeon.loot.map(entry=>entry.id)];
+ return <section className="panel compact-card dungeon" key={dungeon.id}>
+ <details className="card-disclosure"><summary><span className="card-title">{dungeon.name}</span><StatSymbols mix={mix}/><span className="badge">{dungeonOccupants(game,dungeon.id).length}/{dungeon.maxConcurrent}</span></summary>
+ <div className="card-body"><p className="lore">{dungeon.description}</p><p className="muted">Travel Time: {travelSeconds(game.homeLocationId,dungeon.locationId)}s</p>
+ <div className="attribute-tags">{mix.map(entry=><StatSymbol key={entry.stat} stat={entry.stat} label value={`${Math.round(entry.weight*100)}%`}/>)}</div>
+ <h4>Skills & opportunities</h4><div className="skill-cards">{skillIds.map(id=>{const skill=SKILLS.find(s=>s.id===id)!;const checks=route.rooms.flatMap(room=>room.checks).filter(check=>check.skill===id);const level=Math.max(...checks.map(c=>c.requiredLevel));return <details className="skill-card" key={id}><summary><span>{skill.name}{level>0&&<small> Lv {level}+</small>}</span><StatSymbols mix={skillStatMix(checks)}/>{member&&<span className="skill-readiness">{member.skills[id].level>=level?'✓':'Locked'}</span>}</summary><div className="card-body"><p>{checks.map(check=>check.name).join(' · ')}</p><div className="attribute-tags">{skillStatMix(checks).map(entry=><StatSymbol key={entry.stat} stat={entry.stat} label/>)}</div>{member&&<p className="muted">{member.name} · Level {member.skills[id].level}{level>0?` / ${level} required`:''}</p>}</div></details>;})}</div>
+ {!modern&&<p className="muted">Established task route. Continue Current Goals to discover new routes.</p>}</div></details>
+ <div className="card-footer"><span className="reward-preview" title="Possible finds">Finds: {loot.map((id,index)=><React.Fragment key={id}>{index>0?' · ':''}<ResourceName id={id}/></React.Fragment>)}</span><div className="card-controls"><label className="depth">Room limit<input aria-label={`${dungeon.name} global room limit`} type="number" min="1" max="1000000" placeholder="Unlimited" value={game.dungeonLimits[dungeon.id]??''} onChange={event=>{const raw=event.target.value;if(raw===''||Number.isInteger(Number(raw)))onChange(g=>setDungeonLimit(g,dungeon.id,raw===''?null:Number(raw)));}}/></label><button disabled={!member||member.queue.length>=20} onClick={()=>{if(!member)return;onChange(g=>{const current=g.members.find(m=>m.id===member.id);return current?setQueue(g,current.id,[...current.queue,{dungeonId:dungeon.id,maxDepth:null}]):g;});setAdded(`${dungeon.id}:${member.id}`);}}>+ Queue</button></div></div>
+ {added===`${dungeon.id}:${member?.id}`&&<span role="status" className="inline-feedback">Added to {member?.name}’s queue</span>}
  </section>;})}</>;
 }

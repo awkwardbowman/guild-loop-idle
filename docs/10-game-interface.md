@@ -74,3 +74,8 @@ The event log uses a compact `D1 - 00:00:00 Unlock` header, a message beneath it
 ### Travel and sales
 
 The calendar shows Emberveil as the home location. Active expedition tiles and member panels show outbound/exploring/homeward stage, stage progress, and total time until home. Check-driven exploration estimates retain the ~ marker; a homeward countdown is exact. Return home initiates travel and disappears during an existing return. Dungeon entries list their location and each leg’s travel time. Resources includes quantity inputs, provisional sale prices, and pending trade countdowns/progress.
+
+
+### Main stats, attributes and guildmaster
+
+The Guild page shows the guildmaster’s own nine-stat profile and innate-magic designation. Member/candidate stats show all nine roots. Luck is displayed as a modifier with maximum/affinity rather than a consumable fraction. The attribute panel offers By main stat and By activity views, exposing all 27 attributes with their root, grouping, trained value, affinity and effective fallback. Learned skills remain a separate panel. Ordinary members rely on relics/artifacts for magical effects.

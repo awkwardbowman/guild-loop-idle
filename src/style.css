@@ -45,3 +45,7 @@
 .pending-trades{margin-top:18px}.pending-trade{padding:10px 0}
 .pending-trade>div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px}
 .pending-trade b{color:var(--accent)}
+
+.attribute-group{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.attribute-group h3{color:var(--accent);margin-bottom:3px}
+.strength progress::-webkit-progress-value{background:#b68a7e}.dexterity progress::-webkit-progress-value{background:#88a99c}.intelligence progress::-webkit-progress-value{background:#8b9dbf}

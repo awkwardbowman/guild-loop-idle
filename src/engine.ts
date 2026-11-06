@@ -1,3 +1,4 @@
+import {STAT_INFO,zeroPools} from './attributes.ts';
 import {travelSeconds,locationById} from './locations.ts';
 import type {LocationId} from './locations.ts';
 import {EVENT_TEXT} from './story.ts';
@@ -15,8 +16,9 @@ export type Member = SkillProfile & { id: string; name: string; tier: number; st
 export type Run = { stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks'; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; gold: number };
 export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
 export type Trade = {id:number;locationId:LocationId;resourceId:string;quantity:number;gold:number;remaining:number;duration:number};
-export type Game = { homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { gold: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
-export const zero = (): Pools => ({ might: 0, agility: 0, focus: 0 });
+export type Guildmaster=SkillProfile & {id:'guildmaster';name:string;stats:Member['stats'];innateMagic:true};
+export type Game = { guildmaster:Guildmaster; homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { gold: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
+export const zero=zeroPools;
 const copy = <T,>(v: T): T => structuredClone(v);
 function rand(g: Game) { g.seed = (Math.imul(1664525, g.seed) + 1013904223) >>> 0; return g.seed / 4294967296; }
 function log(g: Game, member: string, reason: string, detail: string, growth = zero(), section:Section = reportSection({member,reason})) { g.reports.unshift({ section, day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
@@ -26,11 +28,17 @@ export function recruit(g: Game): Member {
  const id = `member-${g.nextId++}`;
  const name = `${names[Math.floor(rand(g) * names.length)]} ${id.split('-')[1]}`;
  const stats = {} as Member['stats'];
- for (const stat of STATS) { const affinity = 35 + tier * 25 + Math.floor(rand(g) * 45); const max = 10 + Math.floor(rand(g) * 8); stats[stat] = { current: max, max, affinity }; }
+ for (const stat of ['strength','dexterity','intelligence',...STATS.filter(stat=>!['strength','dexterity','intelligence'].includes(stat))] as (keyof Pools)[]) { const affinity = 35 + tier * 25 + Math.floor(rand(g) * 45); const max = 10 + Math.floor(rand(g) * 8); stats[stat] = { current: max, max, affinity }; }
  return { ...newSkillProfile(stats), id, name, tier, stats, queue: dungeonUnlocked(g.progression,'wood')?[{ dungeonId: 'wood', maxDepth: 1 }]:[], queueIndex: 0, cooldown: 0, resetSeconds: RESET_SECONDS, enabled: true, runs: 0 };
 }
+/** Provisional starting values; the guildmaster alone has innate magic. */
+export function newGuildmaster():Guildmaster {
+ const stats=Object.fromEntries(STATS.map(stat=>[stat,{current:stat==='soul'?100:12,max:stat==='soul'?100:12,affinity:stat==='soul'?300:60}])) as Member['stats'];
+ return {id:'guildmaster',name:'Guildmaster',innateMagic:true,stats,...newSkillProfile(stats)};
+}
+export const canCastInnateMagic=(g:Game,actorId:string)=>actorId===g.guildmaster.id&&g.guildmaster.innateMagic;
 export function initialGame(seed = 73129): Game {
- const g: Game = { homeLocationId:'emberveil',trades:[],nextTradeId:1,progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { gold: 12, materials: 0, gear: 8, gearCap: 8, gearRegen: .12, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['gold','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
+ const g: Game = { guildmaster:newGuildmaster(),homeLocationId:'emberveil',trades:[],nextTradeId:1,progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { gold: 12, materials: 0, gear: 8, gearCap: 8, gearRegen: .12, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['gold','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
  log(g, 'Story', 'A beginning', 'You and a friend are ready to build a guild.');
  g.pinnedResources=[];
  return g;
@@ -39,8 +47,8 @@ export function initialGame(seed = 73129): Game {
 export function sandboxGame(seed=73129):Game { const g=initialGame(seed);g.progression.completed.guild_founded={day:1,time:0};g.progression.completed.legacy_access={day:1,time:0};
  for (let i = 0; i < 3; i++) g.members.push(recruit(g));
  g.members[0].name = 'Rowan'; g.members[1].name = 'Mira'; g.members[2].name = 'Bram';
- g.members[0].stats.might.max = g.members[0].stats.might.current = 18;
- g.members[1].stats.focus.max = g.members[1].stats.focus.current = 20;
+ g.members[0].stats.strength.max = g.members[0].stats.strength.current = 18;
+ g.members[1].stats.intelligence.max = g.members[1].stats.intelligence.current = 20;
  g.members[1].queue = [{dungeonId:'ruins',maxDepth:1}]; g.members[2].queue = [{dungeonId:'quarry',maxDepth:1}];
  g.progression.completed.guild_founded={day:1,time:0};g.progression.completed.legacy_access={day:1,time:0};g.pinnedResources=['gold','gear','materials'];
  return g;
@@ -138,7 +146,7 @@ function tick(g: Game) {
   run.progress++;
   if(run.progress>=taskDuration(run)) {
    for(const s of STATS) m.stats[s].current=Math.max(0,m.stats[s].current-task.cost[s]*floorScale(run.floor));
-   if(STATS.some(s=>m.stats[s].current<=0)) {finish(g,run,'Retreated',`Stat exhausted on ${d.name} F${run.floor}.`);continue;}
+   if(STATS.some(s=>STAT_INFO[s].consumable&&m.stats[s].current<=0)) {finish(g,run,'Retreated',`Stat exhausted on ${d.name} F${run.floor}.`);continue;}
    for(const s of STATS) run.training[s]+=task.training[s]*floorScale(run.floor);
    run.task++;run.progress=0;
    if(run.task>=d.tasks.length) {
@@ -178,7 +186,7 @@ function explorationETA(g: Game, run: Run): number {
   if(current.progress<taskDuration(current))return seconds;
   const d=dungeonById(current.dungeonId);const task=d.tasks[current.task];
   for(const s of STATS)pools[s]-=task.cost[s]*floorScale(current.floor);
-  if(STATS.some(s=>pools[s]<=0))return seconds;
+  if(STATS.some(s=>STAT_INFO[s].consumable&&pools[s]<=0))return seconds;
   current.task++;current.progress=0;
   if(current.task>=d.tasks.length){if(current.floor>=effectiveLimit(g,current))return seconds;current.floor++;current.task=0;}
  }

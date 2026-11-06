@@ -1,10 +1,11 @@
 import type {LocationId} from './locations.ts';
-export const STATS = ['might', 'agility', 'focus'] as const;
-export type Stat = typeof STATS[number];
-export type Pools = Record<Stat, number>;
+import {zeroPools} from './attributes.ts';
+import type {Pools} from './attributes.ts';
+export {STATS,STAT_INFO,zeroPools} from './attributes.ts';
+export type {Stat,Pools} from './attributes.ts';
 export type Task = { name: string; duration: number; cost: Pools; training: Pools };
 export type Dungeon = { id: string; locationId: LocationId; name: string; subtitle: string; description: string; gear: number; gold: number; accent: string; tasks: Task[]; loot: { id: string; name: string; weight: number }[] };
-const p = (might: number, agility: number, focus: number): Pools => ({ might, agility, focus });
+const p = (strength:number,dexterity:number,intelligence:number):Pools=>({...zeroPools(),strength,dexterity,intelligence});
 export const DUNGEONS: Dungeon[] = [
  { id: 'wood', locationId: 'catacombs', name: 'Ritual Catacombs', subtitle: 'NEAR EMBERVEIL', description: 'Beneath a forgotten shrine, faded ritual marks and broken stones recall an age a thousand years gone. Small creatures now shelter in its quiet passages.', gear: 2, gold: 8, accent: 'green', tasks: [
   { name: 'Clear the fallen branches', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
@@ -26,7 +27,7 @@ export const dungeonById = (id: string) => DUNGEONS.find(d => d.id === id)!;
 export const DAY_SECONDS = 86400;
 export const WARP_SECONDS = 300;
 export const RESET_SECONDS = 12;
-export const VERSION = 4;
+export const VERSION = 5;
 export type Upgrade = 'slots' | 'quarters' | 'gear' | 'regen';
 export const UPGRADE_INFO: Record<Upgrade, { name: string; description: string; gold: number; materials: number }> = {
  slots: { name: 'Expedition desk', description: '+1 simultaneous expedition', gold: 24, materials: 2 },

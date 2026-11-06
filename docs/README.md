@@ -37,6 +37,6 @@ The baseline uses React, TypeScript, and Vite with browser-owned versioned saves
 
 Current version: 0.2 game-interface and bottomless-dungeon redesign. The original website-like dashboard and fixed-day simulation are superseded. See 04, 06, 07 and 10 for current rules.
 
-| [11-progression-and-check-foundations.md](11-progression-and-check-foundations.md) | Implemented event/unlock, attribute/skill/check and save v3 contracts; provisional formulas and authoring extension points |
+| [11-progression-and-check-foundations.md](11-progression-and-check-foundations.md) | Implemented event/unlock, attribute/skill/check and save v5 contracts; provisional formulas and authoring extension points |
 
-Current preparation: version 0.3, pending review; new-player gating and skill-check foundations. Final plot, full attribute tree, decay and gear conversion remain undecided.
+Current preparation: schema v5; accepted nine main stats, nine activity groupings and 27 attributes, plus separate guildmaster stats and modifier-only Luck. Location travel, delayed trades, story/event logs and skill-check foundations are implemented. Spell actions, final plot, decay and gear conversion remain future work. The exact accepted matrix and magic rules are maintained in 02.

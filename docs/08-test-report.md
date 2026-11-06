@@ -1,3 +1,11 @@
+# Nine-stat / 27-attribute validation
+
+November 5, 2026. **90 tests passed, 0 failed**; TypeScript/Vite production build passed. Current results supersede historical counts below.
+
+New regression cases assert the exact approved 27 matches, three per root/activity, correct underlying pools, independent member/guildmaster profiles, exclusive innate-magic eligibility, high guildmaster Soul, modifier-only Luck, no zero-Luck retreat, contributing-attribute training only on success, exact schema-v5 save roundtrip, real v4 Might/Agility/Focus and Finger Dexterity migration, pending trip/trade preservation, exhausted returning members, and malformed-profile rejection. Existing checks, progression, travel/trade and continuous-play regressions also pass.
+
+Visual acceptance remains outstanding because the remote browser could not reach the workspace preview. Spell actions, imbuement production and death/revival behavior are not covered as implemented features.
+
 # Location, travel and trade validation
 
 November 5, 2026. **82 tests passed, 0 failed**; TypeScript/Vite production build passed. This supersedes the current counts below, which are retained as historical evidence.

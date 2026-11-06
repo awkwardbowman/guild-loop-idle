@@ -12,7 +12,7 @@ Updated November 5, 2026. Source: the initial game-design conversation with Maya
 | D04 | Agreed | Recruits have semi-random stats and should be distinctive |
 | D05 | Agreed | Guild capacity, gear capacity, and gear regeneration gate simultaneous expeditions |
 | D06 | Agreed | Dungeons differ in resource requirements and have individual loot pools |
-| D07 | Agreed | Any current stat reaching zero forces retreat; each run also has a timed warp home |
+| D07 | Revised | Insufficient required consumable resources force return; non-consumable modifiers such as Luck do not. The exploration time limit starts return travel. |
 | D08 | Agreed | Dungeon tasks determine stat training, growing maximums for subsequent runs |
 | D09 | Agreed | Each stat has Current Value, Max Value, and Stat Affinity |
 | D10 | Agreed | Higher adventurer tiers have higher average affinities |
@@ -45,7 +45,7 @@ The 0.1 visual design was rejected as too website-like. Replaced with a game-foc
 
 ## Next design decisions
 
-1. Choose the initial stat list and what consuming each stat means.
+1. Tune uses and costs for the accepted nine main stats and 27 attributes; see 02.
 2. Tune bottomless-floor task structure, scaling curves, stat costs and training rewards; depth controls and current completion defaults are in 04.
 3. Decide training retention and any loot retention after retreat or timed warp.
 4. Define capacity and gear semantics: roster versus deployed limits, consumption, reservation, and regeneration.
@@ -90,7 +90,7 @@ These are review considerations, not additional approved mechanics:
 |---|---|---|
 | D33 | Agreed | Save completed events as durable facts; derive feature visibility from them |
 | D34 | Agreed | New players begin with the guild; add 00 Story with feature/content threads appearing as unlocked |
-| D35 | Agreed | Core attributes are pools; specializations consume their underlying root pool, not a child pool |
+| D35 | Revised | Consumable main stats provide pools; specializations charge the underlying root. Luck is a non-consumable modifier. |
 | D36 | Agreed | Specialization fallback extends through ancestry with diminishing contribution |
 | D37 | Agreed | Learned skills have a universal level cap of 99 and determine effective resource use |
 | D38 | Agreed | Check speed, success and efficiency can use different skills or ratios |
@@ -98,3 +98,15 @@ These are review considerations, not additional approved mechanics:
 | D40 | Working defaults | 0.3 supplies a small unlock chain, three sample skills and an archive trap room for testing; plot and final balance remain open |
 
 Functional preparation is implemented and tested. See 11-progression-and-check-foundations.md for technical contracts and 08-test-report.md for actual checks. Source is prepared for a review branch, not a production rollout.
+
+
+## Accepted matrix and guildmaster — November 5, 2026
+
+- Nine main stats: Strength, Dexterity, Constitution, Speed, Perception, Intelligence, Charisma, Soul, Luck.
+- Nine activity groupings: Combat, Dungeoneering, Exploration, Crafting, Social, Trade, Travel & Logistics, Recovery & Support, Management.
+- The exact 27 matches in 02-adventurers-and-stat-growth.md are accepted, with three per stat and three per grouping. Learned skills remain separate.
+- Stats can be consumable, modifiers, or both depending on the activity; Luck is initially non-consumable.
+- The player guildmaster has a separate permanent stat profile with unusually high Soul and is the only innate magic user. Adventurers use relics/artifacts; Soul is useful without spellcasting. Magic/imbuement/revival actions remain future content.
+- The earlier three-pool root model is superseded by schema v5; numerical starting values are implementation defaults.
+- Setting inspiration is Threadless roughly 1,000 years later: a small Emberveil beginning to revive, with Ritual Catacombs nearby. Local travel takes 15 seconds each way; sales take 15 seconds and commit items immediately.
+- A death/revival recovery timer from 4× travel toward 2× travel with diminishing stat benefits is agreed direction; governing stat, scaling and death triggers remain undecided and unimplemented.

@@ -5,7 +5,7 @@ Updated November 5, 2026.
 ## Recruitment and identity — Agreed
 
 - Recruits have semi-random stats and should be individually distinctive.
-- Each stat has a Current Value, Max Value, and Stat Affinity.
+- Main stats retain Current Value, Max Value, and Stat Affinity. Only costs explicitly assigned to consumable stats drain Current Value; Luck is a non-consumable modifier.
 - Higher-tier adventurers have higher average affinities. Tier does not imply identical stat distributions.
 - Exact tiers, roll distributions, starting maximums, traits, classes, and recruit replacement rules are open.
 
@@ -17,7 +17,7 @@ Updated November 5, 2026.
 | Max Value | The amount available at the start of a run; increases through training | Persists between runs |
 | Stat Affinity | Growth potential for this stat; determines how high its maximum can grow | Individual baseline, with future guild modifiers |
 
-Any current stat reaching zero causes retreat. These stats therefore act as expedition resource pools as well as measures of ability.
+Required consumable stats act as expedition resource pools as well as measures of ability. Insufficient resources for required work force return. Luck reaching zero does not cause retreat, and Luck cannot fund a resource charge.
 
 Current values refill for a new run. Each member now has an independent reset cooldown; the playable default is 12 seconds, with a future member stat likely controlling duration. Growth improves the maximum for the next run; it should not be assumed to refill the current run's depleted pool.
 
@@ -73,10 +73,57 @@ The current implementation uses completed-task training, accumulated until retur
 
 ## Attribute and skill foundation — Agreed direction, prepared in 0.3
 
-Core attributes are expendable resource pools with member-specific growth potential. Specializations are capabilities beneath those attributes, not extra resource bars. Finger Dexterity spends the underlying Dexterity pool. Multiple contributing core attributes each pay their part of a check's cost. No mandatory Physical grouping is established; the final root attribute list and tree are still open.
+The accepted main stats and their 27 specializations are listed below. A specialization is a capability beneath a main stat, not an extra resource bar. Finesse spends underlying Dexterity when used to fund work. Multiple contributing roots each pay their part of a check cost. Not every stat must be consumed in a dungeon; Luck is explicitly a modifier. No Physical wrapper is established.
 
-Learned skills are a separate tree/catalog, all capped at level 99. Lock Picking uses 75% Finger Dexterity and 25% Intelligence in the sample definition. Specialization fallback extends through ancestors, retaining less contribution at each step, without counting the same capability repeatedly. Each check can configure speed, success and resource efficiency separately, with different contributing skills/ratios. Intelligence-heavy speed and dexterity-heavy success are intentionally supported.
+Learned skills are a separate tree/catalog, all capped at level 99. Lock Picking uses 75% Finesse and 25% Intelligence in the current definition. Specialization fallback extends through ancestors, retaining less contribution at each step, without counting the same capability repeatedly. Each check can configure speed, success and resource efficiency separately, with different contributing skills/ratios. Intelligence-heavy speed and dexterity-heavy success are intentionally supported.
 
 Skill deterioration through disuse is future agreed direction. Save records include last-used timestamps; decay is disabled. Grace period, rate, retained minimum and recovery remain undecided. Attribute affinity improvements stay limited/future, not a routine skill reward.
 
-The technical contract, provisional formulas, sample progression and save v3 behavior are in 11-progression-and-check-foundations.md. These do not finalize the complete attribute tree or balance.
+The technical contract, provisional formulas, sample progression and save v5 behavior are in 11-progression-and-check-foundations.md. The 9 × 3 matrix is accepted; numerical balance and further skill content remain provisional.
+
+
+## Accepted nine-stat / nine-activity matrix
+
+Each of nine main stats has three attributes. Each of nine activity groupings has three attributes, for 27 unique matches. Role labels describe primary uses; checks may combine attributes across roles. Learned skills such as Lock Picking are separate.
+
+| Main stat | Attribute | Activity grouping |
+|---|---|---|
+| Strength | Power | Combat |
+| Strength | Force | Dungeoneering |
+| Strength | Hauling | Travel & Logistics |
+| Dexterity | Precision | Combat |
+| Dexterity | Finesse | Dungeoneering |
+| Dexterity | Handiwork | Crafting |
+| Constitution | Toughness | Combat |
+| Constitution | Endurance | Travel & Logistics |
+| Constitution | Vitality | Recovery & Support |
+| Speed | Agility | Dungeoneering |
+| Speed | Scouting | Exploration |
+| Speed | Movement | Travel & Logistics |
+| Perception | Observation | Exploration |
+| Perception | Insight | Social |
+| Perception | Diagnosis | Recovery & Support |
+| Intelligence | Design | Crafting |
+| Intelligence | Appraisal | Trade |
+| Intelligence | Planning | Management |
+| Charisma | Persuasion | Social |
+| Charisma | Bargaining | Trade |
+| Charisma | Leadership | Management |
+| Soul | Attunement | Crafting |
+| Soul | Resilience | Recovery & Support |
+| Soul | Inspiration | Management |
+| Luck | Discovery | Exploration |
+| Luck | Serendipity | Social |
+| Luck | Opportunity | Trade |
+
+Combat combines offense and defense. Dungeoneering overcomes environmental obstacles; Exploration discovers routes, hazards and resources. Social concerns people/relationships; Trade concerns economic value. Travel & Logistics moves people/goods; Recovery & Support restores readiness; Management organizes people/work. Crafting includes making, repairing and improving equipment and working with artifacts. These categories are data definitions, not claims that every corresponding activity has been implemented.
+
+## Guildmaster and magic
+
+The guildmaster has a separate permanent nine-stat/27-attribute profile and unusually high Soul. Only the guildmaster has innate magic; adventurers rely on relics/artifacts. Soul alone does not make an adventurer a spellcaster. Attunement supports artifact compatibility, Resilience mental/spiritual recovery and Inspiration morale. The player can eventually provide magic for imbuement while members provide material/design/attunement work. Spell actions, imbuement production and revival mechanics are not implemented yet.
+
+Provisional defaults: guildmaster ordinary stats start at 12/60 maximum/affinity and Soul at 100/300. Newly introduced legacy member stats initialize at 12/60 without RNG changes. These numbers can be tuned without changing the accepted matrix.
+
+## v5 compatibility
+
+Might maps to Strength, old Agility to Dexterity, and Focus to Intelligence. Old Finger Dexterity values and pending training map to Finesse. Newly added roots and attributes initialize deterministically, with existing trained attributes, skill levels, affinity, current pools, carried training, trip/trade timers and RNG preserved. Historical v0–v4 conversions remain supported. Luck never creates a spendable child pool.

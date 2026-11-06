@@ -1,9 +1,10 @@
+import {STAT_INFO,zeroPools} from './attributes.ts';
 import {isLocationId,travelSeconds} from './locations.ts';
 import {isSection} from './sections.ts';
 import { EVENT_IDS } from './progression.ts';
 import { SKILLS, ATTRIBUTES, newSkillProfile, TRAP_ROOM } from './skill-system.ts';
 import type { Game, Member, Assignment } from './engine.ts';
-import { taskDuration, validDepth } from './engine.ts';
+import { taskDuration, validDepth, newGuildmaster } from './engine.ts';
 import { STATS, DUNGEONS, VERSION, WARP_SECONDS, DAY_SECONDS, SALE_VALUES } from './content.ts';
 export const SAVE_KEY = 'guild-loops.save.v1';
 export const BACKUP_KEY = 'guild-loops.backup.v1';
@@ -15,12 +16,15 @@ const text = (v: unknown, max = 200) => typeof v === 'string' && v.length <= max
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 function validateMember(m: Member) {
  requireValue(object(m) && text(m.id,60) && /^member-\d+$/.test(m.id) && text(m.name,60) && integer(m.tier,1,10) && integer(m.runs), 'member identity');
- requireValue(object(m.stats), 'member stats');
+ validateProfile(m);
+ validateRoute(m.queue);
+ requireValue(integer(m.queueIndex,0,Math.max(0,m.queue.length-1)) && integer(m.cooldown,0,86400) && integer(m.resetSeconds,1,86400) && typeof m.enabled==='boolean', 'member schedule');
+}
+function validateProfile(m:Pick<Member,'stats'|'specializations'|'skills'>){
+ requireValue(object(m.stats)&&Object.keys(m.stats).length===STATS.length, 'member stats');
  for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,.001,1e9) && num(v.max,.001,v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
  requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,.001,1e9)&&num(v.value,0,v.affinity);}), 'specialization values');
  requireValue(object(m.skills)&&Object.keys(m.skills).length===SKILLS.length&&SKILLS.every(d=>{const v=m.skills[d.id];return object(v)&&integer(v.level,0,99)&&num(v.experience,0,v.level===99?0:10*(v.level+1)-1e-9)&&(v.lastUsedAt===null||integer(v.lastUsedAt));}), 'learned skills');
- validateRoute(m.queue);
- requireValue(integer(m.queueIndex,0,Math.max(0,m.queue.length-1)) && integer(m.cooldown,0,86400) && integer(m.resetSeconds,1,86400) && typeof m.enabled==='boolean', 'member schedule');
 }
 function validateRoute(route: Assignment[]) { requireValue(Array.isArray(route) && route.length <= 20 && route.every(e => object(e) && DUNGEONS.some(d=>d.id===e.dungeonId) && validDepth(e.maxDepth)), 'dungeon queue'); }
 function pools(p: unknown) { return object(p) && STATS.every(s=>num(p[s])); }
@@ -28,6 +32,8 @@ export function validateGame(input: unknown): Game {
  requireValue(object(input), 'expected a game object');
  const g = input as unknown as Game;
  requireValue(g.version === VERSION, 'unsupported format version');
+ requireValue(object(g.guildmaster)&&g.guildmaster.id==='guildmaster'&&text(g.guildmaster.name,60)&&g.guildmaster.innateMagic===true,'guildmaster');
+ validateProfile(g.guildmaster);
  requireValue(isLocationId(g.homeLocationId)&&integer(g.nextTradeId,1), 'guild location or trade ID');
  requireValue(Array.isArray(g.trades)&&g.trades.length<=100&&new Set(g.trades.map(t=>t.id)).size===g.trades.length&&g.trades.every(t=>object(t)&&integer(t.id,1,g.nextTradeId-1)&&isLocationId(t.locationId)&&Object.hasOwn(SALE_VALUES,t.resourceId)&&integer(t.quantity,1)&&integer(t.gold,1)&&integer(t.duration,1,86400)&&integer(t.remaining,1,t.duration)), 'pending trades');
  requireValue(integer(g.seed,0,4294967295) && integer(g.nextId,1) && integer(g.day,1) && integer(g.elapsed,0,DAY_SECONDS-1), 'clock or random state');
@@ -37,7 +43,7 @@ export function validateGame(input: unknown): Game {
  requireValue(integer(v.gold) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
  requireValue((v.priority==='recruitment'||v.priority==='infrastructure') && integer(v.work,0,19) && object(v.upgrades) && ['slots','quarters','gear','regen'].every(k=>integer((v.upgrades as Record<string,number>)[k],0,100)), 'guild work or upgrades');
  requireValue(Array.isArray(g.members) && g.members.length <= v.rosterCap, 'roster capacity'); g.members.forEach(validateMember);
- for(const m of [...g.members,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.skills).every(s=>s.lastUsedAt===null||s.lastUsedAt<=(g.day-1)*DAY_SECONDS+g.elapsed), 'future skill timestamp');
+ for(const m of [...g.members,g.guildmaster,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.skills).every(s=>s.lastUsedAt===null||s.lastUsedAt<=(g.day-1)*DAY_SECONDS+g.elapsed), 'future skill timestamp');
  if(!Object.hasOwn(g.progression.completed,'guild_founded'))requireValue(g.members.length===0&&g.candidate===null&&g.active.length===0&&g.trades.length===0&&g.phase==='planning','unopened guild');
  const ids = g.members.map(m=>m.id); requireValue(new Set(ids).size === ids.length, 'duplicate members');
  if (g.candidate !== null) { validateMember(g.candidate); requireValue(!ids.includes(g.candidate.id), 'candidate already in roster'); ids.push(g.candidate.id); }
@@ -62,7 +68,7 @@ export function validateGame(input: unknown): Game {
   requireValue(integer(r.task,0,d.tasks.length-1)&&num(r.progress,0,taskDuration(r)-1e-9)&&pools(r.training)&&pools(r.startMax)&&integer(r.gold), 'task state');
   requireValue(object(r.loot)&&Object.entries(r.loot).every(([id,n])=>d.loot.some(l=>l.id===id)&&integer(n)), 'carried loot');
   const m=g.members.find(m=>m.id===r.memberId)!;
-  requireValue(m.cooldown===0&&STATS.every(s=>(r.stage==='returning'||m.stats[s].current>0) && r.startMax[s]===m.stats[s].max), 'active stat snapshot');
+  requireValue(m.cooldown===0&&STATS.every(s=>(r.stage==='returning'||!STAT_INFO[s].consumable||m.stats[s].current>0) && r.startMax[s]===m.stats[s].max), 'active stat snapshot');
  }
  const lootIds=DUNGEONS.flatMap(d=>d.loot.map(l=>l.id));
  requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)), 'inventory');
@@ -71,11 +77,43 @@ export function validateGame(input: unknown): Game {
  return structuredClone(g);
 }
 export function exportSave(g: Game): string { return JSON.stringify({ format: 'guild-loops', version: VERSION, game: validateGame(g) }, null, 2); }
+/** Preserve old roots, carried training and history; initialize newly introduced roots deterministically. */
+function migrateRootStats(g:Record<string,unknown>){
+ requireValue(Array.isArray(g.members)&&Array.isArray(g.active)&&Array.isArray(g.reports),'legacy stat containers');
+ const aliases={strength:'might',dexterity:'agility',intelligence:'focus'} as const;
+ function pool(input:unknown):Record<string,unknown>{
+  requireValue(object(input),'legacy pool');
+  const result:Record<string,unknown>={...zeroPools()};
+  for(const stat of STATS){const old=aliases[stat as keyof typeof aliases];
+   if(Object.hasOwn(input,stat))result[stat]=input[stat];else if(old){requireValue(Object.hasOwn(input,old),'missing legacy pool');result[stat]=input[old];}
+  }
+  return result;
+ }
+ const members=[...g.members,...(g.candidate?[g.candidate]:[])];
+ for(const member of members){
+  requireValue(object(member)&&object(member.stats),'legacy member stats');
+  const stats=member.stats,result:Record<string,unknown>={};
+  for(const stat of STATS){const old=aliases[stat as keyof typeof aliases];
+   if(Object.hasOwn(stats,stat))result[stat]=stats[stat];else if(old){requireValue(Object.hasOwn(stats,old),'missing legacy stat');result[stat]=stats[old];}
+   else result[stat]={current:12,max:12,affinity:60};
+  }
+  member.stats=result;
+ }
+ for(const run of g.active){requireValue(object(run),'legacy run');run.training=pool(run.training);run.startMax=pool(run.startMax);
+  const member=members.find(member=>object(member)&&member.id===run.memberId);requireValue(object(member),'legacy active member');
+  for(const stat of STATS)if(!Object.hasOwn(aliases,stat))(run.startMax as Record<string,unknown>)[stat]=(member.stats as Member['stats'])[stat].max;
+ }
+ for(const report of g.reports){requireValue(object(report),'legacy report');report.growth=pool(report.growth);}
+}
 export function parseSave(raw: string): Game {
  requireValue(raw.length<=2_000_000,'file exceeds 2 MB');
  let data: unknown; try { data=JSON.parse(raw); } catch { throw new Error('This file is not valid JSON. Your current game was not changed.'); }
  requireValue(object(data)&&data.format==='guild-loops','not a Guild Loops save');
- requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===VERSION,'unsupported version; this save may need a newer game');
+ requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===VERSION,'unsupported version; this save may need a newer game');
+ if(typeof data.version==='number'&&data.version<5){
+  requireValue(object(data.game),'legacy stat game');
+  migrateRootStats(data.game);
+ }
  if(data.version===0||data.version===1) {
   requireValue(object(data.game),'legacy game');
   const g=data.game as unknown as Game;
@@ -115,6 +153,24 @@ export function parseSave(raw: string): Game {
    requireValue(object(r)&&DUNGEONS.some(d=>d.id===r.dungeonId),'legacy dungeon');
    const destination=DUNGEONS.find(d=>d.id===r.dungeonId)!.locationId;
    Object.assign(r,{stage:'exploring',originLocationId:'emberveil',destinationLocationId:destination,travelRemaining:0,outboundSeconds:0,returnSeconds:travelSeconds(destination,'emberveil'),outcome:null});
+  }
+  g.version=4;
+ }
+ if(typeof data.version==='number'&&data.version<5){
+  const g=data.game as unknown as Game;requireValue(g.version===4,'legacy stat version');
+  g.guildmaster=newGuildmaster();
+  for(const member of [...g.members,...(g.candidate?[g.candidate]:[])]){
+   const profile=newSkillProfile(member.stats),previous=member.specializations;
+   requireValue(object(previous)&&object(member.skills),'legacy skills');
+   for(const [id,value] of Object.entries(previous)){
+    const target=id==='finger_dexterity'?'finesse':id;
+    requireValue(Object.hasOwn(profile.specializations,target),'unknown legacy specialization');
+    profile.specializations[target]=value;
+   }
+   member.specializations=profile.specializations;
+  }
+  for(const run of g.active)if(Object.hasOwn(run.specializationTraining,'finger_dexterity')){
+   run.specializationTraining.finesse=run.specializationTraining.finger_dexterity;delete run.specializationTraining.finger_dexterity;
   }
   g.version=VERSION;
  }

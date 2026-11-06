@@ -3,24 +3,24 @@ import assert from 'node:assert/strict';
 import {initialGame,completeStoryAction,startDay,advance,recall,sellResource,returnETA,toggleMember,setQueue} from '../src/engine.ts';
 import {parseSave,exportSave} from '../src/persistence.ts';
 import {LOCATIONS,travelSeconds} from '../src/locations.ts';
-import {DUNGEONS,STATS} from '../src/content.ts';
+import {DUNGEONS,STATS,STAT_INFO} from '../src/content.ts';
 function expedition(){let g=initialGame();for(const action of ['found_guild','welcome_friend','discover_trail'] as const)g=completeStoryAction(g,action);return startDay(g);}
 function trading(){let g=advance(expedition(),40);g=toggleMember(g,g.members[0].id);g.inventory={timber:10,herb:4};return g;}
 test('T01 local trip takes 15 seconds each way; no work, payment or recovery before its stage',()=>{
- let g=expedition();const seed=g.seed,max=g.members[0].stats.might.max;
+ let g=expedition();const seed=g.seed,max=g.members[0].stats.strength.max;
  assert.equal(g.homeLocationId,'emberveil');assert.equal(g.active[0].destinationLocationId,'catacombs');assert.equal(returnETA(g,g.active[0]),40);
  g=advance(g,14);assert.equal(g.active[0].stage,'outbound');assert.equal(g.active[0].travelRemaining,1);assert.equal(g.active[0].elapsed,0);assert.equal(g.seed,seed);assert.equal(g.stats.clears,0);
  g=advance(g,1);assert.equal(g.active[0].stage,'exploring');assert.equal(g.active[0].progress,0);
- g=advance(g,10);assert.equal(g.active[0].stage,'returning');assert.equal(g.active[0].travelRemaining,15);assert.equal(g.stats.clears,1);assert.equal(g.members[0].stats.might.max,max);assert.equal(g.guild.gold,12);assert.deepEqual(g.inventory,{});assert.equal(g.members[0].cooldown,0);
+ g=advance(g,10);assert.equal(g.active[0].stage,'returning');assert.equal(g.active[0].travelRemaining,15);assert.equal(g.stats.clears,1);assert.equal(g.members[0].stats.strength.max,max);assert.equal(g.guild.gold,12);assert.deepEqual(g.inventory,{});assert.equal(g.members[0].cooldown,0);
  g=advance(g,14);assert.equal(g.active[0].travelRemaining,1);assert.equal(g.members[0].runs,0);
- g=advance(g,1);assert.equal(g.active.length,0);assert.equal(g.guild.gold,20);assert.equal(g.members[0].runs,1);assert.equal(g.members[0].cooldown,12);assert.ok(g.members[0].stats.might.max>max);
+ g=advance(g,1);assert.equal(g.active.length,0);assert.equal(g.guild.gold,20);assert.equal(g.members[0].runs,1);assert.equal(g.members[0].cooldown,12);assert.ok(g.members[0].stats.strength.max>max);
  assert.equal(Object.values(g.inventory).reduce((a,b)=>a+b,0),1);
 });
 test('T02 outbound and exploring recalls travel home once; returning cannot restart or bypass the delay',()=>{
  for(const elapsed of [5,20]){let g=advance(expedition(),elapsed);g=recall(g,g.members[0].id);assert.equal(g.active[0].stage,'returning');assert.equal(g.active[0].travelRemaining,15);assert.equal(recall(g,g.members[0].id),g);g=advance(g,15);assert.equal(g.members[0].runs,1);assert.equal(g.guild.gold,12);}
 });
 test('T03 exhausted member can save while returning; training and rewards stay unbanked until arrival',()=>{
- let g=expedition();g.members[0].stats.might.current=3;g=advance(g,18);assert.equal(g.active[0].stage,'returning');assert.equal(g.members[0].stats.might.current,0);assert.equal(g.stats.retreats,0);
+ let g=expedition();g.members[0].stats.strength.current=3;g=advance(g,18);assert.equal(g.active[0].stage,'returning');assert.equal(g.members[0].stats.strength.current,0);assert.equal(g.stats.retreats,0);
  const loaded=parseSave(exportSave(g));assert.deepEqual(loaded,g);g=advance(loaded,15);assert.equal(g.stats.retreats,1);assert.equal(g.members[0].cooldown,12);assert.deepEqual(parseSave(exportSave(g)),g);
 });
 test('T04 route destinations and durations are snapshotted while future assignments change',()=>{
@@ -42,7 +42,7 @@ test('T07 concurrent trades survive saves; invalid quantities and unavailable re
 test('T08 imports reject broken routes, timers, duplicate trade IDs and depleted exploring members',()=>{
  const mutations=[(g:any)=>g.active[0].stage='teleporting',(g:any)=>g.active[0].destinationLocationId='nowhere',(g:any)=>g.active[0].travelRemaining=-1,(g:any)=>g.active[0].travelRemaining=16,(g:any)=>g.homeLocationId='nowhere',(g:any)=>g.active[0].stage='returning'];
  for(const mutate of mutations){const raw=JSON.parse(exportSave(expedition()));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(raw)));}
- let g=advance(expedition(),15);for(const stat of STATS){const raw=JSON.parse(exportSave(g));raw.game.members[0].stats[stat].current=0;assert.throws(()=>parseSave(JSON.stringify(raw)));}
+ let g=advance(expedition(),15);for(const stat of STATS.filter(stat=>STAT_INFO[stat].consumable)){const raw=JSON.parse(exportSave(g));raw.game.members[0].stats[stat].current=0;assert.throws(()=>parseSave(JSON.stringify(raw)));}
  g=sellResource(trading(),'timber',1);for(const mutate of [(g:any)=>g.trades[0].remaining=0,(g:any)=>g.trades.push(g.trades[0]),(g:any)=>g.trades[0].resourceId='gold']){const raw=JSON.parse(exportSave(g));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(raw)));}
 });
 test('T09 v3 active outings migrate in place without replaying outbound travel or losing carried loot',()=>{

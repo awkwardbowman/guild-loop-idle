@@ -12,9 +12,8 @@ function opening(seed=73129){let g=initialGame(seed);for(const action of ['remem
 test('CL01 queue changes log additions/removals, not repeated runs or cap edits',()=>{
  let g=opening();const member=g.members[0],count=g.reports.filter(r=>isDungeonEvent(r.reason)).length;
  g=setQueue(g,member.id,[{dungeonId:'wood',maxDepth:2}]);assert.equal(g.reports.filter(r=>isDungeonEvent(r.reason)).length,count);
- g=setQueue(g,member.id,[{dungeonId:'wood',maxDepth:2},{dungeonId:'wood',maxDepth:1}]);assert.equal(g.reports[0].reason,'Dungeon assignment added');
- g=setQueue(g,member.id,[{dungeonId:'wood',maxDepth:1},{dungeonId:'wood',maxDepth:2}]);assert.equal(g.reports.filter(r=>isDungeonEvent(r.reason)).length,count+1);
- g=setQueue(g,member.id,[]);assert.equal(g.reports.filter(r=>r.reason==='Dungeon assignment removed').length,2);
+ const unchanged=setQueue(g,member.id,[{dungeonId:'wood',maxDepth:2},{dungeonId:'wood',maxDepth:1}]);assert.equal(unchanged,g);
+ g=setQueue(g,member.id,[]);assert.equal(g.reports.filter(r=>r.reason==='Dungeon assignment removed').length,1);
 });
 test('CL02 routine dungeon chatter is suppressed; boss/treasure events retain validated drops',()=>{
  let g=advance(opening(),800);const events=g.reports.filter(r=>r.section==='Activities');assert.ok(events.length>0);assert.ok(events.every(r=>isDungeonEvent(r.reason)));
@@ -26,7 +25,7 @@ test('CL02 routine dungeon chatter is suppressed; boss/treasure events retain va
 test('CL03 exhausted dungeons produce one failure, while manual recall produces no failure',()=>{
  let g=opening();g=advance(g,1);g.members[0].stats.constitution.current=0;g=advance(g,31);assert.equal(g.reports.filter(r=>r.reason==='Dungeon failed').length,1);
  let h=advance(opening(),1);h=recall(h,h.active[0].memberId);h=advance(h,15);assert.equal(h.reports.filter(r=>r.reason==='Dungeon failed').length,0);
- assert.equal(visibleReport({member:'Arya',reason:'Room entered',section:'Activities'}),false);assert.equal(visibleReport({member:'Arya',reason:'Retreated',section:'Activities'}),true);
+ assert.equal(visibleReport({member:'Arya',reason:'Room entered',section:'Activities'}),false);assert.equal(visibleReport({member:'Arya',reason:'Retreated',section:'Activities'}),false);
 });
 test('CL04 every attribute has a shared activity shape and parent color; rarity is independent of drop tuning',()=>{
  assert.equal(new Set(STATS.map(stat=>STAT_VISUALS[stat].color)).size,9);assert.equal(new Set(ACTIVITY_GROUPS.map(group=>ACTIVITY_VISUALS[group.id].path)).size,9);

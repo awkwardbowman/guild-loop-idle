@@ -1,3 +1,22 @@
+# Current resource and equipment classification — November 6, 2026
+
+Resource and equipment definitions now hold rarity and tier separately. Existing drops/equipment remain Common. Leather Scraps are T1, Animal Hides T2, Ore T2 and Herbs provisionally T3. Resource tooltips expose both fields; shop tags show rarity and tier. Stable IDs, quantities, costs, bonuses, carrying sizes, loot probabilities and loadout behavior are preserved by this classification pass. This sits on top of the prior weighted-engine/shop pass: equipment capacity is per ally tier; Chips are uncapped; storage offers bulk purchases; Gavin's shared requests consume their fixed materials and teach a selected ally before gear purchases. Earlier global shop-slot ceilings below are historical. No new rarity/tier equip restriction is introduced. Hardened Hide, Scales, ore-family extensions and lore renaming remain future content; a tier-aware loot curve is deferred until balanced and validated.
+
+# Current guild, shops and storage — save v7
+
+Supersedes global equipment-capacity purchases and the standalone Resources page below. Equipment capacity equals each ally’s tier, independent of item tier; each starter equips one item. Purchased templates remain guild-wide. Removed shop capacity offers/API is a no-op compatibility entry point. Existing owned gear is retained, with excess equipped pieces removed when importing pre-v7 saves. Legacy owned templates grandfather their purchase access.
+
+Shops groups by city, currently Emberveil/Gavin and unlocked Stillmere/Elder Ash. Each shop has Shop and Requests tabs. Gavin’s two requests also render in Current Goals using the same completion API/state. Stable request IDs, actor instance IDs, resource IDs and skill IDs are separate.
+
+- gavin_leather_lesson: 12 Leather Scraps (the initial storage cap), consumed once. Choose an Arya/Clyde instance; Guild Master cannot be taught normal skills. Learner receives known Leather Crafting level 1; the permanent progression event unlocks shared armor/satchel purchases and reveals the first crafting assignment card. Its actual recipe/action is deliberately deferred.
+- gavin_herb_referral: 5 Herbs (initial cap), consumed once. Unlocks Stillmere and Gavin’s herbologist friend Elder Ash. Upgraded storage caps do not change either request cost.
+
+Purchase rows put fixed-width item-tier tags on the left. Bought rows are gray, affordable unlocked rows green, and other rows use the standard palette. Each cost shows owned/required: gray for insufficient stock, red if storage capacity is below the requirement, green if funded. Hide maxed purchases hides owned templates.
+
+Storage, pinning and timed selling now live in Guild → Storage. Resource sidebar has no pinned-count label; each pinned value shows owned/max, red when full. Chips has infinite storage and no cap purchase; its stored numeric legacy cap is ignored. Capacity quantity options are 1/10/100/Max upgrades. Prices sum all sequential exponential upgrades; fixed batches are atomic, while Max chooses all affordable upgrades within the existing level/number limits.
+
+Attention symbols for recruits/healing/idle remain at fixed positions even at zero; other activity counts use a matching spacer so numbers align. Top main navigation never includes these indicators.
+
 # Guild and Resources
 
 Updated November 5, 2026. Current opening supersedes the prototype consumable-gear economy.

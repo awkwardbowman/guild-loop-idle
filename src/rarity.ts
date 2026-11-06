@@ -1,4 +1,4 @@
-/** Shared rarity IDs are zero-based; tier 1 presentation is Common. */
+/** Rarity is the outer classification; positive tiers are independent ranks within it. */
 export const Rarity={Common:0,Uncommon:1,Rare:2,Epic:3,Legendary:4,Mythic:5,Relic:6,Masterwork:7,Eternal:8} as const;
 export type RarityDefinition={name:string;short:string;color:string};
 export const rarity:readonly RarityDefinition[]=[

@@ -1,3 +1,11 @@
+# Current backlog UI — November 6, 2026
+
+Members → Assignments starts with current activity/status, live outing progress/cargo and contextual pause/recall/remove/dismiss actions. Unlocked dungeon choices follow it; there is no multi-entry route editor. Each option displays member-specific farthest room, last return room/reason and an editable personal cap when assigned. Empty history is —. Changing assignment moves the waiting destination; current trips continue their saved destination/cap.
+
+Dungeon cards show active/capacity immediately followed by N queued. Expanding shows the roster-ordered waiting members and live relevant current/max pools. Sidebar member totals distinguish queued from idle and healing; dungeon sidebar tiles also show queued counts. Members/candidates show separate rarity and tier; material tooltips and equipment tags share the same classification vocabulary.
+
+Story → Plot is newest first by saved day/time, with reverse event-registry order as deterministic tie breaker. Underlying event timestamps, unlock destinations and durable progression records are unchanged.
+
 # Game Interface
 
 Agreed redesign, November 5, 2026. Replaces the presentation-led baseline dashboard.
@@ -135,3 +143,21 @@ Members’ summary and main navigation display shared attention symbols/counts f
 Dungeon logs are limited to new/removed assignments, failed dungeons, completed boss rooms and completed treasure rooms. Routine departure/travel/room/check/retry/successful return chatter is no longer stored; verbose entries from older saves are hidden. Assignment reordering or cap-only edits do not generate new-assignment spam. Boss/treasure events include the entire room’s actual drops; room drop accumulators survive mid-room saves. Other event sections are unchanged.
 
 `rarity.ts` is the shared zero-indexed Common → Eternal palette supplied by Maya, with enum-like Rarity IDs and direct rarity[index] access. All current resources and rooms are Common (index 0 / tier 1), as are current recruit presentation tags. Equipment level is separate from rarity. Resource depthBias preserves prior depth weighting independently of display rarity. Shared components tint resource names, actual drop lists, room labels and recruit tags; contracts/trade variants can reuse the same registry.
+
+### Discovered skills browser — current
+
+Skills starts with no visible learned/combo skills. Internal starter abilities remain in place so Arya/Clyde and the opening checks retain their authored behavior; visibility is a separate discovered flag. Positive experience from successful use reveals a skill. Failure, ineligibility and resource exhaustion do not reveal it. Existing saves without that flag retain previously used/experienced skills while untouched starter levels remain hidden. The dungeon’s expanded skill cards use the same discovery rule.
+
+Each learned skill is one compact inline row: name, participating attribute symbols in parent colors, and level. No Practice column, XP fraction or /99 text appears on normal rows. Left sub-card provides all 27 named/symbolized attributes as a scrollable checklist, searchable by attribute/root/activity name. Matching any checked attribute includes a discovered skill; no checked filters includes all discovered skills. Clear resets the checklist/search. The right side provides skill-name search and Name A–Z / Level descending sorting. Empty learned list and no-filter-results have distinct messages.
+
+Discovery is optional save metadata validated as boolean. Save version remains 6; no numeric skill levels, XP thresholds, success chances or resource costs change.
+
+### Weighted engine / shop request pass — current
+
+The separate Resources tab is removed; storage/trading/pinning are consolidated under Guild → Storage, including its sidebar management link. Pin dropdown omits its count and shows owned/max values, red at maximum; Chips displays ∞. Capacity selection uses 1/10/100/Max.
+
+Main navigation is stable with no attention icons. Sidebar Members always renders recruit/healing/idle icons and counts in fixed-width positions, with matching empty spacers in other activity rows. Catacomb expanded cards explicitly show Combat and Herbology to communicate the starter roles.
+
+Shops has city tabs, shop sections Shop/Requests, left-fixed tier tags, bought/affordable/unfunded row states, owned/required cost text and a hide-maxed checkbox. Requests are actionable both here and in Current Goals. Leather lesson selection only lists Arya/Clyde instances; completed requests gray out and cannot charge again. Elder Ash appears in Stillmere after the herb referral. The Leather Crafting assignment entry is visible after teaching, but no crafting timer/input/output is invented.
+
+Current generated rooms now clear deterministically with full-second weighted parent-pool costs. Normal return UI does not show a recovery state; only injured returns heal. Info text and archived history filtering reflect the distinction. Save v7 migrates existing skill profiles, requests defaults, equipped limits and partial generated work.

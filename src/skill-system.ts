@@ -5,6 +5,8 @@ export {ATTRIBUTES} from './attributes.ts';
 export type {AttributeDefinition} from './attributes.ts';
 export type SkillDefinition={id:string;name:string;affinities:{attribute:string;weight:number}[];specialization:number;dungeonId?:string};
 export const SKILLS: SkillDefinition[]=[
+ {id:'herbology',name:'Herbology',affinities:[{attribute:'handiwork',weight:.4},{attribute:'observation',weight:.6}],specialization:.5},
+ {id:'leather_crafting',name:'Leather Crafting',affinities:[{attribute:'handiwork',weight:.6},{attribute:'design',weight:.4}],specialization:.5},
  {id:'combat',name:'Combat',affinities:[{attribute:'power',weight:.5},{attribute:'precision',weight:.5}],specialization:.5},
  {id:'athletics',name:'Athletics',affinities:[{attribute:'agility',weight:.5},{attribute:'endurance',weight:.5}],specialization:.5},
  {id:'scavenging',name:'Scavenging',affinities:[{attribute:'observation',weight:.5},{attribute:'discovery',weight:.5}],specialization:.5},
@@ -15,11 +17,11 @@ export const SKILLS: SkillDefinition[]=[
  {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finesse',weight:.75},{attribute:'design',weight:.25}],specialization:.5}
 ];
 export type Specialization={value:number;affinity:number};
-export type LearnedSkill={level:number;experience:number;lastUsedAt:number|null};
+export type LearnedSkill={discovered?:boolean;level:number;experience:number;lastUsedAt:number|null};
 export type SkillProfile={specializations:Record<string,Specialization>;skills:Record<string,LearnedSkill>};
 export type CheckActor=SkillProfile & {stats:Record<Stat,{current:number;max:number;affinity:number}>;gear:number};
 export function newSkillProfile(stats:CheckActor['stats']):SkillProfile {
- return {specializations:Object.fromEntries(ATTRIBUTES.filter(a=>a.parent).map(a=>[a.id,{value:0,affinity:stats[rootPool(a.id)].affinity}])),skills:Object.fromEntries(SKILLS.map(s=>[s.id,{level:0,experience:0,lastUsedAt:null}]))};
+ return {specializations:Object.fromEntries(ATTRIBUTES.filter(a=>a.parent).map(a=>[a.id,{value:0,affinity:stats[rootPool(a.id)].affinity}])),skills:Object.fromEntries(SKILLS.map(s=>[s.id,{discovered:false,level:0,experience:0,lastUsedAt:null}]))};
 }
 export function validateAttributeTree(tree:AttributeDefinition[]){
  const ids=new Set(tree.map(a=>a.id));if(ids.size!==tree.length)throw Error('Duplicate attribute');
@@ -50,7 +52,8 @@ export function resourceCost(actor:CheckActor,check:CheckDefinition,scale=1):Poo
 }
 function pay(actor:CheckActor,cost:Pools):boolean {if((Object.keys(cost) as Stat[]).some(s=>cost[s]>0&&(actor.stats[s].current<=0||actor.stats[s].current<cost[s])))return false;for(const s of Object.keys(cost) as Stat[])actor.stats[s].current=Math.max(0,actor.stats[s].current-cost[s]);return true;}
 function exhausted(actor:CheckActor,cost:Pools){return (Object.keys(cost) as Stat[]).some(s=>cost[s]>0&&actor.stats[s].current<=0);}
-export function gainSkillExperience(skill:LearnedSkill,amount:number,now:number){skill.lastUsedAt=now;skill.experience+=amount;while(skill.level<99&&skill.experience>=10*(skill.level+1)){skill.experience-=10*(skill.level+1);skill.level++;}if(skill.level===99)skill.experience=0;}
+export const isSkillDiscovered=(skill:LearnedSkill)=>skill.discovered??(skill.experience>0||skill.lastUsedAt!==null);
+export function gainSkillExperience(skill:LearnedSkill,amount:number,now:number){if(amount>0)skill.discovered=true;skill.lastUsedAt=now;skill.experience+=amount;while(skill.level<99&&skill.experience>=10*(skill.level+1)){skill.experience-=10*(skill.level+1);skill.level++;}if(skill.level===99)skill.experience=0;}
 // Disuse metadata is stored now. No deterioration is applied until its design is approved.
 export const SKILL_DECAY={enabled:false} as const;
 export function stepRoom(input:CheckActor,room:CheckRoom,state:RoomState,random:()=>number,now:number,scale=1){

@@ -1,3 +1,9 @@
+# Current single assignment — November 6, 2026
+
+This supersedes multi-entry queues, duplicate destinations, reordering and cycling below. Each member has zero or one repeating dungeon assignment; the engine rejects multi-entry edits. Assigning a different dungeon replaces that destination. Removing an assignment prevents future departure while an active trip finishes normally. Roster priority determines dispatch and visible waiting order. Queued members are counted separately from idle; healing remains a distinct state, and active/disabled/healing members do not count in the ready dungeon queue.
+
+Each assignment retains a personal room cap; global caps retain their existing behavior. Edits affect future trips; active snapshots are preserved. Save v8 migrates each old route to its saved next entry and resets its index to zero, preserving active trips and stats. No historical per-dungeon run data is invented. Member Assignments shows current activity and contextual actions, unlocked dungeon choices, personal cap and member-specific dungeon history. Crafting recipe/execution design remains deferred, so the unlocked Leather Crafting entry remains a placeholder rather than an assignable job.
+
 # Queues and Assignment
 
 Updated November 5, 2026 for the continuous-time redesign.

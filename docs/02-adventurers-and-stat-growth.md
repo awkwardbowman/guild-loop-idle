@@ -1,3 +1,7 @@
+# Current classification — November 6, 2026
+
+Rarity is the broad class; Tier is a separate, open-ended positive rank within it. Both are stored and displayed for members and recruitment candidates. Arya and Clyde are Common T1 and retain affinity total 10, starting maximum total 9, learned identities and normal starter equipment access. Existing saves receive Common classification without rewriting stats. No tier boundary automatically changes rarity; future Rare recruits should have correspondingly higher tiers, not an assumed Rare T1. Current Common recruitment keeps its prior distribution and provisional 10^tier budget. Cross-rarity affinity curves and recruitment distributions remain future balance work. The tier-10 validation ceiling is removed; safe-integer serialization limits are technical guards, not content progression limits.
+
 # Adventurers and Stat Growth
 
 Updated November 5, 2026.

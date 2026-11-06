@@ -1,12 +1,20 @@
 import React,{useState} from 'react';
 import {STAT_VISUALS} from './stat-presentation.ts';
 import type {Member} from './engine.ts';
-import {SKILLS} from './skill-system.ts';
+import {browseLearnedSkills} from './skill-browser.ts';
+import type {SkillSort} from './skill-browser.ts';
 import {StatSymbol,ActivitySymbol} from './StatSymbols.tsx';
 import {ACTIVITY_GROUPS,STATS,STAT_INFO,SPECIALIZATIONS,STAT_SHORT} from './attributes.ts';
 type Profile=Pick<Member,'stats'|'specializations'|'skills'>;
 export function LearnedSkillsPanel({member}:{member:Profile}){
- return <table><thead><tr><th>Skill</th><th>Level</th><th>Practice</th></tr></thead><tbody>{SKILLS.map(skill=>{const learned=member.skills[skill.id];return <tr key={skill.id}><td><b>{skill.name}</b><span className="skill-detail attribute-tags">{skill.affinities.map(a=>{const attribute=SPECIALIZATIONS.find(n=>n.id===a.attribute)!;return <span key={a.attribute} style={{color:STAT_COLORS[attribute.parent]}}><ActivitySymbol group={attribute.group} stat={attribute.parent}/> {attribute.name}</span>;})}</span></td><td>{learned.level} / 99</td><td>{learned.level===99?'Mastered':`${learned.experience} / ${10*(learned.level+1)}`}</td></tr>;})}</tbody></table>;
+ const [selected,setSelected]=useState<string[]>([]),[attributeQuery,setAttributeQuery]=useState(''),[query,setQuery]=useState(''),[sort,setSort]=useState<SkillSort>('name');
+ const known=browseLearnedSkills(member),skills=browseLearnedSkills(member,selected,query,sort);
+ const attributes=SPECIALIZATIONS.filter(attribute=>[attribute.name,STAT_INFO[attribute.parent].name,ACTIVITY_GROUPS.find(group=>group.id===attribute.group)!.name].some(name=>name.toLocaleLowerCase().includes(attributeQuery.trim().toLocaleLowerCase())));
+ const toggle=(id:string)=>setSelected(current=>current.includes(id)?current.filter(attribute=>attribute!==id):[...current,id]);
+ return <div className="skill-browser"><aside className="skill-filter-card" aria-label="Skill attribute filters"><div className="skill-filter-heading"><b>Attributes · {selected.length}/27</b><button disabled={!selected.length&&!attributeQuery} onClick={()=>{setSelected([]);setAttributeQuery('');}}>Clear</button></div><input type="search" aria-label="Search skill attributes" placeholder="Find an attribute…" value={attributeQuery} onChange={event=>setAttributeQuery(event.target.value)}/><div className="skill-filter-checklist">{attributes.map(attribute=><label key={attribute.id} title={`${STAT_INFO[attribute.parent].name} · ${ACTIVITY_GROUPS.find(group=>group.id===attribute.group)!.name}`}><input type="checkbox" checked={selected.includes(attribute.id)} onChange={()=>toggle(attribute.id)}/><ActivitySymbol group={attribute.group} stat={attribute.parent}/><span style={{color:STAT_COLORS[attribute.parent]}}>{attribute.name}</span></label>)}{!attributes.length&&<p className="muted">No attributes match.</p>}</div></aside>
+ <section className="learned-skill-results" aria-label="Learned skills"><div className="skill-browser-toolbar"><input type="search" aria-label="Search learned skills" placeholder="Search skills…" value={query} onChange={event=>setQuery(event.target.value)}/><select aria-label="Sort learned skills" value={sort} onChange={event=>setSort(event.target.value as SkillSort)}><option value="name">Name A–Z</option><option value="level">Level ↓</option></select></div>
+ {skills.length?<ul className="compact-skill-list">{skills.map(skill=><li key={skill.id}><b>{skill.name}</b><span className="skill-combination" aria-label={`${skill.name} attributes`}>{skill.affinities.map(affinity=>{const attribute=SPECIALIZATIONS.find(attribute=>attribute.id===affinity.attribute)!;return <span key={attribute.id} title={attribute.name}><ActivitySymbol group={attribute.group} stat={attribute.parent}/></span>;})}</span><span className="skill-level">Lv {member.skills[skill.id].level}</span></li>)}</ul>:<p className="skill-empty muted">{known.length?'No skills match these filters.':'No skills discovered yet.'}</p>}
+ </section></div>;
 }
 export function AttributesPanel({member}:{member:Profile}){
  const [sort,setSort]=useState<'stat'|'skill'>('stat');

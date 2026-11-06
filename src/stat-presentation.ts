@@ -17,7 +17,7 @@ export const STAT_VISUALS:Record<Stat,{color:string;path:string}>={
 export type StatEmphasis={stat:Stat;weight:number};
 export function checkStatMix(check:Pick<RoomCheck,'attributes'>):StatEmphasis[]{
  const weights=new Map<Stat,number>();
- for(const entry of check.attributes){const stat=SPECIALIZATIONS.find(a=>a.id===entry.attribute)?.parent;if(stat)weights.set(stat,(weights.get(stat)??0)+entry.weight);}
+ for(const entry of check.attributes){const stat=SPECIALIZATIONS.find(a=>a.id===entry.attribute)?.parent??(STATS.includes(entry.attribute as Stat)?entry.attribute as Stat:undefined);if(stat)weights.set(stat,(weights.get(stat)??0)+entry.weight);}
  return [...weights].map(([stat,weight])=>({stat,weight})).sort((a,b)=>b.weight-a.weight||STATS.indexOf(a.stat)-STATS.indexOf(b.stat));
 }
 /** Expected requirement mix from the live group/room probabilities, not old planning profiles. */

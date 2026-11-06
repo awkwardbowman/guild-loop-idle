@@ -1,6 +1,11 @@
+import {REQUESTS} from './requests.ts';
+import type {RequestId,RequestCompletion} from './requests.ts';
+import {storageQuote,storageCap} from './resources.ts';
+import type {StorageQuantity} from './resources.ts';
+import {equipmentCapacity} from './equipment.ts';
 import {RESOURCES,resourceById,initialStorage,storageUpgradePrice,nextStorageCap,cargoSize,difficultyAtRoom} from './resources.ts';
 import {EQUIPMENT,equipmentById,equipmentBonus,carryingLimit,SHOP_CAPACITY} from './equipment.ts';
-import {rollRoom,roomById,roomExertion,roomCheckStep,roomRewards} from './rooms.ts';
+import {rollRoom,roomById,roomCheckStep,roomRewards} from './rooms.ts';
 import type {GeneratedRoom} from './rooms.ts';
 import {STAT_INFO,zeroPools} from './attributes.ts';
 import {travelSeconds,locationById} from './locations.ts';
@@ -16,12 +21,13 @@ import { DAY_SECONDS, WARP_SECONDS, RESET_SECONDS, STATS, VERSION, DUNGEONS, dun
 import type { Pools, Upgrade } from './content.ts';
 export type StatValues = { current: number; max: number; affinity: number };
 export type Assignment = { dungeonId: string; maxDepth: number | null };
-export type Member = SkillProfile & { origin:'legacy'|'recruit'|'arya'|'clyde';equipped:string[];carryCapacity:number;bestRoom:number; id: string; name: string; tier: number; stats: Record<keyof Pools, StatValues>; queue: Assignment[]; queueIndex: number; cooldown: number; resetSeconds: number; enabled: boolean; runs: number };
-export type Run = { stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks' | 'rooms';generated:GeneratedRoom|null;loadout:string[];carryCapacity:number; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; roomLoot?:Record<string,number>; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; chips: number };
+export type DungeonHistory = {bestRoom:number;lastReturn:{room:number;reason:string;detail:string;day:number;time:number}|null};
+export type Member = SkillProfile & { rarity:number;dungeonHistory:Record<string,DungeonHistory>;origin:'legacy'|'recruit'|'arya'|'clyde';equipped:string[];carryCapacity:number;bestRoom:number; id: string; name: string; tier: number; stats: Record<keyof Pools, StatValues>; queue: Assignment[]; queueIndex: number; cooldown: number; resetSeconds: number; enabled: boolean; runs: number };
+export type Run = { reachedRoom:number;stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks' | 'rooms';generated:GeneratedRoom|null;loadout:string[];carryCapacity:number; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; roomLoot?:Record<string,number>; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; chips: number };
 export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools;drops?:Record<string,number>;rarity?:number };
 export type Trade = {id:number;locationId:LocationId;resourceId:string;quantity:number;chips:number;remaining:number;duration:number};
 export type Guildmaster=SkillProfile & {id:'guildmaster';name:string;stats:Member['stats'];innateMagic:true};
-export type Game = { storage:Record<string,{cap:number;level:number}>;equipment:{unlocked:string[];capacity:number}; guildmaster:Guildmaster; homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { chips: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
+export type Game = { requests:Partial<Record<RequestId,RequestCompletion>>;storage:Record<string,{cap:number;level:number}>;equipment:{unlocked:string[];capacity:number}; guildmaster:Guildmaster; homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { chips: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
 export const zero=zeroPools;
 const copy = <T,>(v: T): T => structuredClone(v);
 function rand(g: Game) { g.seed = (Math.imul(1664525, g.seed) + 1013904223) >>> 0; return g.seed / 4294967296; }
@@ -37,15 +43,15 @@ export function recruit(g: Game,legacy=false): Member {
  const stats = {} as Member['stats'];
  for (const stat of ['strength','dexterity','intelligence',...STATS.filter(stat=>!['strength','dexterity','intelligence'].includes(stat))] as (keyof Pools)[]) { const affinity = 35 + tier * 25 + Math.floor(rand(g) * 45); const max = 10 + Math.floor(rand(g) * 8); stats[stat] = { current: max, max, affinity }; }
  const total=STATS.reduce((sum,stat)=>sum+stats[stat].affinity,0);if(!legacy)for(const stat of STATS){const affinity=stats[stat].affinity/total*tierBudget(tier);stats[stat]={current:affinity*.8,max:affinity*.8,affinity};}
- return {origin:legacy?'legacy':'recruit',equipped:[],carryCapacity:legacy?1000000:32,bestRoom:0, ...newSkillProfile(stats), id, name, tier, stats, queue: dungeonUnlocked(g.progression,'wood')?[{ dungeonId: 'wood', maxDepth: 1 }]:[], queueIndex: 0, cooldown: 0, resetSeconds: RESET_SECONDS, enabled: true, runs: 0 };
+ return {rarity:0,dungeonHistory:{},origin:legacy?'legacy':'recruit',equipped:[],carryCapacity:legacy?1000000:32,bestRoom:0, ...newSkillProfile(stats), id, name, tier, stats, queue: dungeonUnlocked(g.progression,'wood')?[{ dungeonId: 'wood', maxDepth: 1 }]:[], queueIndex: 0, cooldown: 0, resetSeconds: RESET_SECONDS, enabled: true, runs: 0 };
 }
 export function startingFriend(g:Game,who:'arya'|'clyde'):Member {
  const affinity=who==='arya'?[2,1.8,2,1.4,.8,.5,.4,.4,.7]:[.4,.7,.8,.5,1.8,1.6,1.4,1,1.8];
  const stats=Object.fromEntries(STATS.map((stat,index)=>[stat,{affinity:affinity[index],max:affinity[index]*.9,current:affinity[index]*.9}])) as Member['stats'];
  const profile=newSkillProfile(stats);
- if(who==='arya'){profile.skills.combat.level=3;profile.skills.athletics.level=2;profile.skills.lock_picking.level=1;}
- else {profile.skills.scavenging.level=4;profile.skills.harvesting.level=2;profile.skills.observation.level=2;profile.skills.crypt_lore.level=1;}
- return {...profile,origin:who,equipped:[],carryCapacity:who==='arya'?72:36,bestRoom:0,id:`member-${g.nextId++}`,name:who==='arya'?'Arya':'Clyde',tier:1,stats,queue:[],queueIndex:0,cooldown:0,resetSeconds:RESET_SECONDS,enabled:true,runs:0};
+ if(who==='arya'){profile.skills.combat.level=3;profile.skills.combat.discovered=true;}
+ else {profile.skills.herbology.level=2;profile.skills.herbology.discovered=true;}
+ return {...profile,rarity:0,dungeonHistory:{},origin:who,equipped:[],carryCapacity:who==='arya'?72:36,bestRoom:0,id:`member-${g.nextId++}`,name:who==='arya'?'Arya':'Clyde',tier:1,stats,queue:[],queueIndex:0,cooldown:0,resetSeconds:RESET_SECONDS,enabled:true,runs:0};
 }
 /** Provisional starting values; the guildmaster alone has innate magic. */
 export function newGuildmaster():Guildmaster {
@@ -54,7 +60,7 @@ export function newGuildmaster():Guildmaster {
 }
 export const canCastInnateMagic=(g:Game,actorId:string)=>actorId===g.guildmaster.id&&g.guildmaster.innateMagic;
 export function initialGame(seed = 73129): Game {
- const g: Game = { storage:initialStorage(),equipment:{unlocked:[],capacity:0},guildmaster:newGuildmaster(),homeLocationId:'emberveil',trades:[],nextTradeId:1,progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { chips: 0, materials: 0, gear: 0, gearCap: 8, gearRegen: 0, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['chips','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
+ const g: Game = { requests:{},storage:initialStorage(),equipment:{unlocked:[],capacity:0},guildmaster:newGuildmaster(),homeLocationId:'emberveil',trades:[],nextTradeId:1,progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { chips: 0, materials: 0, gear: 0, gearCap: 8, gearRegen: 0, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['chips','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
  log(g, 'Story', 'A beginning', 'A thousand years after the old legends, Emberveil is beginning to stir again. Your story starts here.');
  g.pinnedResources=[];
  return g;
@@ -80,17 +86,23 @@ function arriveHome(g: Game, run: Run, reason: string, detail: string) {
  for (const stat of STATS) { gains[stat] = growth(run.startMax[stat], m.stats[stat].affinity, run.training[stat]); m.stats[stat].max += gains[stat]; }
  noteEvent(g,'first_return');
  for(const [id,training]of Object.entries(run.specializationTraining)){const specialty=m.specializations[id];specialty.value+=growth(specialty.value,specialty.affinity,training);}
- m.runs++; m.cooldown = m.resetSeconds; m.queueIndex = m.queue.length ? (m.queueIndex + 1) % m.queue.length : 0;
+ if(run.rules==='rooms'&&reason!=='Injured')for(const stat of STATS)m.stats[stat].current=m.stats[stat].max;
+ m.runs++; m.cooldown = run.rules==='rooms'?(reason==='Injured'?m.resetSeconds:0):m.resetSeconds; m.queueIndex = m.queue.length ? (m.queueIndex + 1) % m.queue.length : 0;
  deposit(g,'chips',run.chips);
  for(const [id,amount] of Object.entries(run.loot))deposit(g,id,amount);
  refreshDiscoveries(g);
  if (reason === 'Retreated') g.stats.retreats++;
  if (reason === 'Warped home') g.stats.warps++;
- log(g, m.name, reason==='Retreated'?'Dungeon failed':reason, `${dungeonById(run.dungeonId).name} · ${detail} Banked ${run.chips} chips and ${Object.values(run.loot).reduce((a,b)=>a+b,0)} loot. Reset ${m.resetSeconds}s.`, gains);
+ log(g, m.name, reason==='Injured'?'Dungeon failed':reason, `${dungeonById(run.dungeonId).name} · ${detail} Banked ${run.chips} chips and ${Object.values(run.loot).reduce((a,b)=>a+b,0)} loot. Reset ${m.resetSeconds}s.`, gains);
  g.active = g.active.filter(r => r !== run);
 }
 function finish(g:Game,run:Run,reason:string,detail:string){
  if(run.stage==='returning')return;
+ const member=g.members.find(m=>m.id===run.memberId)!;
+ const history=member.dungeonHistory[run.dungeonId]??={bestRoom:0,lastReturn:null};
+ const reached=run.reachedRoom;
+ history.bestRoom=Math.max(history.bestRoom,reached);
+ history.lastReturn={room:reached,reason,detail,day:g.day,time:g.elapsed};
  run.stage='returning';run.travelRemaining=run.returnSeconds;run.outcome={reason,detail};
  // Exploration state is no longer active; preserve carried rewards and pending training.
  run.task=0;run.progress=0;run.room=null;run.generated=null;delete run.roomLoot;
@@ -99,12 +111,14 @@ function finish(g:Game,run:Run,reason:string,detail:string){
 }
 /** Departing members reserve a dungeon place; homeward travel releases it. */
 export function dungeonOccupants(g:Game,id:string){return g.active.filter(run=>run.dungeonId===id&&run.stage!=='returning');}
+export function dungeonWaiting(g:Game,id:string){return g.members.filter(member=>member.enabled&&member.cooldown===0&&member.queue[0]?.dungeonId===id&&!g.active.some(run=>run.memberId===member.id));}
 export function memberActivities(g:Game){
  const expeditionIds=new Set(g.active.map(run=>run.memberId));
  const expeditions=g.members.filter(member=>expeditionIds.has(member.id)).length;
  const healing=g.members.filter(member=>!expeditionIds.has(member.id)&&member.cooldown>0).length;
  // Trading/crafting currently have no assigned members. Pending sales are guild transactions.
- return {expeditions,trading:0,crafting:0,healing,recruits:g.candidate?1:0,idle:g.members.length-expeditions-healing};
+ const queued=g.members.filter(member=>member.enabled&&member.queue.length>0&&member.cooldown===0&&!expeditionIds.has(member.id)).length;
+ return {expeditions,trading:0,crafting:0,healing,queued,recruits:g.candidate?1:0,idle:g.members.length-expeditions-healing-queued};
 }
 function dispatch(g: Game) {
  if(!hasFeature(g.progression,'activities'))return;
@@ -118,7 +132,7 @@ function dispatch(g: Game) {
   const startMax=zero(); for(const s of STATS) { m.stats[s].current=m.stats[s].max; startMax[s]=m.stats[s].max; }
   const rules = generated?'rooms':d.id==='ruins'&&(hasEvent(g.progression,'skill_checks_enabled')||hasEvent(g.progression,'archive_discovered'))?'checks':'tasks';
   const outboundSeconds=travelSeconds(g.homeLocationId,d.locationId),returnSeconds=travelSeconds(d.locationId,g.homeLocationId);
-  g.active.push({generated:null,loadout:[...m.equipped],carryCapacity:carryingLimit(m.carryCapacity,m.equipped),stage:outboundSeconds?'outbound':'exploring',originLocationId:g.homeLocationId,destinationLocationId:d.locationId,travelRemaining:outboundSeconds,outboundSeconds,returnSeconds,outcome:null,specializationTraining:{},rules,room:rules==='checks'?newRoomState():null,memberId:m.id,dungeonId:d.id,personalLimit:entry.maxDepth,floor:1,task:0,progress:0,elapsed:0,training:zero(),startMax,loot:{},chips:0});
+  g.active.push({reachedRoom:0,generated:null,loadout:[...m.equipped],carryCapacity:carryingLimit(m.carryCapacity,m.equipped),stage:outboundSeconds?'outbound':'exploring',originLocationId:g.homeLocationId,destinationLocationId:d.locationId,travelRemaining:outboundSeconds,outboundSeconds,returnSeconds,outcome:null,specializationTraining:{},rules,room:rules==='checks'?newRoomState():null,memberId:m.id,dungeonId:d.id,personalLimit:entry.maxDepth,floor:1,task:0,progress:0,elapsed:0,training:zero(),startMax,loot:{},chips:0});
   log(g,m.name,'Departed',`${d.name} · ${outboundSeconds}s travel · target ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity) === Infinity ? 'unlimited depth' : `room ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity)}`}.`);
  }
 }
@@ -133,7 +147,7 @@ function reward(g: Game, run: Run) {
 }
 function tick(g: Game) {
  g.elapsed++; if(g.elapsed>=DAY_SECONDS) {g.elapsed=0;g.day++;log(g,'Guild','New day',`Day ${g.day}. Expeditions continue.`);}
- for(const m of g.members) m.cooldown=Math.max(0,m.cooldown-1);
+ for(const m of g.members){const healing=m.cooldown>0;m.cooldown=Math.max(0,m.cooldown-1);if(healing&&m.cooldown===0)for(const stat of STATS)m.stats[stat].current=m.stats[stat].max;}
  g.guild.gear=Math.min(g.guild.gearCap,g.guild.gear+g.guild.gearRegen);
  const canWork=hasFeature(g.progression,g.guild.priority==='recruitment'?'recruitment':'infrastructure');
  if(canWork&&(g.guild.priority==='infrastructure'||!g.candidate)) g.guild.work++;
@@ -151,6 +165,10 @@ function tick(g: Game) {
    }
    continue;
   }
+  const historyMember=g.members.find(m=>m.id===run.memberId)!;
+  const history=historyMember.dungeonHistory[run.dungeonId]??={bestRoom:0,lastReturn:null};
+  if(run.floor<=effectiveLimit(g,run))run.reachedRoom=Math.max(run.reachedRoom,run.floor);
+  history.bestRoom=Math.max(history.bestRoom,run.reachedRoom);
   if(run.rules==='rooms'){tickGenerated(g,run);continue;}
   const m=g.members.find(m=>m.id===run.memberId)!;const d=dungeonById(run.dungeonId);const task=d.tasks[run.task];
   // A newly lowered global cap is applied at the next floor boundary.
@@ -195,6 +213,11 @@ export function advance(input: Game, seconds: number): Game {
 }
 export function returnETA(g:Game,run:Run):number {
  if(run.stage==='returning')return run.travelRemaining;
+ if(run.rules==='rooms'&&run.outboundSeconds<=30&&run.returnSeconds<=30){
+  const forecast=copy(g);for(const member of forecast.members)member.enabled=false;
+  for(let seconds=1;seconds<=400;seconds++){tick(forecast);if(!forecast.active.some(active=>active.memberId===run.memberId))return seconds;}
+ }
+
  return (run.stage==='outbound'?run.travelRemaining:0)+explorationETA(g,run)+run.returnSeconds;
 }
 function explorationETA(g: Game, run: Run): number {
@@ -230,7 +253,7 @@ export function dismiss(input:Game,id:string):Game {if(input.active.some(r=>r.me
 export function moveMember(input:Game,id:string,delta:number):Game {const g=copy(input);const i=g.members.findIndex(m=>m.id===id),j=i+delta;if(i<0||j<0||j>=g.members.length)return input;[g.members[i],g.members[j]]=[g.members[j],g.members[i]];return g;}
 export const validDepth=(n:unknown):n is number|null=>n===null||(typeof n==='number'&&Number.isInteger(n)&&n>=1&&n<=1000000);
 export function setQueue(input:Game,id:string,queue:Assignment[]):Game {
- if(queue.length>20||queue.some(e=>!DUNGEONS.some(d=>d.id===e.dungeonId)||!dungeonUnlocked(input.progression,e.dungeonId)||!validDepth(e.maxDepth)))return input;
+ if(queue.length>1||queue.some(e=>!DUNGEONS.some(d=>d.id===e.dungeonId)||!dungeonUnlocked(input.progression,e.dungeonId)||!validDepth(e.maxDepth)))return input;
  const g=copy(input),member=g.members.find(member=>member.id===id);if(!member)return input;
  const count=(entries:Assignment[],dungeonId:string)=>entries.filter(entry=>entry.dungeonId===dungeonId).length;
  for(const dungeon of DUNGEONS){const delta=count(queue,dungeon.id)-count(member.queue,dungeon.id);for(let i=0;i<Math.abs(delta);i++)log(g,member.name,delta>0?'Dungeon assignment added':'Dungeon assignment removed',dungeon.name,zero(),'Activities');}
@@ -280,30 +303,35 @@ export function runProgress(run:Run):{value:number;max:number} {
 
 export function resourceAmount(g:Game,id:string):number{return id==='chips'?g.guild.chips:id==='materials'?g.guild.materials:g.inventory[id]??0;}
 function deposit(g:Game,id:string,amount:number){
- if(!amount)return;const stored=resourceAmount(g,id),accepted=Math.min(amount,Math.max(0,g.storage[id].cap-stored));
+ if(!amount)return;const stored=resourceAmount(g,id),accepted=id==='chips'?amount:Math.min(amount,Math.max(0,g.storage[id].cap-stored));
  if(id==='chips')g.guild.chips+=accepted;else if(id==='materials')g.guild.materials+=accepted;else g.inventory[id]=stored+accepted;
  if(amount>accepted)log(g,'Guild','Storage overflow',`${amount-accepted} ${resourceById(id).name} discarded: storage is full.`,zero(),'Resources');
 }
 function refreshDiscoveries(g:Game){
  if((g.inventory.leather??0)>0)noteEvent(g,'first_leather');if((g.inventory.herb??0)>0)noteEvent(g,'first_herb');
 }
-export function buyStorage(input:Game,id:string):Game{
- if(!hasFeature(input.progression,'resources')||!RESOURCES.some(resource=>resource.id===id))return input;
- const storage=input.storage[id],price=storageUpgradePrice(storage.level);if(!Number.isSafeInteger(price)||input.guild.chips<price||storage.level>=100)return input;
- const g=copy(input);g.guild.chips-=price;g.storage[id]={cap:nextStorageCap(storage.cap),level:storage.level+1};return g;
+export function buyStorage(input:Game,id:string,quantity:StorageQuantity=1):Game{
+ if(id==='chips'||!hasFeature(input.progression,'resources')||!RESOURCES.some(resource=>resource.id===id)||![1,10,100,'max'].includes(quantity))return input;
+ const quote=storageQuote(input.storage[id],input.guild.chips,quantity);if(!quote.affordable)return input;
+ const g=copy(input);g.guild.chips-=quote.price;g.storage[id]={cap:quote.cap,level:quote.level};return g;
+}
+export function completeRequest(input:Game,id:RequestId,studentId?:string):Game{
+ const request=REQUESTS.find(request=>request.id===id);if(!request||!hasEvent(input.progression,'tanner_opened')||input.requests[id]||hasEvent(input.progression,request.event)||(input.inventory[request.resourceId]??0)<request.amount)return input;
+ const student=request.skillId?input.members.find(member=>member.id===studentId&&['arya','clyde'].includes(member.origin)):undefined;
+ if(request.skillId&&!student)return input;
+ const g=copy(input);g.inventory[request.resourceId]-=request.amount;
+ if(request.skillId){const learner=g.members.find(member=>member.id===student!.id)!;learner.skills[request.skillId]={level:1,experience:0,lastUsedAt:null,discovered:true};}
+ g.requests[id]={completedAt:(g.day-1)*DAY_SECONDS+g.elapsed,...(student?{studentId:student.id}:{})};noteEvent(g,request.event);return g;
 }
 export function unlockEquipment(input:Game,id:string):Game{
- const item=EQUIPMENT.find(item=>item.id===id);if(!item||!hasEvent(input.progression,'tanner_opened')||input.equipment.unlocked.includes(id)||input.guild.chips<item.chips||(input.inventory.leather??0)<item.leather)return input;
+ const item=EQUIPMENT.find(item=>item.id===id);if(!item||!hasEvent(input.progression,'tanner_opened')||!hasEvent(input.progression,'leather_crafting_learned')||input.equipment.unlocked.includes(id)||input.guild.chips<item.chips||(input.inventory.leather??0)<item.leather)return input;
  const g=copy(input);g.guild.chips-=item.chips;g.inventory.leather-=item.leather;g.equipment.unlocked.push(id);log(g,'Guild','Equipment unlocked',`${item.name} is available to every member.`,zero(),'Shops');return g;
 }
-export function buyEquipmentCapacity(input:Game,shop:'tanner'|'herbalist'):Game{
- if(!hasEvent(input.progression,shop==='tanner'?'tanner_opened':'stillmere_unlocked')||input.equipment.capacity>=SHOP_CAPACITY[shop])return input;
- const price=4*2**input.equipment.capacity;if(input.guild.chips<price)return input;
- const g=copy(input);g.guild.chips-=price;g.equipment.capacity++;return g;
-}
+/** Retired compatibility API: equipment capacity now comes from ally tier. */
+export function buyEquipmentCapacity(input:Game,_shop:'tanner'|'herbalist'):Game{return input;}
 export function equip(input:Game,memberId:string,id:string):Game{
  const member=input.members.find(member=>member.id===memberId);if(!member||!input.equipment.unlocked.includes(id)||input.active.some(run=>run.memberId===memberId))return input;
- const removing=member.equipped.includes(id);if(!removing&&member.equipped.length>=input.equipment.capacity)return input;
+ const removing=member.equipped.includes(id);if(!removing&&member.equipped.length>=equipmentCapacity(member))return input;
  const g=copy(input),m=g.members.find(member=>member.id===memberId)!;m.equipped=removing?m.equipped.filter(item=>item!==id):[...m.equipped,id];return g;
 }
 function resolvedRoom(g:Game,run:Run,skipped:boolean){
@@ -319,23 +347,20 @@ function tickGenerated(g:Game,run:Run){
  if(cargoSize(run.loot,run.chips)>=run.carryCapacity){finish(g,run,'Cargo full','Carrying capacity reached.');return;}
  run.elapsed++;
  if(!run.generated){
-  const exertion=roomExertion(run.floor,run.loadout);
-  if(member.stats.constitution.current<=exertion){finish(g,run,'Retreated',`Too tired to enter room ${run.floor}.`);return;}
-  member.stats.constitution.current-=exertion;run.generated=rollRoom(run.dungeonId,()=>rand(g));run.roomLoot={};
+  run.generated=rollRoom(run.dungeonId,()=>rand(g));run.roomLoot={};
   log(g,member.name,'Room entered',`Room ${run.floor} · ${roomById(run.dungeonId,run.generated.id).name}.`);
  }
  const definition=roomById(run.dungeonId,run.generated.id),check=definition.checks[run.generated.index];
  const result=roomCheckStep({...member,gear:g.guild.gear},check,run.generated,run.floor,run.loadout,()=>rand(g),(g.day-1)*DAY_SECONDS+g.elapsed);
  member.stats=result.actor.stats;member.skills=result.actor.skills;member.specializations=result.actor.specializations;run.generated=result.state;run.progress=result.state.work;
- if(result.outcome==='exhausted'){finish(g,run,'Retreated',`Cannot fund ${check.name}.`);return;}
- if(result.outcome==='ineligible'||result.outcome==='failed'){
-  if(!definition.mandatory){log(g,member.name,'Room skipped',`${definition.name}: ${result.outcome==='ineligible'?'requires '+check.skill+' level '+check.requiredLevel:'check failed'}.`);resolvedRoom(g,run,true);}
-  else if(result.outcome==='ineligible'){finish(g,run,'Retreated',`Required skill missing: ${check.skill}.`);return;}
-  else log(g,member.name,'Retrying',`${check.name}: failed; trying again.`);
+ if(result.outcome==='exhausted'||result.outcome==='injured'){finish(g,run,result.outcome==='injured'?'Injured':'Tired',`${result.outcome==='injured'?'Constitution depleted':'Required resource depleted'} during ${check.name}.`);return;}
+ if(result.outcome==='ineligible'){
+  if(!definition.mandatory){log(g,member.name,'Room skipped',`${definition.name}: ${'requires '+check.skill+' level '+check.requiredLevel}.`);resolvedRoom(g,run,true);}
+  else {finish(g,run,'Missing skill',`Required skill missing: ${check.skill}.`);return;}
  }else if(result.outcome==='success'){
   for(const stat of STATS)run.training[stat]+=result.training[stat];
   for(const [id,amount]of Object.entries(result.specializationTraining))run.specializationTraining[id]=(run.specializationTraining[id]??0)+amount;
-  const remaining=run.carryCapacity-cargoSize(run.loot,run.chips),canHarvest=member.skills.harvesting.level>=1;
+  const remaining=run.carryCapacity-cargoSize(run.loot,run.chips),canHarvest=member.skills.herbology.discovered===true;
   const rewards=roomRewards(check,run.floor,remaining,canHarvest,()=>rand(g));
   run.roomLoot??={};for(const [id,amount]of Object.entries(rewards))run.roomLoot[id]=(run.roomLoot[id]??0)+amount;
   for(const [id,amount]of Object.entries(rewards))if(id==='chips')run.chips+=amount;else run.loot[id]=(run.loot[id]??0)+amount;

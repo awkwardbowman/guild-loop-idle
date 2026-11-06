@@ -1,3 +1,13 @@
+# November 6 design discussion — dungeon fallback and character action gates
+
+**New direction under discussion (not implemented):** Arya needs Power, Clyde must have Constitution and Crafting and can stay a non-Combat scavenger, Guild Master lacks Constitution and has Crafting. Dungeon entry is Constitution-only, *not* Power, Combat Discipline or Combat Composite. Per weighted check: use the defined Skill where trained; if absent, use the selected Attribute fallback; if the Attribute is unselected, its share contributes zero with no weight renormalization. Need to reconcile baseline-1 display with zero effective participation for unselected roots.
+
+Constitution should be present in every floor's work/cost and act as the main dungeon failure resource; current rooms are the actual progress units. Current hard level-1 Combat gates on mandatory checks and all-or-nothing pool charging are incompatible. Decide whether other depleted pools disable only their contributions, whether all rooms (not just canonical floors) drain CON, and ordinary fatigue versus danger injury. Tune work, costs and recovery so the non-Combat scavenger has finite meaningful progression. Guard against no-contribution zero-speed mandatory checks.
+
+Proposed per-character, **action-level** hard gates: selected Charisma for Recruitment, Intelligence for Research (future), Perception for Scavenging, Constitution for dungeon entry. No automatic entire-tab hiding; the Guild Master retains Charisma+Intelligence. Strength/Dexterity/Speed mainly support dungeon speed; Luck and Soul have situational roles. Distinguish from current executable v8 rules. Further detail in docs/02, 04 and 09.
+
+---
+
 # Approved character grid and terminology decisions — November 6, 2026 (planned, not implemented)
 
 Approved names: nine root **Attributes**; nine activity **Disciplines**; pairwise authored **Skills** (e.g. Strength × Combat = Power); learned multi-Skill **Composite Skills**. Each character specializes in five Attributes and five Disciplines. **The 5×5 matrix always has 25 positions, but only catalog-authored pairs display Skills; all missing pairings stay completely blank.** Example: Combat × Perception is an empty cell. The existing 27 unique Skills are not expanded merely to fill a grid.

@@ -1,3 +1,15 @@
+# New Skill grid totals, endurance and explanatory UI — November 6, 2026 (planned, NOT implemented)
+
+- In the fixed 5×5 character Skill matrix, add **a total at the end of each Attribute row**, **a total at the bottom of each Discipline column**, and **a bottom-right grand total** of all populated Skill numeric Values, counting each Skill **exactly once**. Blank unauthored pairs do not contribute to totals. Layout orientation may swap axes, but there must be five totals per axis and one grand total.
+- The same totals are useful for **discipline-level and attribute-level checks**. Example: Dungeoneering total = Force + Finesse + Agility **only where the character actually owns those defined Skills**. A baseline-0.01 fallback is used to make weak *check progress*, but does **not** appear as a trained Skill or inflate a matrix rollup. Keep raw totals descriptive: a total is **not** a guaranteed dungeon rating because dungeons have authored weights and Constitution endurance.
+- Display a meaningful label for the corner value, e.g. **Total Skill Value** (or Overall Power if clearly explained); raw totals favor profiles with more authored Skill intersections, so do not label it a cross-build balance-adjusted rating unless normalized.
+- **Only the numeric Value gets red/yellow/green training-ratio coloring.** Axis totals, the grand total and hidden Potential must not leak undiscovered Potential. Indicate potentially undiscovered values with appropriate discovery gating. Retain no additional status icons. Keep baseline-0.01 attributes separate from specialized trainable cells.
+- Character dungeon eligibility indicator: **Con-1 means owning at least one Constitution Skill** (Toughness, Endurance, or Vitality), **not merely Constitution being selected**. Show combined current Constitution endurance, maximum from owned Con Skills, and current room drain rate (per game second) when an expedition is active. Other Attributes and Soul/Luck are **non-consumable** and must not be represented as dungeon-draining gauges.
+- The **Info → Skills** section additionally explains row/column/grand totals, how a Skill check uses a selected Attribute fallback or tiny 0.01 non-specialized baseline, why a powerful group total need not guarantee a particular room, Con-1 and room-specific failures, how per-second endurance drain causes slow builds to fail sooner, future Speed/Agility/Scouting/Movement effects, and how flat/percent/Catchup gear modifies checks **without unlocking prerequisites**. Keep symbols, Attribute colors and number-only trained-state colors as already agreed.
+- For assignment-specific actions show disabled-with-reason gating (e.g. requires Perception, requires Composite Skill) without hiding entire navigation tabs. Combat is not a blanket eligibility condition for any dungeon.
+
+---
+
 # Planned 5×5 character matrix and Info Skills guide — November 6, 2026 (design only)
 
 **Required in the next character specialization PR, not implemented in v8.**

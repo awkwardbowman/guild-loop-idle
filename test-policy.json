@@ -57,8 +57,7 @@
     "tests/attributes.test.ts": {
       "priority": "P1",
       "groups": [
-        "attributes",
-        "dungeon"
+        "attributes"
       ],
       "ids": [
         "AT01",
@@ -74,9 +73,7 @@
     "tests/backlog.test.ts": {
       "priority": "P2",
       "groups": [
-        "guild",
-        "progression",
-        "content"
+        "guild"
       ],
       "ids": [
         "B01",
@@ -90,9 +87,7 @@
     "tests/compact-logs.test.ts": {
       "priority": "P2",
       "groups": [
-        "logging",
-        "ui",
-        "dungeon"
+        "logging"
       ],
       "ids": [
         "CL01",
@@ -132,9 +127,7 @@
     "tests/engine.test.ts": {
       "priority": "P1",
       "groups": [
-        "core",
-        "dungeon",
-        "guild"
+        "core"
       ],
       "ids": [
         "C01",
@@ -181,10 +174,7 @@
     "tests/foundations.test.ts": {
       "priority": "P1",
       "groups": [
-        "core",
-        "dungeon",
-        "checks",
-        "progression"
+        "core"
       ],
       "ids": [
         "G01",
@@ -216,10 +206,7 @@
     "tests/opening.test.ts": {
       "priority": "P2",
       "groups": [
-        "content",
-        "progression",
-        "dungeon",
-        "economy"
+        "content"
       ],
       "ids": [
         "O01",
@@ -258,9 +245,7 @@
     "tests/playthrough.test.ts": {
       "priority": "P1",
       "groups": [
-        "integration",
-        "progression",
-        "core"
+        "integration"
       ],
       "ids": [
         "E01",
@@ -298,9 +283,7 @@
     "tests/travel-trade.test.ts": {
       "priority": "P1",
       "groups": [
-        "travel",
-        "economy",
-        "save"
+        "travel"
       ],
       "ids": [
         "T01",
@@ -364,7 +347,8 @@
       "calendar"
     ],
     "D13": [
-      "travel"
+      "travel",
+      "dungeon"
     ],
     "G01": [
       "progression"
@@ -397,44 +381,59 @@
       "save"
     ],
     "I01": [
-      "save"
+      "save",
+      "dungeon",
+      "checks"
     ],
     "I03": [
       "integration",
-      "save"
+      "save",
+      "dungeon",
+      "checks"
     ],
     "K01": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K02": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K03": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K04": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K05": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K06": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K07": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K08": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K09": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K10": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "K11": [
-      "checks"
+      "checks",
+      "dungeon"
     ],
     "E02": [
       "save"
@@ -447,10 +446,12 @@
     ],
     "O11": [
       "save",
-      "travel"
+      "travel",
+      "dungeon"
     ],
     "O12": [
-      "save"
+      "save",
+      "dungeon"
     ],
     "O13": [
       "save"
@@ -475,6 +476,127 @@
     ],
     "T09": [
       "save"
+    ],
+    "C02": [],
+    "D01": [
+      "dungeon"
+    ],
+    "D02": [
+      "dungeon"
+    ],
+    "D03": [
+      "dungeon"
+    ],
+    "D04": [
+      "dungeon"
+    ],
+    "D05": [
+      "dungeon"
+    ],
+    "D06": [
+      "dungeon"
+    ],
+    "D07": [
+      "dungeon"
+    ],
+    "D08": [
+      "dungeon"
+    ],
+    "D09": [
+      "dungeon"
+    ],
+    "D10": [
+      "dungeon"
+    ],
+    "D11": [
+      "dungeon"
+    ],
+    "D12": [
+      "dungeon"
+    ],
+    "Q01": [
+      "guild"
+    ],
+    "Q02": [
+      "guild"
+    ],
+    "Q03": [
+      "guild"
+    ],
+    "Q04": [
+      "guild"
+    ],
+    "Q05": [
+      "guild"
+    ],
+    "Q06": [
+      "guild"
+    ],
+    "Q07": [
+      "guild"
+    ],
+    "P01": [
+      "progression",
+      "content"
+    ],
+    "P02": [
+      "progression",
+      "content"
+    ],
+    "P03": [
+      "progression",
+      "content"
+    ],
+    "U01": [
+      "ui",
+      "economy"
+    ],
+    "I02": [
+      "dungeon",
+      "checks"
+    ],
+    "B01": [
+      "guild"
+    ],
+    "B05": [
+      "content",
+      "equipment"
+    ],
+    "B06": [
+      "progression",
+      "ui"
+    ],
+    "O01": [],
+    "O02": [
+      "dungeon"
+    ],
+    "O03": [
+      "dungeon"
+    ],
+    "O04": [
+      "dungeon"
+    ],
+    "O05": [
+      "dungeon"
+    ],
+    "O06": [
+      "dungeon"
+    ],
+    "O07": [
+      "dungeon"
+    ],
+    "O08": [],
+    "O14": [
+      "dungeon"
+    ],
+    "T06": [
+      "economy"
+    ],
+    "T07": [
+      "economy"
+    ],
+    "T08": [
+      "economy"
     ]
   }
 }

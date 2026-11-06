@@ -1,3 +1,13 @@
+# Proposed configurable Insufficient Skill Threshold UI — November 6, 2026 (DESIGN ONLY)
+
+Place **Insufficient Skill Threshold** near **Depth Limit** in each dungeon's expanded settings, with an **Inherit global default** choice. The global default belongs in Guild/Configuration or Info Settings (settings location TBD), but **Info → Skills/Dungeons** must describe what the threshold means. Candidate default **1% efficiency**; **0% disables the check**. Keep the control separate from permission/Skill learning gates and from manual Recall.
+
+Explain efficiency as **predicted work rate divided by the room's reference work rate**, with missing Skill → selected Attribute fallback → unselected 0.01 baseline and gear order applied. This is NOT Value/Potential and NOT chance to succeed. Tooltip example: `1% means work is predicted at less than one hundredth of the reference room pace`. Show effective per-member evaluation when practical, and a clear `Insufficient skill` reason for any automatic bail.
+
+Important player promise: no free safe escapes during a floor. Qualified exits at a canonical floor boundary can be safe; a 30-second mid-floor failsafe is exceptional and must obey authored failure/reward rules. Existing engine rolls rooms individually, so do not claim the player can preflight whole randomized floors until prediction/pre-generation is implemented. Once finalized, add this explanation to the dedicated Info Skills legend rather than hiding it only in a tooltip.
+
+---
+
 # Revised UI: combined Endurance, Constitution XP and queued recall — November 6, 2026 (DESIGN ONLY)
 
 On member and dungeon views, label the only draining dungeon resource **Endurance Capacity** (Current / Maximum), derived from owned Constitution Skills. Do **not** show the Constitution Attribute itself, or any other Attribute, as a consumable dungeon meter. Character Skill matrix still shows Value, hidden-until-discovered Potential, row totals, column totals and grand total; the Constitution column/row helps communicate the capability that feeds capacity. Info → Skills needs an explicit explanation of **Con-1**, owned Toughness/Endurance/Vitality contributions to Endurance Capacity, and the **general Constitution XP granted on completed full floors** in addition to specific check training.

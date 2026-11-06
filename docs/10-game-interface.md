@@ -1,3 +1,13 @@
+# Revised UI: combined Endurance, Constitution XP and queued recall — November 6, 2026 (DESIGN ONLY)
+
+On member and dungeon views, label the only draining dungeon resource **Endurance Capacity** (Current / Maximum), derived from owned Constitution Skills. Do **not** show the Constitution Attribute itself, or any other Attribute, as a consumable dungeon meter. Character Skill matrix still shows Value, hidden-until-discovered Potential, row totals, column totals and grand total; the Constitution column/row helps communicate the capability that feeds capacity. Info → Skills needs an explicit explanation of **Con-1**, owned Toughness/Endurance/Vitality contributions to Endurance Capacity, and the **general Constitution XP granted on completed full floors** in addition to specific check training.
+
+Info → Skills / Equipment text must state the exact modifier order **Catchup, then Flat, then Percent**. Example: base 2, Catchup 10 → 6, +5 → 11, +20% → 13.2. No gear modifier unlocks prerequisites. Numeric Value colors stay directly on numbers only.
+
+The Recall button now **requests** recall: show "Recall pending" and, if useful, remaining fallback seconds until the 30-second stuck-run fail-safe. Safe exit happens **after completing the current canonical floor** (10-room boundary), not at each room; the emergency 30-second interrupt may cut off a floor and should not be portrayed as a normal safe clear. When already between floors, safe recall can happen immediately. Depth limits remain as before. Show enough information to distinguish **Room N** from **Floor F**, since current v8 code labels room numbers `run.floor`. Exact emergency penalty/time basis and pause semantics should be finalized before coding.
+
+---
+
 # New Skill grid totals, endurance and explanatory UI — November 6, 2026 (planned, NOT implemented)
 
 - In the fixed 5×5 character Skill matrix, add **a total at the end of each Attribute row**, **a total at the bottom of each Discipline column**, and **a bottom-right grand total** of all populated Skill numeric Values, counting each Skill **exactly once**. Blank unauthored pairs do not contribute to totals. Layout orientation may swap axes, but there must be five totals per axis and one grand total.

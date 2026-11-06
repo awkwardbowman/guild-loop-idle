@@ -1,3 +1,15 @@
+# Proposed role and activity eligibility refinements — November 6, 2026 (NOT implemented)
+
+The Guild Master remains explicitly **without Constitution**, and therefore cannot dungeon-run. Arya must retain the **Power** Skill (Strength × Combat). Clyde must select **Constitution, Perception and Dexterity**, plus **Crafting** Discipline, and may be a non-Combat dungeon scavenger: the proposed five Attributes are **Dexterity, Constitution, Perception, Intelligence, Luck**; proposed five Disciplines are **Crafting, Exploration, Management, Recovery & Support, Trade**. This preserves Scavenging (Observation + Discovery), Herbology/Harvesting (Handiwork + Observation), Leather Crafting (Handiwork + Design), and additional lore/research aptitudes. Clyde's full list is a suggestion awaiting final approval.
+
+**Proposed progress rule:** weighted dungeon checks use trained Skill Value; if the defined Skill is unavailable but its Attribute is selected, use a reduced parent-Attribute fallback; if the Attribute is not selected, that component contributes **zero**, despite the character's displayed baseline-1 competence. Do not normalize surviving weights. This explicitly separates **baseline display** from **effective weighted work**. No Combat/Power/Combat Composite prerequisite for general dungeon entry; Constitution selection is enough. The content-defined specialized action gates (e.g. Herbology) are separate.
+
+**Proposed action eligibility gates** (not blanket tab locks): no selected **Charisma** → character cannot perform Recruitment assignments; no **Intelligence** → Research assignments (future); no **Perception** → Scavenging; no **Constitution** → dungeon expedition. Strength, Dexterity and Speed are predominantly weighted dungeon efficiency; Luck and Soul provide atypical situational effects but are not universal hard locks. The Guild Master has Charisma/Intelligence for guild-level Recruitment and Research, so those tabs must not be hidden because other members lack those stats.
+
+**Engineering caution:** if a non-Constitution resource drains to zero, either stop the related contributions and keep funding the remaining slices, or define another explicit exhaustion rule. To make Constitution the sole expedition end condition, the current all-or-nothing pool-cost check must change and Constitution must appear at least once per progression unit. When it depletes on a danger check, injury vs normal exhausted return should be separately specified. Ensure no zero-progress mandatory-room infinite loops.
+
+---
+
 # Planned specialization redesign — November 6, 2026 (design only, NOT implemented)
 
 ## Terminology and structure

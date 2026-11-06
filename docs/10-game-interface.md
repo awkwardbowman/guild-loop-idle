@@ -84,3 +84,16 @@ The Guild page shows the guildmaster’s own nine-stat profile and innate-magic 
 ### Dungeon attribute matching
 
 The dungeon catalog has a member-comparison selector, an Attribute emphasis summary with percentages, an expandable per-check breakdown and relative importance, and the selected member’s advisory weighted capability. Individual check outcomes and resource availability remain decisive; this is not a success-probability estimate.
+
+
+## Current opening UI v6
+
+Story introduces history and Arya/Clyde before Guild management appears. Founding grants both named recruits, Members and the no-gear Ritual Catacombs. Plot unlocks also enter the compact section-colored event log.
+
+Guild has Guild Master, Guild Hall and Storage subtabs. Chips are the primary guild currency. Storage lists each resource quantity/cap and its individual cap purchase. Overflow is discarded and logged. Resources keeps manual pinning and timed trade controls.
+
+The first Leather Scraps enable Gavin’s story action and Shops tab. Gavin is both Tanner and Barkeep. Shops offers reusable guild-wide gear unlocks and absolute equipment-slot ceilings; Members offers independent loadouts, current/best room, total core stats and cargo capacity. In-flight loadouts cannot change.
+
+Dungeon listings show primary group weights, nested room weights, mandatory/optional status, applicable attributes, skill requirements, selected-member eligibility and sized loot weights. Difficulty/reward descriptions use rooms, with ten per floor for flavor.
+
+Stillmere’s herbalist appears after the five-herb referral, enables herb sales and offers equipment capacity to five. Compression and assigned auto-selling are future placeholders rather than active controls.

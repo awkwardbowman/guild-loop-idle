@@ -19,7 +19,7 @@ New guilds open with Story only, then unlock features through saved events. Memb
 
 ## Saves
 
-Local autosave plus versioned JSON export/import and backup recovery. Save schema v5 migrates v0/v1/v2/v3/v4, preserving existing access, rosters and active task outings. Existing guilds can enable skill-based future archive expeditions from Story → Guild → Train for trap rooms. Browser play is paused on reload and hidden/closed tabs do not accrue progress. No database/account required; optional sync is future work.
+Local autosave plus versioned JSON export/import and backup recovery. Save schema v6 migrates v0/v1/v2/v3/v4/v5, preserving existing access, rosters and active task outings. Existing guilds can enable skill-based future archive expeditions from Story → Guild → Train for trap rooms. Browser play is paused on reload and hidden/closed tabs do not accrue progress. No database/account required; optional sync is future work.
 
 ## Design and validation
 
@@ -30,3 +30,5 @@ Vercel target: Vite build command `npm run build`, output `dist`. Hosting is not
 Location-based expeditions use separate outbound travel, exploration, return travel and recovery. Local routes take 15 seconds each way. Resources includes delayed sales: stock is committed immediately and gold arrives after a 15-second trade. All timers use the game clock and survive save/import.
 
 The accepted nine main stats and 27 attributes are centrally defined in `src/attributes.ts`, balanced across nine activity groupings. Luck is non-consumable. The guildmaster has a separate high-Soul stat profile and sole innate-magic eligibility; actual spell actions are future work. See docs/02-adventurers-and-stat-growth.md.
+
+The current opening introduces Arya and Clyde with fixed tier-1 profiles under a 10-point total. New adventures use weighted room categories/rooms, exponential difficulty and linear sized loot budgets. Chips replace Gold. First Leather Scraps introduce Gavin, Tanner and Barkeep; five held herbs unlock the Stillmere referral. Shared gear unlocks, individual loadouts, carrying limits and per-resource storage caps are playable. Overflow is discarded and logged. Guild now has Guild Master, Guild Hall and Storage subtabs.

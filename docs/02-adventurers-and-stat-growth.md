@@ -122,7 +122,7 @@ Combat combines offense and defense. Dungeoneering overcomes environmental obsta
 
 The guildmaster has a separate permanent nine-stat/27-attribute profile and unusually high Soul. Only the guildmaster has innate magic; adventurers rely on relics/artifacts. Soul alone does not make an adventurer a spellcaster. Attunement supports artifact compatibility, Resilience mental/spiritual recovery and Inspiration morale. The player can eventually provide magic for imbuement while members provide material/design/attunement work. Spell actions, imbuement production and revival mechanics are not implemented yet.
 
-Provisional defaults: guildmaster ordinary stats start at 12/60 maximum/affinity and Soul at 100/300. Newly introduced legacy member stats initialize at 12/60 without RNG changes. These numbers can be tuned without changing the accepted matrix.
+Historical v5 defaults (superseded for new guilds): guildmaster ordinary stats started at 12/60 maximum/affinity and Soul at 100/300. Newly introduced legacy member stats initialize at 12/60 without RNG changes. These numbers can be tuned without changing the accepted matrix.
 
 ## v5 compatibility
 
@@ -134,3 +134,24 @@ Might maps to Strength, old Agility to Dexterity, and Focus to Intelligence. Old
 The accepted 27 attributes form the common foundation. Every dungeon can author its own ordered check series with different combinations. Each check has relative importance within the dungeon and weighted attributes within the check, each normalized to 100%. The overall dungeon attribute mix sums check importance × that check’s attribute weights. These planning weights are separate from live check speed, success, efficiency and resource charging; learned skill proficiency and affordability still determine actual outcomes.
 
 The dungeon catalog displays the weighted attribute mix, per-check importance and combinations, plus an advisory weighted-capability score for a selected member. The score combines effective attributes with the planning mix; it is not a success probability or resource-survival guarantee. Initial profiles are provisional examples. The archive’s mix derives from its actual learned-skill dependencies; the starter and delve planning profiles accompany their existing fixed-task routes until their full bespoke check content is authored.
+
+
+## Starting budget and tiers — Current v6
+
+Tier potential is **10^tier total across the nine core stats**, not ten points per stat. Tier 1 has 10; tier 2 has 100; tier 3 has 1,000. New recruits divide their tier budget across nine affinities. Current/max totals start below potential. The first two recruits have fixed tier-1 allocations; each starts with a core maximum total of 9 and affinity total of 10. All initial skill levels are at most 4.
+
+| Stat | Arya affinity | Clyde affinity |
+|---|---:|---:|
+| Strength | 2 | 0.4 |
+| Dexterity | 1.8 | 0.7 |
+| Constitution | 2 | 0.8 |
+| Speed | 1.4 | 0.5 |
+| Perception | 0.8 | 1.8 |
+| Intelligence | 0.5 | 1.6 |
+| Charisma | 0.4 | 1.4 |
+| Soul | 0.4 | 1 |
+| Luck | 0.7 | 1.8 |
+
+Starting maximum/current = 90% of the listed affinity. Arya starts Combat 3, Athletics 2, Lock Picking 1. Clyde starts Scavenging 4, Harvesting 2, Observation 2, Crypt Lore 1. Unlisted learned skills start at zero. Harvesting requires level 1, so Arya cannot self-train it through failed checks or roll herbs from incidental loot. Clyde can. Root and specialization experience is awarded from successful checks; failures grant no skill XP.
+
+New guildmaster current/max total is 10: Soul 8 and 0.25 in each other stat, with higher affinity reserved for future progression. These replace the large v5 starting numbers. Old saves preserve their previous stat values as legacy profiles instead of shrinking existing adventurers. The exact 27-attribute matrix above is unchanged.

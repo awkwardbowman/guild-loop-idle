@@ -1,54 +1,43 @@
 # Guild and Resources
 
-Updated November 5, 2026.
+Updated November 5, 2026. Current opening supersedes the prototype consumable-gear economy.
 
-## Guild master — Agreed
+## Currency
 
-The player manages priorities such as recruitment and infrastructure. The guild persists while its adventurers perform their individual loops. There is no guild-master reset initially.
+**Chips replace Gold entirely.** Chips / Pebs / Bowls are rock-based denominations (chips, pebbles, boulders), analogous to bronze/silver/gold. All current accounting and prices use Chips; higher denomination conversion ratios are not invented yet. Old Gold balances, carried rewards, pending sale quotes and pins migrate 1:1 to Chips.
 
-How priorities are expressed is open: weighted allocation, ordered priorities, toggles, or another interface. A specific allocation system has not been approved.
+## Guild tabs
 
-## Adventurer dispatch priority — Agreed
+- **Guild Master:** the player’s own stats, attributes and future magic. The guildmaster cannot fight.
+- **Guild Hall:** recruitment/infrastructure priorities, roster and expedition capacity, and hall upgrades.
+- **Storage:** per-resource quantities, caps and paid cap increases.
 
-The player maintains an ordered list of guild members. The continuous-time prototype considers eligible members in roster order whenever support becomes available, superseding the old day-start-only dispatch default. This member ordering is a separate control from the guild master's recruitment/infrastructure priorities. Detailed scheduling and future eligibility rules are defined in 06-queues-and-assignment.md.
+Member dispatch order remains distinct from guild work priorities. Internal worker assignments and automation are future systems. No passive stat or gear regeneration starts enabled in a new guild.
 
-## Support resources — Agreed direction
+## Storage and carrying
 
-The guild has limits and replenishment systems that gate simultaneous expeditions. Explicitly named concepts:
+Each resource has its own storage cap. Starter caps: Chips 80; Leather Scraps 12; Animal Hides 8; Ore 8; Herbs 5; Building Materials 10. Old resources remain supported in existing saves.
 
-| Concept | Intended purpose | Unresolved detail |
-|---|---|---|
-| Max capacity | Limits the number of adventurers the guild can support | Total roster, simultaneous deployment, or separate limits? |
-| Gear capacity | Limits equipment support available for expeditions | Consumable stock, reserved loadout capacity, or durable item inventory? |
-| Gear regeneration | Replenishes the equipment support resource over time | Rate, cap, costs, and when gear is consumed or returned? |
+Each cap upgrade costs `ceil(5 × 1.25^level)` Chips; the selected cap becomes `ceil(cap × 1.2)`, at least +1. Only the selected resource changes. Values are provisional slow exponential defaults.
 
-Other support resources may be added later. None are yet specified.
+Carrying capacity is separate from guild storage. Item size counts toward both the room loot budget and carried cargo, but stored caps count resource quantities. Arya carries size 72; Clyde 36. Chips use size 1; Leather Scraps 1; Animal Hides/Ore 2; Herbs 3. Cargo is deposited only on arrival home. Items exceeding individual storage caps are discarded and logged; no automatic sale or unclaimed overflow is created.
 
-Supporting an adventurer should depend on available guild resources, not simply whether a recruit exists. Dungeon-specific resource requirements also affect deployment; the exact split between guild costs and adventurer stat costs is open.
+The guildmaster may later learn compression magic. Storage tabs may later auto-sell when a guild member is assigned to that work. Both are future scope, not active passive systems.
 
-## Infrastructure — Agreed category, details open
+## Gavin’s equipment shop
 
-Infrastructure is a guild-master priority. Specific buildings, upgrade paths, costs, currencies, and production rules have not been selected.
+Gavin is Emberveil’s **Tanner and Barkeep**, doing both jobs in a small town. The first Leather Scraps enable his story unlock and Shops tab. Equipment purchases unlock reusable templates for the entire guild; each member independently equips unlocked pieces while home. There is no single shared copy to fight over.
 
-## Recruitment — Agreed category, details open
+- Rough Leather Armor: tier 1, +10% Constitution effectiveness, 4 Chips + 3 Leather Scraps.
+- Reinforced Leather Armor: tier 2, +25% Constitution effectiveness, 12 Chips + 8 Leather Scraps.
+- Leather Satchel: tier 1, +12 carrying capacity, 5 Chips + 4 Leather Scraps.
 
-Recruitment produces semi-random adventurers. Higher tiers have higher average Stat Affinity. Recruitment timing, costs, candidate offers, tier unlocks, and dismissal or replacement rules are not decided.
+Armor reduces constitution exertion and benefits relevant check capability; it does not create permanent stat growth or passive regeneration. Equipment is snapshotted for an outing.
 
-## Affinity improvement — Future, agreed
+Equipment capacity is guild-wide, applied per member. Gavin supports an absolute maximum of 1; Stillmere’s herbalist supports 5, even if Gavin’s slot purchase was skipped. Each next slot costs `4 × 2^current capacity` Chips. A later shop’s ceiling is absolute, not an additive bonus.
 
-Guild-master upgrades will eventually improve affinity. An additive modifier is a candidate implementation. See 02-adventurers-and-stat-growth.md for the formula direction and unresolved scope.
+## Herbs and trade
 
-## Proposals that are not requirements
+The first herb enables a conversation with Gavin, who will not buy it. Once the guild holds 5 herbs, he provides directions to Stillmere; the sample is not consumed. Herbs can then be sold to the herbalist. Sales commit inventory immediately and pay Chips after a 15-second game-time trade. Overflow of sale proceeds is also discarded and logged if Chips storage is full.
 
-- Research as an additional priority.
-- Specific buildings or resource types.
-- A later guild prestige/reset system.
-- Automatic spending rules or recruitment automation.
-
-## Resource interface and future returns
-
-Resources has its own main tab. Players can pin chosen resources to the collapsible left-sidebar resource display. See 10-game-interface.md.
-
-The baseline separates member roster capacity and simultaneous expedition capacity, consumes gear once on dispatch, and regenerates gear continuously to its cap. These are provisional accounting choices. Early successful returns may eventually refund unused Gear/Supplies to speed future departures; refund percentages, supply units, caps and reservation accounting are undecided and not implemented.
-
-Guild is the main guildmaster tab, including a reserved future skill-tree area. Affinity upgrades belong to that future development; no tree nodes or costs are currently approved.
+Future guild affinity upgrades, traits, compression, worker assignments and automatic spending remain distinct from current equipment/storage purchases. Legacy consumable gear and gear regeneration are retained only for established saved task routes; new room routes need no dispatch gear.

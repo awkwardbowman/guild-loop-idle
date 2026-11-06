@@ -112,3 +112,22 @@ Functional preparation is implemented and tested. See 11-progression-and-check-f
 - A death/revival recovery timer from 4× travel toward 2× travel with diminishing stat benefits is agreed direction; governing stat, scaling and death triggers remain undecided and unimplemented.
 
 - The 27 attributes are the shared foundation for most activities. Dungeons will have unique specialized check sequences and weighted combinations, displayed beside the dungeon for member selection. Each dungeon/check can assign different relative importance. Authored planning weights are separate from actual speed/success/efficiency/cost channels.
+
+
+## Emberveil opening — Accepted v6
+
+- Introduce player history, then friends Arya/Clyde, then found the guild. Both are fixed low-tier recruits.
+- Tier-1 total core potential budget is 10, not 10 per stat; tiers scale as 10^tier. Starting core maxima total 9 for each friend.
+- Arya favors dungeon progression; Clyde has higher support/scavenging skills and the Harvesting eligibility Arya lacks.
+- The Ritual Catacombs require no equipment; no passive regeneration begins enabled.
+- Track rooms; ten may represent a canonical floor. Use weighted room groups, then weighted rooms within the selected group.
+- Optional failures skip; mandatory failures retry until required resources cannot fund progress. Only successful checks award skill XP.
+- Loot uses a size budget, repeated eligible weighted draws and a permanent size-1/weight-1 Chips fallback. Resource rarity improves relative weights with depth, not hard unlock floors.
+- Difficulty grows slowly exponentially; rewards grow linearly.
+- Gavin is the Tanner and Barkeep. First Leather Scraps unlock his shop story. Equipment unlocks are guild-wide, loadouts per member, shop capacity ceilings absolute.
+- First herb opens Gavin’s conversation; he does not buy herbs. Holding 5 herbs unlocks directions to Stillmere’s herbalist without consuming the sample.
+- Chips replace Gold entirely; Pebs/Bowls represent pebbles/boulders as later denominations.
+- Each resource has a separately purchased cap. Cargo capacity is separate. Overflow is discarded and logged. Compression magic and assigned storage-tab auto-selling are future systems.
+- Guild subtabs: Guild Master, Guild Hall, Storage.
+
+These decisions supersede the old single unnamed friend, consumable gear/regen starter, fixed task floors, uncapped stockpile and Gold terminology. Exact numerical weights/prices are provisional implementation values.

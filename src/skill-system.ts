@@ -3,8 +3,13 @@ import {ATTRIBUTES,STATS,STAT_INFO,zeroPools} from './attributes.ts';
 import type {AttributeDefinition} from './attributes.ts';
 export {ATTRIBUTES} from './attributes.ts';
 export type {AttributeDefinition} from './attributes.ts';
-export type SkillDefinition={id:string;name:string;affinities:{attribute:string;weight:number}[];specialization:number};
+export type SkillDefinition={id:string;name:string;affinities:{attribute:string;weight:number}[];specialization:number;dungeonId?:string};
 export const SKILLS: SkillDefinition[]=[
+ {id:'combat',name:'Combat',affinities:[{attribute:'power',weight:.5},{attribute:'precision',weight:.5}],specialization:.5},
+ {id:'athletics',name:'Athletics',affinities:[{attribute:'agility',weight:.5},{attribute:'endurance',weight:.5}],specialization:.5},
+ {id:'scavenging',name:'Scavenging',affinities:[{attribute:'observation',weight:.5},{attribute:'discovery',weight:.5}],specialization:.5},
+ {id:'harvesting',name:'Harvesting',affinities:[{attribute:'handiwork',weight:.5},{attribute:'observation',weight:.5}],specialization:.5},
+ {id:'crypt_lore',name:'Crypt Lore',dungeonId:'wood',affinities:[{attribute:'planning',weight:.5},{attribute:'observation',weight:.5}],specialization:.5},
  {id:'observation',name:'Observation',affinities:[{attribute:'observation',weight:.75},{attribute:'scouting',weight:.25}],specialization:.5},
  {id:'investigation',name:'Investigation',affinities:[{attribute:'planning',weight:.75},{attribute:'observation',weight:.25}],specialization:.5},
  {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finesse',weight:.75},{attribute:'design',weight:.25}],specialization:.5}

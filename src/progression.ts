@@ -1,25 +1,27 @@
-/** Saved events are facts. Feature visibility is derived, never independently saved. */
-export const EVENT_IDS = ['guild_founded','recruitment_opened','first_member_recruited','trail_discovered','first_floor_cleared','first_return','archive_discovered','archive_floor_cleared','quarry_discovered','skill_checks_enabled','legacy_access'] as const;
-export type EventId = typeof EVENT_IDS[number];
-export type Stamp = { day: number; time: number };
-export type Progression = { completed: Partial<Record<EventId, Stamp>> };
-export type Feature = 'recruitment'|'members'|'activities'|'resources'|'infrastructure'|'skills';
-export const freshProgression = (): Progression => ({completed:{}});
-export const hasEvent = (p:Progression,id:EventId) => Object.hasOwn(p.completed,id);
-export function recordEvent(p:Progression,id:EventId,stamp:Stamp):boolean {if(hasEvent(p,id))return false;p.completed[id]={...stamp};return true;}
-const FEATURES: Record<Feature,EventId> = {recruitment:'recruitment_opened',members:'first_member_recruited',activities:'trail_discovered',resources:'first_return',infrastructure:'first_return',skills:'archive_discovered'};
+/** IDs remain stable for historical saves. */
+export const EVENT_IDS=['history_remembered','friends_introduced','guild_founded','recruitment_opened','first_member_recruited','trail_discovered','first_floor_cleared','first_return','first_leather','tanner_opened','first_herb','herbs_discussed','stillmere_unlocked','archive_discovered','archive_floor_cleared','quarry_discovered','skill_checks_enabled','room_routes_enabled','legacy_access'] as const;
+export type EventId=typeof EVENT_IDS[number];export type Stamp={day:number;time:number};export type Progression={completed:Partial<Record<EventId,Stamp>>};
+export type Feature='recruitment'|'members'|'activities'|'resources'|'infrastructure'|'skills';
+export const freshProgression=():Progression=>({completed:{}});
+export const hasEvent=(p:Progression,id:EventId)=>Object.hasOwn(p.completed,id);
+export function recordEvent(p:Progression,id:EventId,stamp:Stamp){if(hasEvent(p,id))return false;p.completed[id]={...stamp};return true;}
+const FEATURES:Record<Feature,EventId>={recruitment:'recruitment_opened',members:'first_member_recruited',activities:'trail_discovered',resources:'first_return',infrastructure:'first_return',skills:'trail_discovered'};
 export const hasFeature=(p:Progression,f:Feature)=>hasEvent(p,'legacy_access')||hasEvent(p,FEATURES[f]);
-export const dungeonUnlocked=(p:Progression,id:string)=>['wood','ruins','quarry'].includes(id)&&(hasEvent(p,'legacy_access')||hasEvent(p,id==='wood'?'trail_discovered':id==='ruins'?'archive_discovered':'quarry_discovered')); 
-export const STORY_ACTIONS = [
- {id:'found_guild',thread:'Guild',title:'Open the guild',description:'You grew up watching adventurers come and go, always wondering what it would be like to be part of their stories. You have never been an adventurer yourself, but you believe you can build something of your own. With one friend willing to take the first step beside you, you decide to open a guild.',requires:[],event:'guild_founded'},
- {id:'welcome_friend',thread:'Guild',title:'Welcome your first member',description:'Your friend is ready to become the guild’s first adventurer. A guildmaster and one member: it is a small beginning, but it is yours.',requires:['guild_founded'],event:'first_member_recruited'},
- {id:'study_checks',thread:'Guild',title:'Train for trap rooms',description:'Explore the archive using observation, investigation and lock picking.',requires:['legacy_access'],event:'skill_checks_enabled'},
- {id:'open_recruitment',thread:'Guild',title:'Open recruitment',description:'Look for more adventurers to join you and your friend.',requires:['first_member_recruited'],event:'recruitment_opened'},
- {id:'discover_trail',thread:'Expeditions',title:'Explore the Ritual Catacombs',description:'Make Ritual Catacombs available for expeditions.',requires:['first_member_recruited'],event:'trail_discovered'},
- {id:'discover_archive',thread:'Expeditions',title:'Investigate the archive',description:'Unlock the archive and its three-stage trap-room skill checks.',requires:['first_floor_cleared'],event:'archive_discovered'},
- {id:'discover_quarry',thread:'Expeditions',title:'Survey the ridge',description:'Make Emberstone Delve available for expeditions.',requires:['archive_floor_cleared'],event:'quarry_discovered'}
-] as const satisfies readonly {id:string;thread:string;title:string;description:string;requires:readonly EventId[];event:EventId}[];
+export const dungeonUnlocked=(p:Progression,id:string)=>['wood','ruins','quarry'].includes(id)&&(hasEvent(p,'legacy_access')||hasEvent(p,id==='wood'?'trail_discovered':id==='ruins'?'archive_discovered':'quarry_discovered'));
+export const STORY_ACTIONS=[
+ {id:'remember_history',thread:'Guild',title:'Your story in Emberveil',description:'A thousand years have passed since the events now remembered in broken shrines and half-told legends. Emberveil is a small town beginning to revive. You grew up watching travellers bring useful things back from the ruins, wishing you could help rebuild. You cannot fight, but your unusually strong Soul carries a spark of magic.',requires:[],event:'history_remembered'},
+ {id:'meet_friends',thread:'Guild',title:'Arya and Clyde',description:'Arya has always been the one to venture ahead: quick, determined, and comfortable facing whatever lurks in the dark. Clyde is more at home sorting finds, spotting useful plants, and making a little go a long way. Neither is a celebrated adventurer. They are your friends, and they believe the three of you can build something together.',requires:['history_remembered'],event:'friends_introduced'},
+ {id:'found_guild',thread:'Guild',title:'Open the guild',description:'Arya and Clyde offer to become your first two recruits. You will keep the hall running while they explore the nearby Ritual Catacombs: a quiet, abandoned place that needs no equipment to enter.',requires:['friends_introduced'],event:'guild_founded'},
+ {id:'open_recruitment',thread:'Guild',title:'Open recruitment',description:'Invite more adventurers to the growing guild.',requires:['first_return'],event:'recruitment_opened'},
+ {id:'open_tanner',thread:'Town',title:'Find a use for these scraps',description:'What can we possibly do with these scraps? Gavin, the town’s tanner and barkeep, can turn your finds into useful equipment. He works hides by day and tends the bar by evening; in a town this small, everyone wears more than one hat. Visit the new Shops tab.',requires:['first_leather'],event:'tanner_opened'},
+ {id:'ask_about_herbs',thread:'Town',title:'Show Gavin your herbs',description:'Gavin shakes his head. “I work hides, not leaves. Bring together a useful handful, though, and I can point you toward someone who does.”',requires:['tanner_opened','first_herb'],event:'herbs_discussed'},
+ {id:'find_stillmere',thread:'Town',title:'Directions to Stillmere',description:'With five herbs to show, Gavin gives you directions to nearby Stillmere. Its herbalist buys herbs and can support a larger equipment loadout. The sample stays yours.',requires:['herbs_discussed'],minimum:{id:'herb',amount:5},event:'stillmere_unlocked'},
+ {id:'discover_archive',thread:'Expeditions',title:'Investigate the archive',description:'Follow a lead from Stillmere to the old archive.',requires:['stillmere_unlocked'],event:'archive_discovered'},
+ {id:'discover_quarry',thread:'Expeditions',title:'Survey the ridge',description:'Investigate the old workings beyond Emberveil.',requires:['archive_floor_cleared'],event:'quarry_discovered'},
+ {id:'revisit_catacombs',thread:'Guild',title:'Meet Arya and Clyde',description:'Welcome two local friends and try the newly surveyed catacomb rooms. Make room for two recruits in your roster first. Existing outings keep their saved rules.',requires:['legacy_access'],event:'room_routes_enabled'},
+ {id:'study_checks',thread:'Guild',title:'Train for trap rooms',description:'Explore the archive using observation, investigation and lock picking.',requires:['legacy_access'],event:'skill_checks_enabled'}
+] as const satisfies readonly {id:string;thread:string;title:string;description:string;requires:readonly EventId[];event:EventId;minimum?:{id:string;amount:number}}[];
 export type StoryActionId=typeof STORY_ACTIONS[number]['id'];
-export function availableStoryActions(p:Progression){return STORY_ACTIONS.filter(a=>a.requires.every(id=>hasEvent(p,id))&&!hasEvent(p,a.event)&&(!hasEvent(p,'legacy_access')||a.id==='study_checks'));}
-export function storyThreads(p:Progression){return ['Guild',...(hasFeature(p,'members')?['Expeditions']:[])];}
-export function visibleTabs(p:Progression){if(!hasEvent(p,'guild_founded')&&!hasEvent(p,'legacy_access'))return ['Story'];return ['Story','Guild',...(hasFeature(p,'members')?['Members']:[]),...(hasFeature(p,'activities')?['Activities']:[]),...(hasFeature(p,'resources')?['Resources']:[]),'Info'];}
+export function availableStoryActions(p:Progression,inventory?:Record<string,number>){return STORY_ACTIONS.filter(action=>action.requires.every(id=>hasEvent(p,id))&&!hasEvent(p,action.event)&&(!hasEvent(p,'legacy_access')||['study_checks','revisit_catacombs','open_tanner','ask_about_herbs','find_stillmere'].includes(action.id))&&(!('minimum' in action)||!inventory||(inventory[action.minimum.id]??0)>=action.minimum.amount));}
+export function storyThreads(p:Progression){return ['Guild',...(hasFeature(p,'members')?['Expeditions','Town']:[])];}
+export function visibleTabs(p:Progression){if(!hasEvent(p,'guild_founded')&&!hasEvent(p,'legacy_access'))return ['Story'];return ['Story','Guild',...(hasFeature(p,'members')?['Members']:[]),...(hasFeature(p,'activities')?['Activities']:[]),...(hasFeature(p,'resources')?['Resources']:[]),...(hasEvent(p,'tanner_opened')?['Shops']:[]),'Info'];}

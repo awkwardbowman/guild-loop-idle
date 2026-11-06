@@ -24,7 +24,7 @@ The guild is conceptually a persistent prestige layer. A later guild reset syste
 2. Recruit adventurers with semi-random stats and individual growth potential.
 3. Assign adventurers to dungeons, subject to guild support limits.
 4. Resolve dungeon tasks, consuming current stats and generating stat training based on the dungeon.
-5. Descend bottomless floors to a personal/global stopping depth; return through success, stat depletion, recall, or the expedition time limit.
+5. Explore weighted rooms to a personal/global stopping depth; return through success, stat depletion, recall, or the expedition time limit.
 6. Carry stat growth into the next run; successful dungeon runs return random loot from that dungeon's pool.
 7. Improve the guild and refine assignments to sustain more adventurers and tackle harder content.
 
@@ -40,25 +40,19 @@ The guild is conceptually a persistent prestige layer. A later guild reset syste
 
 The current tabbed interface is specified in 10-game-interface.md; bottomless dungeons in 04-dungeons-and-expeditions.md and queue execution in 06-queues-and-assignment.md. Final balance, offline progression and broader content progression remain open. The game is inspired by a reference game's loop concept; it does not yet inherit that game's specific systems.
 
-## Grounded opening — Current direction
+## Grounded opening — Accepted and implemented
 
-You grew up watching adventurers and wanted to be part of that world. You are not an adventurer yourself, but you believe you can build and lead a guild. One friend shares the idea and becomes its first adventurer. The initial ambition is to make this small guild work and grow it.
+1. Story introduces the player’s history in Emberveil, a small town reviving a thousand years after Threadless.
+2. Introduce Arya and Clyde: low-tier friends with fixed, complementary profiles.
+3. Found the guild; both friends join and the harmless Ritual Catacombs unlock immediately, with no equipment requirement.
+4. Arya pushes deeper. Clyde has better scavenging/harvesting skills and can obtain herbs Arya cannot harvest.
+5. The first stored Leather Scraps open a story action to meet **Gavin, Tanner and Barkeep**. His shop unlocks shared equipment and individual loadouts.
+6. The first stored herb opens Gavin’s conversation. He does not buy herbs; with five herbs held, he gives directions to Stillmere’s herbalist without consuming the sample.
+7. Extend gear, carrying capacity and resource storage; then investigate further dungeons.
 
-The earlier reincarnation/demon-king premise was considered and rejected. Do not introduce a chosen-one destiny, hidden personal powers, a world-saving obligation or a catastrophic starting threat without a new design decision. The opening is optimistic and personal; not being an adventurer does not make the protagonist a failure.
+The opening is optimistic and personal. The guildmaster cannot fight; unusually high Soul supports future magic. No chosen-one obligation or catastrophic starting threat is introduced.
 
-### Implemented first beats
-
-| Step | Story / action | Unlocked |
-|---|---|---|
-| Introduction | Establish the protagonist's interest in adventurers and the friend beside them | Only Story, with Current Goals and Plot |
-| Open the guild | Commit to starting together | Guild and utility Info |
-| Welcome your first member | The friend joins as the guaranteed first member | Members |
-| Prepare to grow | Open ordinary recruitment and discover the first manageable expedition | Existing recruitment / first-dungeon systems |
-
-The friend is temporarily named “Your friend”; no final name, gender, backstory, class, unique trait or authored stat profile is established. Current stats use the prototype seeded recruit generator. The first dungeon remains the prototype trail; names, the exact first job, narrative copy and later opening beats remain open. A newly joined friend has no queued dungeon until discovery, preventing spoilers before the feature unlock.
-
-Existing saves keep established guilds and rosters; they are not reset or given a second founding friend. Opening actions and the friend grant are one-time events. Clock/work cannot start before the guild opens. Save loading remains available from the Story-only screen.
-
+Existing saves retain rosters, active trips and balances. They may opt into the new room routes through Current Goals → Meet Arya and Clyde, provided two roster spaces are available. Existing active routes retain their saved rules. Fresh history/founding is a new-guild flow; it does not overwrite established saves.
 
 ## Setting and magic direction — November 5, 2026
 

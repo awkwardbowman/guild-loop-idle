@@ -54,3 +54,8 @@
 .dungeon-attribute-mix{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:3px;font-size:11px}
 .attribute-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .dungeon-check-profile{padding:8px 0}.dungeon-check-profile small{display:block;margin-top:6px;color:var(--muted);line-height:1.6}
+
+.equipment-loadout{padding-top:18px;margin-top:18px;border-top:1px solid var(--line)}
+.equipment-loadout button{font-size:11px;margin:4px 5px 0 0}
+.equipment-loadout button[aria-pressed=true]{border-color:var(--accent);color:#e5ce9e}
+.room-group-weights{padding:14px 0;border-top:1px solid var(--line);margin-top:15px}

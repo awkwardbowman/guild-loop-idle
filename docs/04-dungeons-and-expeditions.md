@@ -1,3 +1,41 @@
+# Dungeons and Expeditions — Current Rooms
+
+Updated November 5, 2026. The new opening uses **rooms** as progression units; ten rooms represent a floor for flavor. Personal/global limits count rooms.
+
+## Weighted room selection
+
+Each dungeon owns group weights and a weighted room catalog within each group. Select a group, then a room within it. Catacomb group weights: Neutral 5, Combat 5, Trap 2, Puzzle 1, Boss 0.25, Treasure 2. Multipliers apply directly to weights, so doubling Trap doubles its relative rate. These are weights, not fixed percentages. Archive and delve have separate group distributions and room catalogs.
+
+Neutral passages, scavenger combat, rusted snares, faded ritual puzzles, an oversized crypt beetle and forgotten caches/herb alcoves form the starter room catalog. Each room has ordered checks, applicable weighted attributes, a learned skill, optional minimum skill, costs, work and loot. Crypt Lore is a dungeon-specific skill.
+
+Optional failure/ineligibility skips that room with no skill XP or loot. Mandatory failure retries the check; inability to fund required work returns the member home. All required resources must be affordable before work progresses. Successful checks alone award skill XP and pending attribute training. No death or punitive failure is introduced in these harmless starter catacombs.
+
+## Difficulty and reward scaling
+
+Difficulty and exertion grow **1.04^(room−1)**. Base room exertion is 0.063 Constitution × difficulty, reduced by equipped Constitution bonuses. Repeated check attempts also have small explicit resource costs. Loot budget is `1 + floor((room−1)/4) + a 0-or-1 roll`: linear progression, independent of exponential difficulty.
+
+At full affinity, 100 seeded trials gave Clyde room 10, Arya room 20, and Clyde with Reinforced Leather Armor room 12. This comes from their pools and costs, not hardcoded character depth ceilings. Starting current maxima are lower, and optional/retry outcomes can affect individual results.
+
+## Budgeted weighted loot
+
+First roll a room’s integer budget, limited by remaining carrying capacity. Each draw selects among items that fit the remaining size, spends that item’s size and repeats. **Chips always remain a size-1, weight-1 fallback.** If budget 4 spends two size-1 Leather Scraps, size-3 Herbs become ineligible for subsequent draws. A Herb first leaves room for one size-1 result.
+
+Resources carry rarity tiers; their relative weights improve smoothly with depth using `base weight × (1 + min(4,(room−1)/20) × rarity)`. Chips remain weight 1. Herbs need size 3 and Harvesting eligibility, with no hard depth gate: an early find is unlikely but possible once the budget fits. Arya cannot obtain herbs until she learns the required skill; Clyde starts able to harvest.
+
+Loot, Chips and pending growth remain carried until arrival home. Cargo and storage have separate limits; overflow is discarded on deposit. See 03 for economy/caps and 02 for the fixed friends and stat budgets.
+
+## Trips, persistence and future failure
+
+Local outbound and return travel each take 15 game seconds. Travel is separate from exploration and 12-second recovery. Rooms, partial work, attempts, RNG, cargo, loadout and travel stages survive saves. The temporary 300-second exploration limit starts a safe return. Pausing/closed play does not advance timers.
+
+Old active task/check routes preserve their rules on migration. Existing guilds can adopt room routes through the Arya/Clyde story action; current trips are not rewritten. A future death/revival timer should range from 4× toward 2× travel using a diminishing stat benefit, but death triggers and the governing stat remain undecided.
+
+---
+
+## Historical task-route contract
+
+The following is retained for older saved outings only and is superseded by the room rules above for new departures using room routes.
+
 # Dungeons and Expeditions
 
 Updated November 5, 2026. Current bottomless-dungeon redesign supersedes fixed dungeon completion and daily expedition resets.

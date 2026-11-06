@@ -1,3 +1,20 @@
+# Current Room and Progression Contract — v6
+
+November 5, 2026. The accepted opening supersedes the historical single-friend/task-route content below.
+
+- `resources.ts`: resource sizes/caps, currency naming, rarity weights, budgeted loot and exponential storage prices.
+- `rooms.ts`: six group types, two-stage weighted selection, dungeon room/check catalogs, optional/mandatory resolution, affordability, success-only skill XP and generated-room state.
+- `equipment.ts`: shared unlock templates, stat bonuses, carry bonuses and absolute shop capacity ceilings.
+- `engine.ts`: fixed Arya/Clyde, 10^tier recruit budgets, room-step integration, cargo/deposit overflow, shop/cap purchases, snapshot loadouts and story transitions.
+- `GuildPanel.tsx` / `ShopsPanel.tsx`: new guild subtabs, per-resource storage purchases and Gavin/Stillmere shops.
+- `persistence.ts`: v6 validation and historical migration. Old Gold maps to Chips, new skills default safely, existing stocks receive preserving caps, old profiles/trips keep their values/rules. Generated room ID/index/work/attempts and cargo/loadout snapshots are validated.
+
+The shared nine roots / nine groups / 27 attributes remain unchanged. No child resource pools or passive new-guild regeneration are added. Legacy task/check routes continue to use their saved rules, and can be opted out of through the new story path for future departures.
+
+---
+
+## Historical foundations and retained APIs
+
 # Progression and Check Foundations — Current
 
 November 5, 2026. Functional preparation based on Maya's accepted design; numerical rules below are provisional implementation choices. This is a game-specific system inspired by D&D attributes, not an implementation of official D&D rules.

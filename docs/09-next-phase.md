@@ -1,3 +1,13 @@
+# Next PR planning: character specialization and Info Skills — November 6, 2026
+
+**Design requested, no implementation or PR opened.** Add alongside the Leather Crafting work queue: all characters choose five of nine **Attributes** and five of nine **Disciplines**, with baseline 1 and no normal training outside their picks. Their pairwise capabilities become **Skills** (Power = Strength + Combat); advanced learned abilities become **Composite Skills**. Constitution selected is a required dungeon gate. Guild Master selects Perception, Intelligence, Charisma, Soul and Luck (no physical specialties and no dungeon access; five Disciplines TBD). Character display becomes an eligible 5×5 matrix with neutral black Discipline glyphs, Attribute-tinted Skill glyphs, Value/Potential reveal and training-ratio coloring.
+
+**The Info tab must include a Skills section explaining every symbol and this entire mechanism, including the 5×5 grid, skill tiers, combination rules, specializations, dungeon eligibility and color legend.** See docs/02-adventurers-and-stat-growth.md and docs/10-game-interface.md for the detailed planned contract.
+
+**Resolve before implementation:** the currently authored 27 total 9×9 pairings cannot guarantee 25 valid cells for each 5×5 choice; specific 5/5 character picks, generated recruits, Composite Skill prerequisites, baseline/stat budget interactions, Guild Master disciplines, saved progression migrations and the inclusive 90% color boundary are all still open. Do not change gameplay or claim implemented until a later PR passes migration and UI tests.
+
+---
+
 # Backlog implemented — November 6, 2026
 
 Single dungeon assignments, queued statuses/counts/lists, simplified member controls, per-member/dungeon history, newest-first Plot and separate rarity/tier metadata are implemented in save v8. The pending discovered-skills and weighted-engine/shop commits are included in this delivery.

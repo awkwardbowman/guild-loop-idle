@@ -1,3 +1,13 @@
+# New design option: Insufficient Skill Threshold — November 6, 2026 (not implemented)
+
+Add a configurable **Insufficient Skill Threshold** to dungeon settings, proposed as inherited global default with per-dungeon override. Initial candidate threshold **1%**, 0%=disabled. The ratio must compare estimated effective work rate (after actual Skill/Attribute/0.01 baseline fallback, weighted check contributions, Catchup→Flat→Percent gear and any tick-speed effect) against a **room-authored reference work rate**, rather than a member's own personal Potential. A 90% Power/10% Finesse room should be severely slow for Clyde but still attemptable unless projected efficiency is truly below threshold.
+
+Do not allow arbitrary free escape mid-floor. Recommended: check qualification before committing to an entire **canonical floor** (ten rooms); return at a safe boundary if below threshold. If a floor is already underway, ordinary recall remains queued to a full-floor boundary, while a 30-second exceptional interruption still requires explicit failure semantics. **Implementation question:** current engine randomly rolls individual rooms and uses variable `floor` as room index, so exact floor-level preflight requires pre-generation or an explicit aggregate estimate. Per-room preflight inside ten-room floors is not equivalent to safe floor-boundary bail. Threshold behavior and exact interaction with a 30s attempt/grace need final determination.
+
+Explain control, efficiency denominator, missing-Skill fallback, floor vs room behavior and outcomes in Info. Persist per-dungeon override and global default, with validation; test Clyde/Arya, weak builds, disallowed actions, depth limits, queued recall and XP accounting. Do not label complete or implement until approved.
+
+---
+
 # Confirmed next-PR design: Endurance capacity, full-floor training, gear order and recall — November 6, 2026
 
 **Approved direction (not implemented):** Constitution is **not a directly drained Attribute**. Dungeon runs consume a separate overall **Endurance Capacity** derived from available Constitution Skills (Toughness, Endurance and Vitality); Con-1 eligibility still requires at least one such Skill. Every room's per-second endurance drain is independent of the weighted work requirements and scales with floor depth. Soul/Luck and all Attributes are non-consumable.

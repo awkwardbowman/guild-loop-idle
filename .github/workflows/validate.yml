@@ -1,14 +1,27 @@
 name: Validate game
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm test
-      - run: npm run build
+      - name: Risk-based PR tests
+        if: github.event_name == 'pull_request'
+        run: npm run test:changed -- --base "${{ github.event.pull_request.base.sha }}"
+      - name: Full regression on main and manual runs
+        if: github.event_name != 'pull_request'
+        run: npm run test:full
+      - name: Production build
+        run: npm run build

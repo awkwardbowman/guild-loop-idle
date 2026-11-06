@@ -1,4 +1,7 @@
-import { freshProgression, hasFeature, hasEvent, dungeonUnlocked, recordEvent, availableStoryActions } from './progression.ts';
+import {EVENT_TEXT} from './story.ts';
+import {reportSection} from './sections.ts';
+import type {Section} from './sections.ts';
+import { freshProgression, hasFeature, hasEvent, dungeonUnlocked, recordEvent, availableStoryActions, STORY_ACTIONS } from './progression.ts';
 import type { Progression, StoryActionId, EventId } from './progression.ts';
 import { newSkillProfile, newRoomState, stepRoom, TRAP_ROOM, checkMetrics } from './skill-system.ts';
 import type { SkillProfile, RoomState, CheckActor } from './skill-system.ts';
@@ -8,12 +11,12 @@ export type StatValues = { current: number; max: number; affinity: number };
 export type Assignment = { dungeonId: string; maxDepth: number | null };
 export type Member = SkillProfile & { id: string; name: string; tier: number; stats: Record<keyof Pools, StatValues>; queue: Assignment[]; queueIndex: number; cooldown: number; resetSeconds: number; enabled: boolean; runs: number };
 export type Run = { specializationTraining: Record<string,number>; rules: 'tasks' | 'checks'; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; gold: number };
-export type Report = { day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
+export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
 export type Game = { progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { gold: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
 export const zero = (): Pools => ({ might: 0, agility: 0, focus: 0 });
 const copy = <T,>(v: T): T => structuredClone(v);
 function rand(g: Game) { g.seed = (Math.imul(1664525, g.seed) + 1013904223) >>> 0; return g.seed / 4294967296; }
-function log(g: Game, member: string, reason: string, detail: string, growth = zero()) { g.reports.unshift({ day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
+function log(g: Game, member: string, reason: string, detail: string, growth = zero(), section:Section = reportSection({member,reason})) { g.reports.unshift({ section, day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
 export function recruit(g: Game): Member {
  const tier = rand(g) < .22 ? 2 : 1;
  const names = ['Rowan','Mira','Bram','Sable','Tess','Orin','Jun','Wren','Iris','Ash'];
@@ -168,10 +171,15 @@ export function upgradeCost(g:Game,key:Upgrade){const n=g.guild.upgrades[key]+1;
 export function buyUpgrade(input:Game,key:Upgrade):Game {if(!hasFeature(input.progression,'infrastructure'))return input;const cost=upgradeCost(input,key);if(input.guild.gold<cost.gold||input.guild.materials<cost.materials)return input;const g=copy(input);g.guild.gold-=cost.gold;g.guild.materials-=cost.materials;g.guild.upgrades[key]++;if(key==='slots')g.guild.slots++;if(key==='quarters')g.guild.rosterCap++;if(key==='gear')g.guild.gearCap+=4;if(key==='regen')g.guild.gearRegen+=.1;return g;}
 export function calendar(day:number,seconds:number){const y=Math.floor((day-1)/360)+1,month=Math.floor(((day-1)%360)/30)+1,date=((day-1)%30)+1;const pad=(n:number)=>String(n).padStart(2,'0');return {date:`${pad(date)} / ${pad(month)} / ${String(y).padStart(4,'0')}`,time:`${pad(Math.floor(seconds/3600))}:${pad(Math.floor(seconds%3600/60))}:${pad(seconds%60)}`};}
 
-function noteEvent(g:Game,id:EventId){if(recordEvent(g.progression,id,{day:g.day,time:g.elapsed}))log(g,'Guild','Milestone',id.replaceAll('_',' '));}
+function noteEvent(g:Game,id:EventId){
+ if(!recordEvent(g.progression,id,{day:g.day,time:g.elapsed}))return;
+ // Archive discovery already describes its skill unlock in the same plot entry.
+ if(id==='skill_checks_enabled'&&hasEvent(g.progression,'archive_discovered')&&!hasEvent(g.progression,'legacy_access'))return;
+ log(g,'Story','Unlock',STORY_ACTIONS.find(a=>a.event===id)?.title??EVENT_TEXT[id].title,zero(),'Story');
+}
 export function completeStoryAction(input:Game,id:StoryActionId):Game {
  const action=availableStoryActions(input.progression).find(a=>a.id===id);if(!action)return input;
  const g=copy(input);if(action.id==='welcome_friend'){const friend=recruit(g);friend.name='Your friend';g.members.push(friend);}
- noteEvent(g,action.event);if(action.event==='trail_discovered'){for(const m of g.members)if(!m.queue.length)m.queue=[{dungeonId:'wood',maxDepth:1}];}if(action.event==='archive_discovered')noteEvent(g,'skill_checks_enabled');log(g,'Guild','Unlocked',action.title);return g;
+ noteEvent(g,action.event);if(action.event==='trail_discovered'){for(const m of g.members)if(!m.queue.length)m.queue=[{dungeonId:'wood',maxDepth:1}];}if(action.event==='archive_discovered')noteEvent(g,'skill_checks_enabled');return g;
 }
 export const checkActorFor=(g:Game,id:string):CheckActor|null=>{const m=g.members.find(m=>m.id===id);return m?structuredClone({...m,gear:g.guild.gear}):null;};

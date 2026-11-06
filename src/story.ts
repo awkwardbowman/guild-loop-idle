@@ -8,7 +8,7 @@ const goalsLocation:StoryLocation={tab:'Story',label:'Story → Current Goals'};
 const memberQueue:StoryLocation={tab:'Members',label:'Members → select a member → Dungeon queue'};
 const dungeonCatalog:StoryLocation={tab:'Activities',label:'Activities → Dungeons'};
 const skills:StoryLocation={tab:'Members',label:'Members → select a member → Skills and Attribute specializations'};
-const EVENT_TEXT:Record<EventId,{title:string;description:string;locations:StoryLocation[]}>= {
+export const EVENT_TEXT:Record<EventId,{title:string;description:string;locations:StoryLocation[]}>= {
  guild_founded:{title:'The guild is established',description:'The guild has opened its doors. Your first member is waiting to join you.',locations:[{tab:'Guild',label:'Guild'},goalsLocation]},
  recruitment_opened:{title:'Recruitment is open',description:'The guild can now search for candidates. Resume time to advance recruitment, then review each applicant.',locations:[{tab:'Guild',label:'Guild → Guild priorities → Recruitment'},{tab:'Guild',label:'Guild → Recruitment'}]},
  first_member_recruited:{title:'Your first member joins',description:'Member management is now available. Review their stats and plan their dungeon queue. A new expedition goal is available.',locations:[{tab:'Members',label:'Members → select a member'},goalsLocation]},

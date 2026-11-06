@@ -1,3 +1,4 @@
+import {isSection} from './sections.ts';
 import { EVENT_IDS } from './progression.ts';
 import { SKILLS, ATTRIBUTES, newSkillProfile, TRAP_ROOM } from './skill-system.ts';
 import type { Game, Member, Assignment } from './engine.ts';
@@ -59,7 +60,7 @@ export function validateGame(input: unknown): Game {
  const lootIds=DUNGEONS.flatMap(d=>d.loot.map(l=>l.id));
  requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)), 'inventory');
  requireValue(object(g.stats)&&integer(g.stats.clears)&&integer(g.stats.retreats)&&integer(g.stats.warps), 'lifetime totals');
- requireValue(Array.isArray(g.reports)&&g.reports.length<=100&&g.reports.every(r=>object(r)&&integer(r.day,1,g.day)&&integer(r.time,0,DAY_SECONDS-1)&&text(r.member,60)&&text(r.reason)&&text(r.detail,500)&&pools(r.growth)), 'reports');
+ requireValue(Array.isArray(g.reports)&&g.reports.length<=100&&g.reports.every(r=>object(r)&&(r.section===undefined||isSection(r.section))&&integer(r.day,1,g.day)&&integer(r.time,0,DAY_SECONDS-1)&&text(r.member,60)&&text(r.reason)&&text(r.detail,500)&&pools(r.growth)), 'reports');
  return structuredClone(g);
 }
 export function exportSave(g: Game): string { return JSON.stringify({ format: 'guild-loops', version: VERSION, game: validateGame(g) }, null, 2); }

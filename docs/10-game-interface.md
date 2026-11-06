@@ -70,3 +70,7 @@ Fresh launch and reload select Story. Before founding, no other main tab is rend
 New plot entries also create a single Story-section Unlock event at the same in-game timestamp, including automatic first-clear and first-return milestones. Unlock bodies use the player-facing action title (or milestone title), never internal event IDs. Archive discovery includes skill access in one plot/log entry. Repeated actions do not duplicate unlocks.
 
 The event log uses a compact `D1 - 00:00:00 Unlock` header, a message beneath it, and a section-colored left bar. Member names are inline for expedition events. The bottom Filter sections disclosure supports independent checkboxes, All, and None; filtering only changes visibility, not stored history. The existing latest-100-event retention remains. Existing saves without section tags use a compatibility mapping; new tags are validated on import.
+
+### Travel and sales
+
+The calendar shows Emberveil as the home location. Active expedition tiles and member panels show outbound/exploring/homeward stage, stage progress, and total time until home. Check-driven exploration estimates retain the ~ marker; a homeward countdown is exact. Return home initiates travel and disappears during an existing return. Dungeon entries list their location and each leg’s travel time. Resources includes quantity inputs, provisional sale prices, and pending trade countdowns/progress.

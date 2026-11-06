@@ -1,3 +1,11 @@
+# Location, travel and trade validation
+
+November 5, 2026. **82 tests passed, 0 failed**; TypeScript/Vite production build passed. This supersedes the current counts below, which are retained as historical evidence.
+
+Added coverage for exact 15-second outbound and return boundaries; no dungeon work during travel; delayed loot/growth/recovery; recall during outbound/exploration; repeated-return guards; exhausted members saved in return transit; route snapshots; save continuation across midnight; exact delayed payouts; inventory commitment and overselling guards; concurrent trades; invalid route/timer/trade rejection; and v3 in-flight migration without outbound replay. Updated earlier fixed-time dungeon tests to account for actual travel rather than bypassing it. Existing attribute/check/economy regression tests pass.
+
+Visual browser verification remains unavailable: the remote browser could not reach this workspace's local preview in the preceding interface pass. This change is prepared for review; no production deployment is claimed.
+
 # Story-only Opening Validation
 
 November 5, 2026. Current suite: **70 tests passed, 0 failed**. Production build passed.

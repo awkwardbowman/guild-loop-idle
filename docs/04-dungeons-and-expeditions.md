@@ -20,7 +20,7 @@ Blank limits mean unlimited. Positive integer depth limits are validated. A cap 
 
 Loot and gold stay in carried state until return. Growth is applied once on return from completed, survived tasks using the run's starting maximum. Survived floors are counted when cleared, independently from when loot is banked.
 
-Return reasons: reached depth, stat retreat, manual recall, or the temporary 300-second per-outing warp timer. Returns reset only that member; midnight does not recall anyone. All current returns retain previously earned loot/training. Incomplete/lethal tasks do not grant training or floor rewards. Successful final-task resolution precedes timeout; lethal resolution precedes reward. Depth completion at the timer boundary is logged once as successful return.
+Return reasons: reached depth, stat retreat, manual recall, or the temporary 300-second exploration timer. Each reason starts the return journey; reset begins after arriving home. Travel does not consume the exploration timer. Returns reset only that member; midnight does not recall anyone. All current returns retain previously earned loot/training. Incomplete/lethal tasks do not grant training or floor rewards. Successful final-task resolution precedes timeout; lethal resolution precedes reward. Depth completion at the timer boundary is logged once as successful return.
 
 Reset is temporarily 12 seconds per member. Current stats refill on the next dispatch. Dispatch consumes the dungeon's gear cost once per outing. Gear regenerates continuously, up to guild capacity. Gear refunds and a separate supplies pool are not implemented.
 
@@ -52,3 +52,16 @@ Future gear may convert resources inside dungeons, potentially based on affiniti
 ## Prepared sample check route
 
 The archive can use a three-stage trap room: notice, find the trigger, disarm. Work, payment, rolls, failure tables, learned skills and return behavior are implemented. All three checks must succeed before awarding floor loot. Pending specialization growth applies on return, while skill practice can improve during the outing. See 11-progression-and-check-foundations.md for provisional formulas, current rollout and save behavior.
+
+
+## Locations, travel and trade foundations
+
+Guild Loops is inspired by Threadless roughly a thousand years later. Emberveil is a small settlement beginning to revive. The first dungeon display name is Ritual Catacombs; the existing `wood` content ID remains stable for saves. Location flavor is an adaptation, not a change to campaign canon.
+
+`src/locations.ts` owns location IDs, names, descriptions, travel durations and trade durations. Each dungeon references its location; the guild has a home location. Local outbound and return legs each take **15 game seconds**. Each route snapshots its origin, destination and both durations at dispatch, independently of later queue changes. Locations currently have no relocation or town-growth controls; existing plot progression gates access to their dungeons.
+
+An expedition follows outbound → exploring → returning → home/reset. It occupies its member and an expedition slot throughout travel. Outbound travel performs no checks or floor work. The 300-second limit measures exploration only. Depth completion, depletion, manual return and time limit all start return travel. Manual return during outbound uses the full return leg; returning again cannot restart or skip its timer. Midnight does not interrupt a trip. Carried loot, gold and pending attribute training settle once on arrival, then the existing 12-second recovery starts. Learned skill practice retains its existing during-exploration behavior.
+
+Resources → Trade supports quantity-based sales. Starting a sale removes the committed inventory immediately and creates an independent trade timer; gold is credited once after **15 game seconds**. Multiple sales can proceed concurrently (100 pending trades maximum), with no adventurer or expedition slot requirement. Current per-item prices in `SALE_VALUES` are provisional test values, separate from timing. Price and duration are snapshotted for pending sales. Shop purchases and town-development balancing are separate pending work.
+
+All timers use the normal game clock: pausing freezes them; game speed affects them; closed/hidden play does not advance them. Schema v4 stores journeys and trades. Older active outings migrate in place as exploring, without replaying outbound travel or losing carried rewards, then use the new return leg. New fields and timers are validated on save/import.

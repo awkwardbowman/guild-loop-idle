@@ -35,3 +35,13 @@
 .log-filter-actions{display:flex;gap:6px;margin-bottom:5px}
 .log-filter-actions button{font-size:10px;padding:4px 8px}
 @media(max-width:760px){.tabs button{gap:4px}.tabs button small.section-number{font-size:8px}}
+
+.home-location{font-size:12px;color:#b9c6d4;margin-top:12px}
+.trade-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--line);font-size:11px}
+.trade-item>span{flex:1;min-width:130px}
+.trade-item label{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted)}
+.trade-item input{width:75px;font-size:11px}
+.trade-item button{font-size:11px}
+.pending-trades{margin-top:18px}.pending-trade{padding:10px 0}
+.pending-trade>div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px}
+.pending-trade b{color:var(--accent)}

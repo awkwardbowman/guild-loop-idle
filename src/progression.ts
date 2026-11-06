@@ -15,7 +15,7 @@ export const STORY_ACTIONS = [
  {id:'welcome_friend',thread:'Guild',title:'Welcome your first member',description:'Your friend is ready to become the guild’s first adventurer. A guildmaster and one member: it is a small beginning, but it is yours.',requires:['guild_founded'],event:'first_member_recruited'},
  {id:'study_checks',thread:'Guild',title:'Train for trap rooms',description:'Explore the archive using observation, investigation and lock picking.',requires:['legacy_access'],event:'skill_checks_enabled'},
  {id:'open_recruitment',thread:'Guild',title:'Open recruitment',description:'Look for more adventurers to join you and your friend.',requires:['first_member_recruited'],event:'recruitment_opened'},
- {id:'discover_trail',thread:'Expeditions',title:'Survey the outskirts',description:'Make Briarwood Trail available for expeditions.',requires:['first_member_recruited'],event:'trail_discovered'},
+ {id:'discover_trail',thread:'Expeditions',title:'Explore the Ritual Catacombs',description:'Make Ritual Catacombs available for expeditions.',requires:['first_member_recruited'],event:'trail_discovered'},
  {id:'discover_archive',thread:'Expeditions',title:'Investigate the archive',description:'Unlock the archive and its three-stage trap-room skill checks.',requires:['first_floor_cleared'],event:'archive_discovered'},
  {id:'discover_quarry',thread:'Expeditions',title:'Survey the ridge',description:'Make Emberstone Delve available for expeditions.',requires:['archive_floor_cleared'],event:'quarry_discovered'}
 ] as const satisfies readonly {id:string;thread:string;title:string;description:string;requires:readonly EventId[];event:EventId}[];

@@ -14,3 +14,9 @@ Future design: disuse decay (metadata exists; disabled), traits, stat-driven res
 ## Immediate narrative work
 
 Use the grounded two-friends premise in 01-concept-and-core-loop.md. Next choose the friend's identity, the first modest job and the next few concrete guild-building goals. The live opening now begins with Story only; opening the guild and welcoming the friend unlock management progressively. No final narrative or unique friend build is fixed yet.\n
+
+## Location/trade preparation and pending starter content
+
+Implemented: Emberveil home location, Ritual Catacombs display/flavor, location-backed dungeon destinations, 15-second outbound/return legs, and 15-second delayed resource sales. Durations and sale values are centrally configurable; see 04-dungeons-and-expeditions.md.
+
+Still pending from the accepted opening design: fixed first-friend stats; no starting regeneration; low starter-dungeon depth ceiling and no gear requirement; starter leather/hide loot with occasional ore, herbs and gold; the scrap-triggered shop story; Shops tab; guild-wide gear unlocks with individual loadouts; attribute-based gear tiers/bonuses; and absolute shop-specific gear-capacity ceilings. Existing prototype gear costs, regeneration, floor scaling and loot tables have not yet been replaced by those systems.

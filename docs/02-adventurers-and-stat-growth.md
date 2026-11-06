@@ -1,3 +1,22 @@
+# Agreed character mechanics refinement — November 6, 2026 (planned, NOT implemented)
+
+**Supersedes earlier notes proposing zero contribution for unselected Attributes, draining non-Constitution pools, or eligibility based on Constitution Attribute selection alone.**
+
+- **Only Constitution is consumable.** Soul and Luck are non-consumable, as are Strength, Dexterity, Speed, Perception, Intelligence and Charisma. Older per-root Current/Max drain models remain historical until the next save/engine migration.
+- An unselected Attribute has tiny **baseline competence 0.01** instead of the earlier working 1; it is generally untrainable. That baseline **does contribute**, minimally, to check progress when the related Skill/Attribute is missing. Never redistribute missing Skill weights.
+- Dungeon eligibility: **Con-1 = at least one *owned authored Constitution Skill***, meaning Toughness (Constitution × Combat), Endurance (Constitution × Travel & Logistics), or Vitality (Constitution × Recovery & Support). A mere unselected Constitution 0.01 or skill-boosting equipment does not satisfy the gate.
+- Provisional shared endurance maximum: **sum of owned Constitution Skill effective values**, not an unrelated Constitution-only pool. A character with all three Constitution Skills is substantially more durable than one with only one. Ordinary per-room endurance drain is constant **per elapsed second** and increases by dungeon floor/depth; completing rooms faster saves Constitution.
+- Any dungeon check can be attempted slowly without a Combat/Power Composite gate. Effective pairwise Skill → selected Attribute fallback → tiny unselected Attribute baseline 0.01. Missing catalog intersections stay blank in the *UI grid*; fallback does not invent them as Skills. Authored activities may separately require a specific **Composite Skill**.
+- **Arya must have Power**: Strength as an Attribute and Combat as a Discipline. **Clyde must have Crafting and at least one Constitution Skill** to be a dungeon-running scavenger; suggested 5/5 remain DEX/CON/PER/INT/LCK and Crafting/Exploration/Management/Recovery & Support/Trade, which gives Vitality. **Guild Master has Crafting but no Constitution** and cannot dungeon-run.
+- Attribute/Discipline gate direction remains: Charisma for Recruitment, Intelligence for future Research, Perception for Scavenging, and Con-1 for dungeon entry. No whole-tab hiding for a single character's inability; future specific actions may require Composite Skills.
+- Three authored Skills under a Discipline can be **summed** for discipline-level checks; example Dungeoneering = Force + Finesse + Agility, counting only owned Skills. Speed-derived specific Skills may affect dungeon tick speed, exploration scouting, and travel time separately.
+- Planned equipment modifiers for check effectiveness: (1) +N% multiplier, (2) +N value, (3) Catchup N: `max(V,(V+N)/2)` to raise low values without penalizing high ones. **Gear never creates eligibility, a missing Skill, or a missing Composite Skill**, though it may boost a check's weak baseline contributor.
+- On depletion within a dungeon room, apply **that room's authored failure type**; no automatic safe escape on exhaustion. Do not assume every failed room means the same injury/return; exact consequences are content design.
+
+Remaining engineering choices include the owned-vs-untrained Con Skill starting pool, skill training/caps, source-of-truth for 5/5 picks, floor-rate scaling, modifiers and stacking order, room-specific failure effects, handling voluntary recall/depth caps, and save migration. See docs/04-dungeons-and-expeditions.md.
+
+---
+
 # Proposed role and activity eligibility refinements — November 6, 2026 (NOT implemented)
 
 The Guild Master remains explicitly **without Constitution**, and therefore cannot dungeon-run. Arya must retain the **Power** Skill (Strength × Combat). Clyde must select **Constitution, Perception and Dexterity**, plus **Crafting** Discipline, and may be a non-Combat dungeon scavenger: the proposed five Attributes are **Dexterity, Constitution, Perception, Intelligence, Luck**; proposed five Disciplines are **Crafting, Exploration, Management, Recovery & Support, Trade**. This preserves Scavenging (Observation + Discovery), Herbology/Harvesting (Handiwork + Observation), Leather Crafting (Handiwork + Design), and additional lore/research aptitudes. Clyde's full list is a suggestion awaiting final approval.

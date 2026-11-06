@@ -1,3 +1,29 @@
+# Planned 5×5 character matrix and Info Skills guide — November 6, 2026 (design only)
+
+**Required in the next character specialization PR, not implemented in v8.**
+
+## Character matrix
+Replace the current long specialized-attribute display with a 5×5 matrix: five specialized **Attributes** along one axis and five specialized **Disciplines** along the other. Each defined Attribute + Discipline pairing yields a named **Skill** (e.g. Strength + Combat = Power). Unauthored intersections remain visibly unavailable until the catalog question is resolved; do not imply every one of the 25 combinations exists.
+
+Show trained Skill **Value** in each applicable cell; reveal **Potential** on hover, keyboard focus or tap only after the relevant game unlock, otherwise show unknown. Use a neutral **black** glyph for each standalone Discipline. Tint the Discipline glyph by the source Attribute color within a Skill cell (Combat is not inherently red; Strength + Combat becomes red only because of Strength). Color the numeric Value based on the share of Potential: red below 75%, yellow 75% to less than 90%, green at least 90% provisionally (confirm exact 90% boundary). Make colors supplementary to labels/accessible descriptions.
+
+Clearly distinguish selected specializations from unselected baseline-1 abilities. Keep expedition Current/Max Attribute pools in a separate understandable display, rather than mistaking resource depletion for Skill training. Display dungeon ineligibility when Constitution is not a selected Attribute. Guild Master: Perception, Intelligence, Charisma, Soul and Luck selected; four physical Attributes unselected, no dungeon access.
+
+## Required Info tab subsection: **Skills**
+Add a dedicated **Skills** help section within Info that explains all symbols and this entire system using shared game icon, color and terminology metadata:
+1. Nine **Attributes** (root values, colors and symbols); nine **Disciplines** (black standalone symbols); their pairwise **Skills**; and multi-Skill **Composite Skills** (e.g. Lock Picking).
+2. Why each character chooses five Attributes and five Disciplines, what baseline 1 on the rest means, which capacities can grow, and the Constitution specialization requirement for dungeons.
+3. Reading the 5×5 axes, absent/unavailable cells, visible Value, Potential on hover/focus/tap after unlock, and the difference between trained Skill Value and consumable Current/Max Attribute pools.
+4. Icon legend: black Combat symbol = Discipline; Strength-colored Combat symbol = Power; color originates from the Attribute, not the Discipline.
+5. Training legend: red below 75%, yellow 75%–less than 90%, green at least 90% (provisional 90%-equality rule); unknown Potential shown before discovery; text labels/tooltips for color-blind and keyboard/touch users.
+6. Composite Skill gating: explain prerequisite component Skills and locked/unavailable reasons without pretending unimplemented combinations exist.
+
+Use one canonical metadata table for icons, color logic and help; never hardcode a separate Info legend that can drift from actual character UI. Accessibility must not require a mouse.
+
+Open before coding: catalog expansion for missing 5×5 intersections, five/five chosen sets, Guild Master Disciplines, growth budget/migration and exact 90%-edge semantics.
+
+---
+
 # Current backlog UI — November 6, 2026
 
 Members → Assignments starts with current activity/status, live outing progress/cargo and contextual pause/recall/remove/dismiss actions. Unlocked dungeon choices follow it; there is no multi-entry route editor. Each option displays member-specific farthest room, last return room/reason and an editable personal cap when assigned. Empty history is —. Changing assignment moves the waiting destination; current trips continue their saved destination/cap.

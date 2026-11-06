@@ -1,3 +1,17 @@
+# Updated next-PR scope: single Constitution drain and Skill totals — Nov 6 2026
+
+**New agreed direction, NOT implemented; this supersedes the older text below suggesting zero work from unselected Attributes, charging other stats, and mandatory Constitution check weights.**
+
+- Dungeon entry **Con-1**: own any one of Toughness/Endurance/Vitality. Guild Master lacks Constitution. Clyde's suggested scavenger picks provide Vitality. Mandatory Combat/Power checks are NOT gated behind Combat Composite.
+- Every room drains **one combined Constitution endurance pool at a flat rate per elapsed game second**, scaled by depth/floor, separately from arbitrary weighted Skill requirements. Provisional capacity = sum of the character's owned Constitution Skills. Only Constitution consumes; Soul, Luck and all other Attributes are non-consumable. A missing Skill falls back to selected Attribute; absent Attribute produces tiny **0.01 baseline work**, not zero, with no weight renormalization.
+- If CON runs out within a room, use the **failure mode authored for that room**, never silently choose a universal safe retreat. Work, loot, injury, death/loss/revival consequences, and special exit/recall behavior require proper tests/specification.
+- Speed/Agility may later affect dungeon tick intervals; Scouting area finding and Movement city travel speed are other possible authored benefits. A Discipline-specific check can use the sum of available component Skills, such as Dungeoneering = Force + Finesse + Agility.
+- UI: 5×5 grid includes five **row totals**, five **column totals** and a bottom-right **grand total**, each populated Skill counted once; Info Skills teaches totals and all progress/endurance rules. Numeric Value coloring remains number-only with no added status icon.
+- Later gear variants: additive percent, additive flat numeric bonus, and **Catchup N** applying at least `max(V,(V+N)/2)` to low values, with no lowering stronger stats and **no unlocking missing activities/Composite Skills/Con-1**.
+- Next coding PR must update room progress calculations, endurance pool and flat rates, failure outcomes, guards, migration, stats display, ETA predictions and regression tests. Earlier proposed other-stat depletion and per-room mandatory CON-weight authoring are withdrawn. Leather Crafting recipe definition remains separate future design work. No PR created by this design change.
+
+---
+
 # Additional next-PR design discussion — Constitution endurance and activity gates (Nov 6, 2026)
 
 **Design discussion, no implementation/PR.** The player prefers Clyde as a non-Combat scavenger; proposed 5 Attributes DEX / CON / PER / INT / LCK and Disciplines Crafting / Exploration / Management / Recovery & Support / Trade. Arya must have Power; Guild Master cannot have Constitution. Do not require Power or Combat Composite for generic dungeon participation. A check's authored weighted Skill falls back to its selected Attribute when the Skill is absent; with no selected Attribute, that share contributes zero and the remaining weights are not normalized. The user wants some Constitution cost in every floor, with Constitution depletion as the general expedition failure condition. Since the actual unit is a room, confirm scope and rebalance before implementation.

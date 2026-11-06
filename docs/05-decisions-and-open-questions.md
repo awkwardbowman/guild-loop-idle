@@ -1,3 +1,11 @@
+# Under discussion: insufficient skill auto-bail — November 6, 2026
+
+A configurable **Insufficient Skill Threshold** is requested for underqualified dungeon entrants. Proposal: **1% default, 0% off**, inherited global setting with per-dungeon overrides near depth limits. Compute ratio of actual member weighted effective work-per-second against an authored normal room reference work-per-second, NOT their personal affinity/potential. Clyde can deliberately struggle in a 90% Power/10% Finesse room; the small 0.01 fallback still produces low progress, and the actual ratio (not simply a missing Skill flag) decides whether he trips the threshold.
+
+**Cannot automatically bail safely mid-canonical floor** without violating the newly agreed no-running rule. Recommended safe check at floor boundary, with any mid-floor 30-second failsafe treated as a separate exceptional interruption. But the engine generates rooms randomly and calls each room a `floor`, while ten rooms canonically make one floor: the exact screening unit/benchmark requires an explicit decision. Further open detail: whether low-efficiency candidates attempt for 30 seconds before failure or reject entry immediately; whether trigger is worst mandatory room segment versus full floor estimate; default reference durations; manual recall interaction; exact punishment. Keep this as design (not implementation) until settled.
+
+---
+
 # Finalized mechanic clarifications — November 6, 2026 (planned, not in v8)
 
 - The only **consumable dungeon resource** is overall **Endurance Capacity**, **not** the underlying Constitution Attribute. Max Capacity derives from the owned Constitution Skill values; a Con-1 character owns at least one of Toughness, Endurance or Vitality.

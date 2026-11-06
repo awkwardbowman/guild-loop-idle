@@ -1,3 +1,13 @@
+# Approved character grid and terminology decisions — November 6, 2026 (planned, not implemented)
+
+Approved names: nine root **Attributes**; nine activity **Disciplines**; pairwise authored **Skills** (e.g. Strength × Combat = Power); learned multi-Skill **Composite Skills**. Each character specializes in five Attributes and five Disciplines. **The 5×5 matrix always has 25 positions, but only catalog-authored pairs display Skills; all missing pairings stay completely blank.** Example: Combat × Perception is an empty cell. The existing 27 unique Skills are not expanded merely to fill a grid.
+
+Discipline glyphs are neutral black by themselves; Skill glyphs are Attribute-colored. A Skill's **numeric Value text itself** is colored red (<75% of Potential), yellow (75% to <90%), or green (>=90%, provisional exact-boundary choice). **No added training-state icon, colored dot or badge**. Info → Skills will document all nine symbols per axis, their intersections, blank cells, baseline competence, Constitution gating, Composite Skill prerequisites, hidden Potential and the training legend.
+
+Still open: characters' five/five assignments, generated-recruit distributions, root resource/10^tier balance, Guild Master Discipline picks, legacy save migration, Composite Skill prerequisite exactness and exact-90% boundary. No live gameplay implementation yet.
+
+---
+
 # Backlog disposition — November 6, 2026
 
 Implemented: single repeating dungeon assignment per member; distinct queued status and live roster-ordered dungeon wait lists; current-activity-first member controls; persistent member/dungeon depth and last-return history; newest-first Plot; separate member/material/equipment rarity and tier, with Common T1 starters and safe old-save migration. Tier has no authored maximum within rarity. Current recruitment numbers, equipment permissions and loot rates are preserved.

@@ -6,15 +6,15 @@ import {SECTIONS,filterReports,reportSection} from '../src/sections.ts';
 import {exportSave,parseSave} from '../src/persistence.ts';
 test('plot unlocks produce one readable Story event each, including automatic milestones',()=>{
  let game=initialGame();
- for(const action of ['found_guild','welcome_friend','discover_trail'] as const)game=completeStoryAction(game,action);
- assert.deepEqual(game.reports.filter(r=>r.reason==='Unlock').map(r=>r.detail),['Explore the Ritual Catacombs','Welcome your first member','Open the guild']);
- const unchanged=completeStoryAction(game,'welcome_friend');assert.equal(unchanged,game);
- game=advance(startDay(game),40);
+ for(const action of ['remember_history','meet_friends','found_guild'] as const)game=completeStoryAction(game,action);
+ assert.ok(game.reports.some(report=>report.reason==='Unlock'&&report.detail==='Arya and Clyde'));
+ const unchanged=completeStoryAction(game,'found_guild');assert.equal(unchanged,game);
+ game=advance(startDay(game),150);
  for(const entry of plotEntries(game.progression))assert.ok(game.reports.some(r=>r.section==='Story'&&r.reason==='Unlock'&&r.day===entry.day&&r.time===entry.time));
  const before=game.reports.filter(r=>r.reason==='Unlock').length;
- game=completeStoryAction(game,'discover_archive');
+ game=completeStoryAction(game,'open_recruitment');
  assert.equal(game.reports.filter(r=>r.reason==='Unlock').length,before+1);
- assert.equal(game.reports[0].detail,'Investigate the archive');
+ assert.equal(game.reports[0].detail,'Open recruitment');
  assert.deepEqual(parseSave(exportSave(game)),game);
 });
 test('section filters support all, multiple, none and reports from old saves',()=>{

@@ -1,3 +1,6 @@
+import {RESOURCES,initialStorage,cargoSize} from './resources.ts';
+import {EQUIPMENT,carryingLimit} from './equipment.ts';
+import {roomById,roomDungeon} from './rooms.ts';
 import {STAT_INFO,zeroPools} from './attributes.ts';
 import {isLocationId,travelSeconds} from './locations.ts';
 import {isSection} from './sections.ts';
@@ -5,7 +8,7 @@ import { EVENT_IDS } from './progression.ts';
 import { SKILLS, ATTRIBUTES, newSkillProfile, TRAP_ROOM } from './skill-system.ts';
 import type { Game, Member, Assignment } from './engine.ts';
 import { taskDuration, validDepth, newGuildmaster } from './engine.ts';
-import { STATS, DUNGEONS, VERSION, WARP_SECONDS, DAY_SECONDS, SALE_VALUES } from './content.ts';
+import { STATS, DUNGEONS, VERSION, WARP_SECONDS, DAY_SECONDS, SALE_VALUES, tierBudget } from './content.ts';
 export const SAVE_KEY = 'guild-loops.save.v1';
 export const BACKUP_KEY = 'guild-loops.backup.v1';
 export interface StorageLike { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -17,13 +20,15 @@ const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v ===
 function validateMember(m: Member) {
  requireValue(object(m) && text(m.id,60) && /^member-\d+$/.test(m.id) && text(m.name,60) && integer(m.tier,1,10) && integer(m.runs), 'member identity');
  validateProfile(m);
+ requireValue(['legacy','recruit','arya','clyde'].includes(m.origin)&&integer(m.carryCapacity,1,1000000)&&integer(m.bestRoom)&&Array.isArray(m.equipped)&&new Set(m.equipped).size===m.equipped.length&&m.equipped.every(id=>EQUIPMENT.some(item=>item.id===id)),'member equipment');
+ if(m.origin!=='legacy')requireValue(STATS.reduce((sum,stat)=>sum+m.stats[stat].affinity,0)<=tierBudget(m.tier)+1e-7,'tier stat budget');
  validateRoute(m.queue);
  requireValue(integer(m.queueIndex,0,Math.max(0,m.queue.length-1)) && integer(m.cooldown,0,86400) && integer(m.resetSeconds,1,86400) && typeof m.enabled==='boolean', 'member schedule');
 }
 function validateProfile(m:Pick<Member,'stats'|'specializations'|'skills'>){
  requireValue(object(m.stats)&&Object.keys(m.stats).length===STATS.length, 'member stats');
- for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,.001,1e9) && num(v.max,.001,v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
- requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,.001,1e9)&&num(v.value,0,v.affinity);}), 'specialization values');
+ for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,.001,1e12) && num(v.max,.001,v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
+ requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,.001,1e12)&&num(v.value,0,v.affinity);}), 'specialization values');
  requireValue(object(m.skills)&&Object.keys(m.skills).length===SKILLS.length&&SKILLS.every(d=>{const v=m.skills[d.id];return object(v)&&integer(v.level,0,99)&&num(v.experience,0,v.level===99?0:10*(v.level+1)-1e-9)&&(v.lastUsedAt===null||integer(v.lastUsedAt));}), 'learned skills');
 }
 function validateRoute(route: Assignment[]) { requireValue(Array.isArray(route) && route.length <= 20 && route.every(e => object(e) && DUNGEONS.some(d=>d.id===e.dungeonId) && validDepth(e.maxDepth)), 'dungeon queue'); }
@@ -34,13 +39,15 @@ export function validateGame(input: unknown): Game {
  requireValue(g.version === VERSION, 'unsupported format version');
  requireValue(object(g.guildmaster)&&g.guildmaster.id==='guildmaster'&&text(g.guildmaster.name,60)&&g.guildmaster.innateMagic===true,'guildmaster');
  validateProfile(g.guildmaster);
+ requireValue(object(g.storage)&&RESOURCES.every(resource=>{const storage=g.storage[resource.id];return object(storage)&&integer(storage.cap,1,1e12)&&integer(storage.level,0,100);}), 'storage caps');
+ requireValue(object(g.equipment)&&integer(g.equipment.capacity,0,100)&&Array.isArray(g.equipment.unlocked)&&new Set(g.equipment.unlocked).size===g.equipment.unlocked.length&&g.equipment.unlocked.every(id=>EQUIPMENT.some(item=>item.id===id)), 'equipment unlocks');
  requireValue(isLocationId(g.homeLocationId)&&integer(g.nextTradeId,1), 'guild location or trade ID');
- requireValue(Array.isArray(g.trades)&&g.trades.length<=100&&new Set(g.trades.map(t=>t.id)).size===g.trades.length&&g.trades.every(t=>object(t)&&integer(t.id,1,g.nextTradeId-1)&&isLocationId(t.locationId)&&Object.hasOwn(SALE_VALUES,t.resourceId)&&integer(t.quantity,1)&&integer(t.gold,1)&&integer(t.duration,1,86400)&&integer(t.remaining,1,t.duration)), 'pending trades');
+ requireValue(Array.isArray(g.trades)&&g.trades.length<=100&&new Set(g.trades.map(t=>t.id)).size===g.trades.length&&g.trades.every(t=>object(t)&&integer(t.id,1,g.nextTradeId-1)&&isLocationId(t.locationId)&&Object.hasOwn(SALE_VALUES,t.resourceId)&&integer(t.quantity,1)&&integer(t.chips,1)&&integer(t.duration,1,86400)&&integer(t.remaining,1,t.duration)), 'pending trades');
  requireValue(integer(g.seed,0,4294967295) && integer(g.nextId,1) && integer(g.day,1) && integer(g.elapsed,0,DAY_SECONDS-1), 'clock or random state');
- requireValue(object(g.progression)&&object(g.progression.completed)&&(Object.keys(g.progression.completed).length===0||Object.hasOwn(g.progression.completed,'guild_founded'))&&Object.entries(g.progression.completed).every(([id,stamp])=>EVENT_IDS.includes(id as typeof EVENT_IDS[number])&&object(stamp)&&integer(stamp.day,1,g.day)&&integer(stamp.time,0,DAY_SECONDS-1)&&(stamp.day<g.day||stamp.time<=g.elapsed)), 'progression events');
+ requireValue(object(g.progression)&&object(g.progression.completed)&&(Object.hasOwn(g.progression.completed,'guild_founded')||Object.keys(g.progression.completed).every(id=>['history_remembered','friends_introduced'].includes(id)))&&Object.entries(g.progression.completed).every(([id,stamp])=>EVENT_IDS.includes(id as typeof EVENT_IDS[number])&&object(stamp)&&integer(stamp.day,1,g.day)&&integer(stamp.time,0,DAY_SECONDS-1)&&(stamp.day<g.day||stamp.time<=g.elapsed)), 'progression events');
  requireValue(g.phase === 'running' || g.phase === 'planning', 'phase');
  const v = g.guild; requireValue(object(v), 'guild');
- requireValue(integer(v.gold) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
+ requireValue(integer(v.chips) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
  requireValue((v.priority==='recruitment'||v.priority==='infrastructure') && integer(v.work,0,19) && object(v.upgrades) && ['slots','quarters','gear','regen'].every(k=>integer((v.upgrades as Record<string,number>)[k],0,100)), 'guild work or upgrades');
  requireValue(Array.isArray(g.members) && g.members.length <= v.rosterCap, 'roster capacity'); g.members.forEach(validateMember);
  for(const m of [...g.members,g.guildmaster,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.skills).every(s=>s.lastUsedAt===null||s.lastUsedAt<=(g.day-1)*DAY_SECONDS+g.elapsed), 'future skill timestamp');
@@ -51,27 +58,31 @@ export function validateGame(input: unknown): Game {
  requireValue(Array.isArray(g.active) && g.active.length <= v.slots && new Set(g.active.map(r=>r.memberId)).size === g.active.length, 'active expedition count');
  requireValue(g.phase!=='planning'||g.active.length===0, 'planning state');
  requireValue(object(g.dungeonLimits)&&DUNGEONS.every(d=>validDepth(g.dungeonLimits[d.id])), 'global depth limits');
- const resourceIds=['gold','gear','materials',...DUNGEONS.flatMap(d=>d.loot.map(l=>l.id))];
+ const resourceIds=['gear',...RESOURCES.map(resource=>resource.id)];
  requireValue(Array.isArray(g.pinnedResources)&&new Set(g.pinnedResources).size===g.pinnedResources.length&&g.pinnedResources.every(id=>resourceIds.includes(id)), 'pinned resources');
  for (const r of g.active) {
   requireValue(object(r) && g.members.some(m=>m.id===r.memberId) && DUNGEONS.some(d=>d.id===r.dungeonId), 'active member or dungeon');
   requireValue(validDepth(r.personalLimit)&&integer(r.floor,1,1000000)&&integer(r.elapsed,0,r.stage==='returning'?WARP_SECONDS:WARP_SECONDS-1), 'run position');
   requireValue(object(r.specializationTraining)&&Object.entries(r.specializationTraining).every(([id,n])=>ATTRIBUTES.some(a=>a.id===id&&a.parent)&&num(n)), 'pending specialization training');
-  requireValue(r.rules==='tasks'||r.rules==='checks', 'run rules');
+  requireValue(r.rules==='tasks'||r.rules==='checks'||r.rules==='rooms', 'run rules');
+  requireValue(integer(r.carryCapacity,1,10000000)&&Array.isArray(r.loadout)&&new Set(r.loadout).size===r.loadout.length&&r.loadout.every(id=>g.equipment.unlocked.includes(id)), 'run equipment snapshot');
+  requireValue(r.rules!=='rooms'||cargoSize(r.loot,r.chips)<=r.carryCapacity, 'carried capacity');
+  if(r.generated!==null){requireValue(r.rules==='rooms'&&r.stage==='exploring'&&object(r.generated)&&roomDungeon(r.dungeonId).rooms.some(room=>room.id===r.generated!.id),'generated room');const room=roomById(r.dungeonId,r.generated.id);requireValue(integer(r.generated.index,0,room.checks.length-1)&&num(r.generated.work,0,taskDuration(r)-1e-9)&&r.progress===r.generated.work&&integer(r.generated.attempts),'generated room progress');}else requireValue(r.rules!=='rooms'||r.progress===0,'generated room boundary');
   requireValue(['outbound','exploring','returning'].includes(r.stage)&&isLocationId(r.originLocationId)&&isLocationId(r.destinationLocationId)&&r.destinationLocationId===DUNGEONS.find(d=>d.id===r.dungeonId)!.locationId&&integer(r.outboundSeconds,0,86400)&&integer(r.returnSeconds,0,86400)&&integer(r.travelRemaining,0,r.stage==='outbound'?r.outboundSeconds:r.returnSeconds), 'travel state');
   requireValue(r.stage==='exploring'?r.travelRemaining===0:r.travelRemaining>0, 'travel timer');
   requireValue(r.stage==='returning'?object(r.outcome)&&text(r.outcome.reason)&&text(r.outcome.detail,500)&&r.room===null&&r.task===0&&r.progress===0:r.outcome===null, 'return outcome');
-  if(r.stage==='outbound')requireValue(r.elapsed===0&&r.task===0&&r.progress===0&&r.gold===0&&Object.keys(r.loot).length===0, 'outbound progress');
-  if(r.rules==='tasks'||r.stage==='returning')requireValue(r.room===null,'inactive check room');
+  if(r.stage==='outbound')requireValue(r.elapsed===0&&r.task===0&&r.progress===0&&r.chips===0&&Object.keys(r.loot).length===0, 'outbound progress');
+  if(r.rules==='tasks'||r.rules==='rooms'||r.stage==='returning')requireValue(r.room===null,'inactive check room');
   else { const room=r.room;requireValue(r.dungeonId==='ruins'&&object(room)&&room.status==='active'&&integer(room.index,0,TRAP_ROOM.checks.length-1)&&room.index===r.task&&num(room.work)&&room.work===r.progress&&integer(room.cooldown,0,86400)&&integer(room.attempts)&&(room.lastOutcome===null||text(room.lastOutcome)), 'active check state'); }
   const d=DUNGEONS.find(d=>d.id===r.dungeonId)!;
-  requireValue(integer(r.task,0,d.tasks.length-1)&&num(r.progress,0,taskDuration(r)-1e-9)&&pools(r.training)&&pools(r.startMax)&&integer(r.gold), 'task state');
-  requireValue(object(r.loot)&&Object.entries(r.loot).every(([id,n])=>d.loot.some(l=>l.id===id)&&integer(n)), 'carried loot');
+  requireValue(integer(r.task,0,d.tasks.length-1)&&num(r.progress,0,taskDuration(r)-1e-9)&&pools(r.training)&&pools(r.startMax)&&integer(r.chips), 'task state');
+  requireValue(object(r.loot)&&Object.entries(r.loot).every(([id,n])=>(r.rules==='rooms'?RESOURCES.some(resource=>resource.id===id&&id!=='chips'):d.loot.some(l=>l.id===id))&&integer(n)), 'carried loot');
   const m=g.members.find(m=>m.id===r.memberId)!;
   requireValue(m.cooldown===0&&STATS.every(s=>(r.stage==='returning'||!STAT_INFO[s].consumable||m.stats[s].current>0) && r.startMax[s]===m.stats[s].max), 'active stat snapshot');
  }
- const lootIds=DUNGEONS.flatMap(d=>d.loot.map(l=>l.id));
- requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)), 'inventory');
+ const lootIds=RESOURCES.filter(resource=>!['chips','materials'].includes(resource.id)).map(resource=>resource.id as string);
+ requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)&&n<=g.storage[k].cap)&&g.guild.chips<=g.storage.chips.cap&&g.guild.materials<=g.storage.materials.cap, 'inventory');
+ requireValue(g.members.every(member=>member.equipped.length<=g.equipment.capacity&&member.equipped.every(id=>g.equipment.unlocked.includes(id))), 'equipped items');
  requireValue(object(g.stats)&&integer(g.stats.clears)&&integer(g.stats.retreats)&&integer(g.stats.warps), 'lifetime totals');
  requireValue(Array.isArray(g.reports)&&g.reports.length<=100&&g.reports.every(r=>object(r)&&(r.section===undefined||isSection(r.section))&&integer(r.day,1,g.day)&&integer(r.time,0,DAY_SECONDS-1)&&text(r.member,60)&&text(r.reason)&&text(r.detail,500)&&pools(r.growth)), 'reports');
  return structuredClone(g);
@@ -109,7 +120,12 @@ export function parseSave(raw: string): Game {
  requireValue(raw.length<=2_000_000,'file exceeds 2 MB');
  let data: unknown; try { data=JSON.parse(raw); } catch { throw new Error('This file is not valid JSON. Your current game was not changed.'); }
  requireValue(object(data)&&data.format==='guild-loops','not a Guild Loops save');
- requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===VERSION,'unsupported version; this save may need a newer game');
+ requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===5||data.version===VERSION,'unsupported version; this save may need a newer game');
+ if(typeof data.version==='number'&&data.version<6){
+  requireValue(object(data.game)&&object(data.game.guild)&&Array.isArray(data.game.active),'legacy currency');const game=data.game;
+  for(const holder of [game.guild,...(game.active as unknown[]),...(Array.isArray(game.trades)?game.trades:[])]){requireValue(object(holder),'legacy currency holder');if(Object.hasOwn(holder,'gold')&&!Object.hasOwn(holder,'chips'))holder.chips=holder.gold;delete holder.gold;}
+  if(Array.isArray(game.pinnedResources))game.pinnedResources=game.pinnedResources.map(id=>id==='gold'?'chips':id);
+ }
  if(typeof data.version==='number'&&data.version<5){
   requireValue(object(data.game),'legacy stat game');
   migrateRootStats(data.game);
@@ -133,7 +149,7 @@ export function parseSave(raw: string): Game {
   }
   g.active=[];g.version=2;
   g.elapsed=Math.min(86399,g.elapsed);g.phase='planning';
-  g.dungeonLimits=Object.fromEntries(DUNGEONS.map(d=>[d.id,null]));g.pinnedResources=['gold','gear','materials'];
+  g.dungeonLimits=Object.fromEntries(DUNGEONS.map(d=>[d.id,null]));g.pinnedResources=['chips','gear','materials'];
   g.reports=g.reports.map(r=>({...r,time:0}));
   data.game=g;
  }
@@ -172,6 +188,19 @@ export function parseSave(raw: string): Game {
   for(const run of g.active)if(Object.hasOwn(run.specializationTraining,'finger_dexterity')){
    run.specializationTraining.finesse=run.specializationTraining.finger_dexterity;delete run.specializationTraining.finger_dexterity;
   }
+  g.version=5;
+ }
+ if(typeof data.version==='number'&&data.version<6){
+  const g=data.game as unknown as Game;requireValue(g.version===5,'legacy opening version');
+  g.equipment??={unlocked:[],capacity:0};g.storage??=initialStorage();
+  for(const resource of RESOURCES){const held=resource.id==='chips'?g.guild.chips:resource.id==='materials'?g.guild.materials:g.inventory[resource.id]??0;g.storage[resource.id]??={cap:resource.cap,level:0};g.storage[resource.id].cap=Math.max(g.storage[resource.id].cap,held);}
+  for(const member of [...g.members,...(g.candidate?[g.candidate]:[])]){
+   member.origin='legacy';member.equipped??=[];member.carryCapacity??=1000000;member.bestRoom??=0;
+   const defaults=newSkillProfile(member.stats);member.skills={...defaults.skills,...member.skills};
+  }
+  const gmDefaults=newSkillProfile(g.guildmaster.stats);g.guildmaster.skills={...gmDefaults.skills,...g.guildmaster.skills};
+  for(const run of g.active){run.generated??=null;run.loadout??=[];run.carryCapacity??=1000000;}
+  for(const report of g.reports){report.detail=report.detail.replace(/\bgold\b/gi,'Chips');}
   g.version=VERSION;
  }
  return validateGame(data.game);

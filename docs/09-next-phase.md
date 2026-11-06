@@ -1,27 +1,13 @@
-# Next Phase — After 0.3 Foundations
+# Next Phase — After the Emberveil Opening
 
-November 5, 2026. Implemented functional preparation is described in 11-progression-and-check-foundations.md; actual verification is in 08-test-report.md.
+November 5, 2026. The Arya/Clyde opening, weighted room engine, budgeted loot, Gavin/Stillmere chain, equipment templates/loadouts, Chips economy, caps and Guild subtabs are implemented on the review branch. Verification is in 08.
 
-1. Review the prepared branch and test the fresh-player opening. Existing saves retain access; Story → Current Goals → Train for trap rooms enables future archive checks without resetting.
-2. Define real opening plot, event IDs and unlock beats. Current story actions are functional placeholders.
-3. Tune the accepted nine-stat/27-attribute matrix now implemented in schema v5; choose learned skills and activity-specific effects.
-4. Tune work, success, resource efficiency, practice thresholds, training and failure tables using the three-check archive. Current values are test defaults.
-5. Expand the skill/check catalog and room alternatives with content validation and save migrations.
-6. Validate mobile/touch and keyboard-only flows; then review release to the hosted game.
+1. Playtest pacing: first return, first armor, first herb and five-herb referral. The seeded automated path reached Stillmere in about 56 game minutes; this is a test outcome, not a finalized pacing target.
+2. Tune room/check weights, rarity, work, costs, carrying caps, storage prices and equipment bonuses while preserving the distinct roles of Arya and Clyde.
+3. Refine archive/delve flavor and specialized checks beyond the first dungeon; keep group and room weights independently authored.
+4. Design later training so members can learn currently missing skills without rewarding failed-check spam.
+5. Specify actual death triggers and a governing recovery stat before implementing the 4× to 2× travel revival timer.
+6. Author guildmaster spell actions and storage compression, then worker assignments and per-storage-tab auto-selling. No passive automation or compression is enabled yet.
+7. Choose Pebs/Bowls denomination ratios when needed; current accounting uses Chips only.
 
-Future design: disuse decay (metadata exists; disabled), traits, stat-driven reset, guildmaster skill tree/limited affinity improvements, Gear/Supplies refunds, resource-conversion gear, punitive failure loot-loss, internal duties, offline progress and optional cloud sync.
-
-## Immediate narrative work
-
-Use the grounded two-friends premise in 01-concept-and-core-loop.md. Next choose the friend's identity, the first modest job and the next few concrete guild-building goals. The live opening now begins with Story only; opening the guild and welcoming the friend unlock management progressively. No final narrative or unique friend build is fixed yet.\n
-
-## Location/trade preparation and pending starter content
-
-Implemented: Emberveil home location, Ritual Catacombs display/flavor, location-backed dungeon destinations, 15-second outbound/return legs, and 15-second delayed resource sales. Durations and sale values are centrally configurable; see 04-dungeons-and-expeditions.md.
-
-Still pending from the accepted opening design: fixed first-friend stats; no starting regeneration; low starter-dungeon depth ceiling and no gear requirement; starter leather/hide loot with occasional ore, herbs and gold; the scrap-triggered shop story; Shops tab; guild-wide gear unlocks with individual loadouts; attribute-based gear tiers/bonuses; and absolute shop-specific gear-capacity ceilings. Existing prototype gear costs, regeneration, floor scaling and loot tables have not yet been replaced by those systems.
-
-
-## Accepted attributes implemented
-
-The nine roots, nine activity groups and exact 27 matches are implemented and displayed by main stat or activity. Luck is non-consumable. The guildmaster has a separate high-Soul profile with sole innate magic eligibility. Attribute balance, actual spell/imbuement actions and the death-timer formula remain future work.
+Skill decay, traits, equipment resource conversion, guildmaster affinity upgrades, offline progress and optional cloud sync remain future systems. Existing saves are preserved, not force-normalized to the new tier budgets.

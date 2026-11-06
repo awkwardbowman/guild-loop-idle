@@ -1,0 +1,1205 @@
+{
+  "format": "guild-loops",
+  "version": 5,
+  "game": {
+    "guildmaster": {
+      "id": "guildmaster",
+      "name": "Guildmaster",
+      "innateMagic": true,
+      "stats": {
+        "strength": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "dexterity": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "constitution": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "speed": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "perception": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "intelligence": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "charisma": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        },
+        "soul": {
+          "current": 100,
+          "max": 100,
+          "affinity": 300
+        },
+        "luck": {
+          "current": 12,
+          "max": 12,
+          "affinity": 60
+        }
+      },
+      "specializations": {
+        "power": {
+          "value": 0,
+          "affinity": 60
+        },
+        "force": {
+          "value": 0,
+          "affinity": 60
+        },
+        "hauling": {
+          "value": 0,
+          "affinity": 60
+        },
+        "precision": {
+          "value": 0,
+          "affinity": 60
+        },
+        "finesse": {
+          "value": 0,
+          "affinity": 60
+        },
+        "handiwork": {
+          "value": 0,
+          "affinity": 60
+        },
+        "toughness": {
+          "value": 0,
+          "affinity": 60
+        },
+        "endurance": {
+          "value": 0,
+          "affinity": 60
+        },
+        "vitality": {
+          "value": 0,
+          "affinity": 60
+        },
+        "agility": {
+          "value": 0,
+          "affinity": 60
+        },
+        "scouting": {
+          "value": 0,
+          "affinity": 60
+        },
+        "movement": {
+          "value": 0,
+          "affinity": 60
+        },
+        "observation": {
+          "value": 0,
+          "affinity": 60
+        },
+        "insight": {
+          "value": 0,
+          "affinity": 60
+        },
+        "diagnosis": {
+          "value": 0,
+          "affinity": 60
+        },
+        "design": {
+          "value": 0,
+          "affinity": 60
+        },
+        "appraisal": {
+          "value": 0,
+          "affinity": 60
+        },
+        "planning": {
+          "value": 0,
+          "affinity": 60
+        },
+        "persuasion": {
+          "value": 0,
+          "affinity": 60
+        },
+        "bargaining": {
+          "value": 0,
+          "affinity": 60
+        },
+        "leadership": {
+          "value": 0,
+          "affinity": 60
+        },
+        "attunement": {
+          "value": 0,
+          "affinity": 300
+        },
+        "resilience": {
+          "value": 0,
+          "affinity": 300
+        },
+        "inspiration": {
+          "value": 0,
+          "affinity": 300
+        },
+        "discovery": {
+          "value": 0,
+          "affinity": 60
+        },
+        "serendipity": {
+          "value": 0,
+          "affinity": 60
+        },
+        "opportunity": {
+          "value": 0,
+          "affinity": 60
+        }
+      },
+      "skills": {
+        "observation": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        },
+        "investigation": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        },
+        "lock_picking": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        }
+      }
+    },
+    "homeLocationId": "emberveil",
+    "trades": [],
+    "nextTradeId": 1,
+    "progression": {
+      "completed": {
+        "guild_founded": {
+          "day": 1,
+          "time": 0
+        },
+        "legacy_access": {
+          "day": 1,
+          "time": 0
+        }
+      }
+    },
+    "version": 5,
+    "seed": 2162807417,
+    "nextId": 5,
+    "day": 1,
+    "elapsed": 20,
+    "phase": "running",
+    "guild": {
+      "gold": 12,
+      "materials": 0,
+      "gear": 5.400000000000002,
+      "gearCap": 8,
+      "gearRegen": 0.12,
+      "slots": 2,
+      "rosterCap": 5,
+      "priority": "recruitment",
+      "work": 0,
+      "upgrades": {
+        "slots": 0,
+        "quarters": 0,
+        "gear": 0,
+        "regen": 0
+      }
+    },
+    "members": [
+      {
+        "specializations": {
+          "power": {
+            "value": 0,
+            "affinity": 98
+          },
+          "force": {
+            "value": 0,
+            "affinity": 98
+          },
+          "hauling": {
+            "value": 0,
+            "affinity": 98
+          },
+          "precision": {
+            "value": 0,
+            "affinity": 77
+          },
+          "finesse": {
+            "value": 0,
+            "affinity": 77
+          },
+          "handiwork": {
+            "value": 0,
+            "affinity": 77
+          },
+          "toughness": {
+            "value": 0,
+            "affinity": 75
+          },
+          "endurance": {
+            "value": 0,
+            "affinity": 75
+          },
+          "vitality": {
+            "value": 0,
+            "affinity": 75
+          },
+          "agility": {
+            "value": 0,
+            "affinity": 73
+          },
+          "scouting": {
+            "value": 0,
+            "affinity": 73
+          },
+          "movement": {
+            "value": 0,
+            "affinity": 73
+          },
+          "observation": {
+            "value": 0,
+            "affinity": 82
+          },
+          "insight": {
+            "value": 0,
+            "affinity": 82
+          },
+          "diagnosis": {
+            "value": 0,
+            "affinity": 82
+          },
+          "design": {
+            "value": 0,
+            "affinity": 89
+          },
+          "appraisal": {
+            "value": 0,
+            "affinity": 89
+          },
+          "planning": {
+            "value": 0,
+            "affinity": 89
+          },
+          "persuasion": {
+            "value": 0,
+            "affinity": 73
+          },
+          "bargaining": {
+            "value": 0,
+            "affinity": 73
+          },
+          "leadership": {
+            "value": 0,
+            "affinity": 73
+          },
+          "attunement": {
+            "value": 0,
+            "affinity": 92
+          },
+          "resilience": {
+            "value": 0,
+            "affinity": 92
+          },
+          "inspiration": {
+            "value": 0,
+            "affinity": 92
+          },
+          "discovery": {
+            "value": 0,
+            "affinity": 84
+          },
+          "serendipity": {
+            "value": 0,
+            "affinity": 84
+          },
+          "opportunity": {
+            "value": 0,
+            "affinity": 84
+          }
+        },
+        "skills": {
+          "observation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "investigation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "lock_picking": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          }
+        },
+        "id": "member-1",
+        "name": "Rowan",
+        "tier": 1,
+        "stats": {
+          "strength": {
+            "current": 15,
+            "max": 18,
+            "affinity": 98
+          },
+          "dexterity": {
+            "current": 16,
+            "max": 17,
+            "affinity": 77
+          },
+          "intelligence": {
+            "current": 16,
+            "max": 17,
+            "affinity": 89
+          },
+          "constitution": {
+            "current": 15,
+            "max": 15,
+            "affinity": 75
+          },
+          "speed": {
+            "current": 12,
+            "max": 12,
+            "affinity": 73
+          },
+          "perception": {
+            "current": 12,
+            "max": 12,
+            "affinity": 82
+          },
+          "charisma": {
+            "current": 14,
+            "max": 14,
+            "affinity": 73
+          },
+          "soul": {
+            "current": 17,
+            "max": 17,
+            "affinity": 92
+          },
+          "luck": {
+            "current": 10,
+            "max": 10,
+            "affinity": 84
+          }
+        },
+        "queue": [
+          {
+            "dungeonId": "wood",
+            "maxDepth": 1
+          }
+        ],
+        "queueIndex": 0,
+        "cooldown": 0,
+        "resetSeconds": 12,
+        "enabled": true,
+        "runs": 0
+      },
+      {
+        "specializations": {
+          "power": {
+            "value": 0,
+            "affinity": 123
+          },
+          "force": {
+            "value": 0,
+            "affinity": 123
+          },
+          "hauling": {
+            "value": 0,
+            "affinity": 123
+          },
+          "precision": {
+            "value": 0,
+            "affinity": 93
+          },
+          "finesse": {
+            "value": 0,
+            "affinity": 93
+          },
+          "handiwork": {
+            "value": 0,
+            "affinity": 93
+          },
+          "toughness": {
+            "value": 0,
+            "affinity": 93
+          },
+          "endurance": {
+            "value": 0,
+            "affinity": 93
+          },
+          "vitality": {
+            "value": 0,
+            "affinity": 93
+          },
+          "agility": {
+            "value": 0,
+            "affinity": 94
+          },
+          "scouting": {
+            "value": 0,
+            "affinity": 94
+          },
+          "movement": {
+            "value": 0,
+            "affinity": 94
+          },
+          "observation": {
+            "value": 0,
+            "affinity": 105
+          },
+          "insight": {
+            "value": 0,
+            "affinity": 105
+          },
+          "diagnosis": {
+            "value": 0,
+            "affinity": 105
+          },
+          "design": {
+            "value": 0,
+            "affinity": 92
+          },
+          "appraisal": {
+            "value": 0,
+            "affinity": 92
+          },
+          "planning": {
+            "value": 0,
+            "affinity": 92
+          },
+          "persuasion": {
+            "value": 0,
+            "affinity": 109
+          },
+          "bargaining": {
+            "value": 0,
+            "affinity": 109
+          },
+          "leadership": {
+            "value": 0,
+            "affinity": 109
+          },
+          "attunement": {
+            "value": 0,
+            "affinity": 85
+          },
+          "resilience": {
+            "value": 0,
+            "affinity": 85
+          },
+          "inspiration": {
+            "value": 0,
+            "affinity": 85
+          },
+          "discovery": {
+            "value": 0,
+            "affinity": 107
+          },
+          "serendipity": {
+            "value": 0,
+            "affinity": 107
+          },
+          "opportunity": {
+            "value": 0,
+            "affinity": 107
+          }
+        },
+        "skills": {
+          "observation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "investigation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "lock_picking": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          }
+        },
+        "id": "member-2",
+        "name": "Mira",
+        "tier": 2,
+        "stats": {
+          "strength": {
+            "current": 11,
+            "max": 12,
+            "affinity": 123
+          },
+          "dexterity": {
+            "current": 12,
+            "max": 13,
+            "affinity": 93
+          },
+          "intelligence": {
+            "current": 15,
+            "max": 20,
+            "affinity": 92
+          },
+          "constitution": {
+            "current": 14,
+            "max": 14,
+            "affinity": 93
+          },
+          "speed": {
+            "current": 17,
+            "max": 17,
+            "affinity": 94
+          },
+          "perception": {
+            "current": 12,
+            "max": 12,
+            "affinity": 105
+          },
+          "charisma": {
+            "current": 12,
+            "max": 12,
+            "affinity": 109
+          },
+          "soul": {
+            "current": 12,
+            "max": 12,
+            "affinity": 85
+          },
+          "luck": {
+            "current": 11,
+            "max": 11,
+            "affinity": 107
+          }
+        },
+        "queue": [
+          {
+            "dungeonId": "ruins",
+            "maxDepth": 1
+          }
+        ],
+        "queueIndex": 0,
+        "cooldown": 0,
+        "resetSeconds": 12,
+        "enabled": true,
+        "runs": 0
+      },
+      {
+        "specializations": {
+          "power": {
+            "value": 0,
+            "affinity": 80
+          },
+          "force": {
+            "value": 0,
+            "affinity": 80
+          },
+          "hauling": {
+            "value": 0,
+            "affinity": 80
+          },
+          "precision": {
+            "value": 0,
+            "affinity": 61
+          },
+          "finesse": {
+            "value": 0,
+            "affinity": 61
+          },
+          "handiwork": {
+            "value": 0,
+            "affinity": 61
+          },
+          "toughness": {
+            "value": 0,
+            "affinity": 104
+          },
+          "endurance": {
+            "value": 0,
+            "affinity": 104
+          },
+          "vitality": {
+            "value": 0,
+            "affinity": 104
+          },
+          "agility": {
+            "value": 0,
+            "affinity": 74
+          },
+          "scouting": {
+            "value": 0,
+            "affinity": 74
+          },
+          "movement": {
+            "value": 0,
+            "affinity": 74
+          },
+          "observation": {
+            "value": 0,
+            "affinity": 82
+          },
+          "insight": {
+            "value": 0,
+            "affinity": 82
+          },
+          "diagnosis": {
+            "value": 0,
+            "affinity": 82
+          },
+          "design": {
+            "value": 0,
+            "affinity": 83
+          },
+          "appraisal": {
+            "value": 0,
+            "affinity": 83
+          },
+          "planning": {
+            "value": 0,
+            "affinity": 83
+          },
+          "persuasion": {
+            "value": 0,
+            "affinity": 82
+          },
+          "bargaining": {
+            "value": 0,
+            "affinity": 82
+          },
+          "leadership": {
+            "value": 0,
+            "affinity": 82
+          },
+          "attunement": {
+            "value": 0,
+            "affinity": 78
+          },
+          "resilience": {
+            "value": 0,
+            "affinity": 78
+          },
+          "inspiration": {
+            "value": 0,
+            "affinity": 78
+          },
+          "discovery": {
+            "value": 0,
+            "affinity": 79
+          },
+          "serendipity": {
+            "value": 0,
+            "affinity": 79
+          },
+          "opportunity": {
+            "value": 0,
+            "affinity": 79
+          }
+        },
+        "skills": {
+          "observation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "investigation": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          },
+          "lock_picking": {
+            "level": 0,
+            "experience": 0,
+            "lastUsedAt": null
+          }
+        },
+        "id": "member-3",
+        "name": "Bram",
+        "tier": 1,
+        "stats": {
+          "strength": {
+            "current": 11,
+            "max": 11,
+            "affinity": 80
+          },
+          "dexterity": {
+            "current": 17,
+            "max": 17,
+            "affinity": 61
+          },
+          "intelligence": {
+            "current": 12,
+            "max": 12,
+            "affinity": 83
+          },
+          "constitution": {
+            "current": 14,
+            "max": 14,
+            "affinity": 104
+          },
+          "speed": {
+            "current": 13,
+            "max": 13,
+            "affinity": 74
+          },
+          "perception": {
+            "current": 16,
+            "max": 16,
+            "affinity": 82
+          },
+          "charisma": {
+            "current": 12,
+            "max": 12,
+            "affinity": 82
+          },
+          "soul": {
+            "current": 13,
+            "max": 13,
+            "affinity": 78
+          },
+          "luck": {
+            "current": 15,
+            "max": 15,
+            "affinity": 79
+          }
+        },
+        "queue": [
+          {
+            "dungeonId": "quarry",
+            "maxDepth": 1
+          }
+        ],
+        "queueIndex": 0,
+        "cooldown": 0,
+        "resetSeconds": 12,
+        "enabled": true,
+        "runs": 0
+      }
+    ],
+    "candidate": {
+      "specializations": {
+        "power": {
+          "value": 0,
+          "affinity": 65
+        },
+        "force": {
+          "value": 0,
+          "affinity": 65
+        },
+        "hauling": {
+          "value": 0,
+          "affinity": 65
+        },
+        "precision": {
+          "value": 0,
+          "affinity": 74
+        },
+        "finesse": {
+          "value": 0,
+          "affinity": 74
+        },
+        "handiwork": {
+          "value": 0,
+          "affinity": 74
+        },
+        "toughness": {
+          "value": 0,
+          "affinity": 96
+        },
+        "endurance": {
+          "value": 0,
+          "affinity": 96
+        },
+        "vitality": {
+          "value": 0,
+          "affinity": 96
+        },
+        "agility": {
+          "value": 0,
+          "affinity": 100
+        },
+        "scouting": {
+          "value": 0,
+          "affinity": 100
+        },
+        "movement": {
+          "value": 0,
+          "affinity": 100
+        },
+        "observation": {
+          "value": 0,
+          "affinity": 64
+        },
+        "insight": {
+          "value": 0,
+          "affinity": 64
+        },
+        "diagnosis": {
+          "value": 0,
+          "affinity": 64
+        },
+        "design": {
+          "value": 0,
+          "affinity": 100
+        },
+        "appraisal": {
+          "value": 0,
+          "affinity": 100
+        },
+        "planning": {
+          "value": 0,
+          "affinity": 100
+        },
+        "persuasion": {
+          "value": 0,
+          "affinity": 77
+        },
+        "bargaining": {
+          "value": 0,
+          "affinity": 77
+        },
+        "leadership": {
+          "value": 0,
+          "affinity": 77
+        },
+        "attunement": {
+          "value": 0,
+          "affinity": 96
+        },
+        "resilience": {
+          "value": 0,
+          "affinity": 96
+        },
+        "inspiration": {
+          "value": 0,
+          "affinity": 96
+        },
+        "discovery": {
+          "value": 0,
+          "affinity": 102
+        },
+        "serendipity": {
+          "value": 0,
+          "affinity": 102
+        },
+        "opportunity": {
+          "value": 0,
+          "affinity": 102
+        }
+      },
+      "skills": {
+        "observation": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        },
+        "investigation": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        },
+        "lock_picking": {
+          "level": 0,
+          "experience": 0,
+          "lastUsedAt": null
+        }
+      },
+      "id": "member-4",
+      "name": "Orin 4",
+      "tier": 1,
+      "stats": {
+        "strength": {
+          "current": 13,
+          "max": 13,
+          "affinity": 65
+        },
+        "dexterity": {
+          "current": 12,
+          "max": 12,
+          "affinity": 74
+        },
+        "intelligence": {
+          "current": 17,
+          "max": 17,
+          "affinity": 100
+        },
+        "constitution": {
+          "current": 11,
+          "max": 11,
+          "affinity": 96
+        },
+        "speed": {
+          "current": 12,
+          "max": 12,
+          "affinity": 100
+        },
+        "perception": {
+          "current": 16,
+          "max": 16,
+          "affinity": 64
+        },
+        "charisma": {
+          "current": 11,
+          "max": 11,
+          "affinity": 77
+        },
+        "soul": {
+          "current": 10,
+          "max": 10,
+          "affinity": 96
+        },
+        "luck": {
+          "current": 14,
+          "max": 14,
+          "affinity": 102
+        }
+      },
+      "queue": [
+        {
+          "dungeonId": "wood",
+          "maxDepth": 1
+        }
+      ],
+      "queueIndex": 0,
+      "cooldown": 0,
+      "resetSeconds": 12,
+      "enabled": true,
+      "runs": 0
+    },
+    "active": [
+      {
+        "stage": "exploring",
+        "originLocationId": "emberveil",
+        "destinationLocationId": "catacombs",
+        "travelRemaining": 0,
+        "outboundSeconds": 15,
+        "returnSeconds": 15,
+        "outcome": null,
+        "specializationTraining": {},
+        "rules": "tasks",
+        "room": null,
+        "memberId": "member-1",
+        "dungeonId": "wood",
+        "personalLimit": 1,
+        "floor": 1,
+        "task": 1,
+        "progress": 2,
+        "elapsed": 5,
+        "training": {
+          "strength": 2,
+          "dexterity": 0.5,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0.5,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        },
+        "startMax": {
+          "strength": 18,
+          "dexterity": 17,
+          "constitution": 15,
+          "speed": 12,
+          "perception": 12,
+          "intelligence": 17,
+          "charisma": 14,
+          "soul": 17,
+          "luck": 10
+        },
+        "loot": {},
+        "gold": 0
+      },
+      {
+        "stage": "exploring",
+        "originLocationId": "emberveil",
+        "destinationLocationId": "old_quarter",
+        "travelRemaining": 0,
+        "outboundSeconds": 15,
+        "returnSeconds": 15,
+        "outcome": null,
+        "specializationTraining": {},
+        "rules": "tasks",
+        "room": null,
+        "memberId": "member-2",
+        "dungeonId": "ruins",
+        "personalLimit": 1,
+        "floor": 1,
+        "task": 1,
+        "progress": 1,
+        "elapsed": 5,
+        "training": {
+          "strength": 0.5,
+          "dexterity": 0.5,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 3,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        },
+        "startMax": {
+          "strength": 12,
+          "dexterity": 13,
+          "constitution": 14,
+          "speed": 17,
+          "perception": 12,
+          "intelligence": 20,
+          "charisma": 12,
+          "soul": 12,
+          "luck": 11
+        },
+        "loot": {},
+        "gold": 0
+      }
+    ],
+    "dungeonLimits": {
+      "wood": null,
+      "ruins": null,
+      "quarry": null
+    },
+    "pinnedResources": [
+      "gold",
+      "gear",
+      "materials"
+    ],
+    "reports": [
+      {
+        "section": "Members",
+        "day": 1,
+        "time": 20,
+        "member": "Guild",
+        "reason": "Applicant arrived",
+        "detail": "Orin 4 is waiting.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      },
+      {
+        "section": "Activities",
+        "day": 1,
+        "time": 15,
+        "member": "Mira",
+        "reason": "Arrived",
+        "detail": "Whispering Archive · exploration begins.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      },
+      {
+        "section": "Activities",
+        "day": 1,
+        "time": 15,
+        "member": "Rowan",
+        "reason": "Arrived",
+        "detail": "Ritual Catacombs · exploration begins.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      },
+      {
+        "section": "Activities",
+        "day": 1,
+        "time": 0,
+        "member": "Mira",
+        "reason": "Departed",
+        "detail": "Whispering Archive · 15s travel · target floor 1.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      },
+      {
+        "section": "Activities",
+        "day": 1,
+        "time": 0,
+        "member": "Rowan",
+        "reason": "Departed",
+        "detail": "Ritual Catacombs · 15s travel · target floor 1.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      },
+      {
+        "section": "Story",
+        "day": 1,
+        "time": 0,
+        "member": "Story",
+        "reason": "A beginning",
+        "detail": "You and a friend are ready to build a guild.",
+        "growth": {
+          "strength": 0,
+          "dexterity": 0,
+          "constitution": 0,
+          "speed": 0,
+          "perception": 0,
+          "intelligence": 0,
+          "charisma": 0,
+          "soul": 0,
+          "luck": 0
+        }
+      }
+    ],
+    "inventory": {},
+    "stats": {
+      "clears": 0,
+      "retreats": 0,
+      "warps": 0
+    }
+  }
+}

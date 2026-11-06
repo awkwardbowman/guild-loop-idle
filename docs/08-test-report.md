@@ -1,3 +1,15 @@
+# Emberveil opening validation — v6
+
+November 5, 2026. **106 tests passed, 0 failed**. Production TypeScript/Vite build and diff checks pass. Older counts below are historical.
+
+Verified: fixed <=10-point starting profiles and 10^tier potential budgets; story-first introduction and two recruits; zero-gear dispatch/no starting regen; separate group/room weights and trap multipliers; size-budget loot with dynamic eligibility and Chips fallback; rarity scaling; Harvesting exclusion for Arya and success-only XP for Clyde; optional skips/mandatory retries; cargo limits, per-resource caps and discarded overflow; Gavin/Stillmere gates; non-consuming five-herb referral; guild-wide unlocks/individual loadouts/absolute shop slot ceilings; storage purchases; mid-room deterministic saves; malformed state rejection; and migration from a real released v5 fixture retaining Gold-as-Chips, active trips and sale quotes.
+
+100 seeded max-affinity trials: Arya reached room 20, Clyde room 10, and Clyde with Reinforced Leather Armor room 12. No character-specific hard depth limit is used. Starting maxima are 90% of affinity.
+
+The seeded full opening reached Stillmere after 3,370 game seconds with five herbs held, Gavin unlocked, and Clyde equipped with Rough Leather Armor. Arya remained unable to harvest herbs. Old-route engine/save regressions pass.
+
+Browser visual acceptance is pending the review preview. Actual death/revival, compression, worker assignments/auto-selling, advanced crafting and higher currency denominations are not claimed as implemented.
+
 # Dungeon attribute-profile validation
 
 November 5, 2026. **94 tests passed, 0 failed**; TypeScript/Vite production build passed. Every dungeon has a distinct planning-check sequence, normalized attribute/importance weights, and a member-comparison score. New cases verify exact profile coverage, archive dependencies, weighted fit without mutation, and invalid-profile rejection. Planning profiles are advisory; bespoke live check content for the starter/delve remains future work.

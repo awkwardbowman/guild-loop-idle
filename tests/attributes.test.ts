@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {STATS,STAT_INFO,SPECIALIZATIONS,ACTIVITY_GROUPS,ATTRIBUTES,attributesForGroup,zeroPools} from '../src/attributes.ts';
-import {initialGame,sandboxGame,startDay,advance,canCastInnateMagic,completeStoryAction,recall} from '../src/engine.ts';
+import {recruit,initialGame,sandboxGame,startDay,advance,canCastInnateMagic,completeStoryAction,recall} from '../src/engine.ts';
 import {effectiveAttribute,rootPool,resourceCost,TRAP_ROOM,newRoomState,stepRoom,validateRoom} from '../src/skill-system.ts';
 import {exportSave,parseSave} from '../src/persistence.ts';
 const expected={
@@ -14,10 +14,10 @@ test('AT01 accepted matrix has exactly nine stats, nine groups and all 27 exact 
  for(const attribute of SPECIALIZATIONS)assert.equal(rootPool(attribute.id),attribute.parent);
 });
 test('AT02 every recruit and guildmaster gets complete independent nine-stat and 27-attribute profiles',()=>{
- const game=sandboxGame();for(const actor of [...game.members,game.guildmaster]){assert.deepEqual(Object.keys(actor.stats).sort(),[...STATS].sort());assert.equal(Object.keys(actor.specializations).length,27);}
+ const game=initialGame();for(let i=0;i<3;i++)game.members.push(recruit(game));game.progression.completed.guild_founded={day:1,time:0};for(const actor of [...game.members,game.guildmaster]){assert.deepEqual(Object.keys(actor.stats).sort(),[...STATS].sort());assert.equal(Object.keys(actor.specializations).length,27);}
  assert.ok(game.guildmaster.stats.soul.max>Math.max(...game.members.map(member=>member.stats.soul.max)));
  assert.equal(canCastInnateMagic(game,'guildmaster'),true);for(const member of game.members)assert.equal(canCastInnateMagic(game,member.id),false);
- game.members[0].specializations.power.value=4;assert.equal(game.members[1].specializations.power.value,0);assert.equal(game.guildmaster.specializations.power.value,0);
+ game.members[0].specializations.power.value=.01;assert.equal(game.members[1].specializations.power.value,0);assert.equal(game.guildmaster.specializations.power.value,0);
  assert.deepEqual(parseSave(exportSave(game)),game);
 });
 test('AT03 group attributes fall back to distinct parent stats without extra resource pools',()=>{
@@ -50,8 +50,8 @@ function oldSchema(game:ReturnType<typeof initialGame>,version=4):any{
 }
 test('AT06 v4 saves migrate real old pools and trained/pending Finesse while retaining trip, trade and RNG state',()=>{
  let game=advance(startDay(sandboxGame()),20);game.members[0].specializations.finesse={value:3,affinity:77};game.reports[0].growth.dexterity=2;
- const raw=oldSchema(game);raw.game.trades=[{id:1,locationId:'emberveil',resourceId:'timber',quantity:2,gold:2,duration:15,remaining:8}];raw.game.nextTradeId=2;
- const migrated=parseSave(JSON.stringify(raw));assert.equal(migrated.version,5);assert.equal(migrated.seed,game.seed);assert.deepEqual(migrated.members[0].stats.dexterity,game.members[0].stats.dexterity);assert.deepEqual(migrated.members[0].specializations.finesse,{value:3,affinity:77});assert.equal(migrated.active[0].specializationTraining.finesse,.75);assert.equal(migrated.active[0].stage,game.active[0].stage);assert.equal(migrated.active[0].progress,game.active[0].progress);assert.equal(migrated.reports[0].growth.dexterity,2);assert.deepEqual(migrated.trades,raw.game.trades);assert.equal(migrated.members[0].stats.luck.max,12);
+ const raw=oldSchema(game);raw.game.trades=[{id:1,locationId:'emberveil',resourceId:'timber',quantity:2,chips:2,duration:15,remaining:8}];raw.game.nextTradeId=2;
+ const migrated=parseSave(JSON.stringify(raw));assert.equal(migrated.version,6);assert.equal(migrated.seed,game.seed);assert.deepEqual(migrated.members[0].stats.dexterity,game.members[0].stats.dexterity);assert.deepEqual(migrated.members[0].specializations.finesse,{value:3,affinity:77});assert.equal(migrated.active[0].specializationTraining.finesse,.75);assert.equal(migrated.active[0].stage,game.active[0].stage);assert.equal(migrated.active[0].progress,game.active[0].progress);assert.equal(migrated.reports[0].growth.dexterity,2);assert.deepEqual(migrated.trades,raw.game.trades);assert.equal(migrated.members[0].stats.luck.max,12);
  assert.deepEqual(advance(parseSave(exportSave(migrated)),40),advance(migrated,40));
 });
 test('AT07 v4 returning and exhausted members retain their return countdown and cannot receive duplicated rewards',()=>{

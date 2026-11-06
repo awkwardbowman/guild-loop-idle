@@ -5,7 +5,7 @@ import {currentGoals,plotEntries} from './story.ts';
 import type {StoryLocation,StoryTab} from './story.ts';
 export function StoryPanel({game,onChange,onNavigate}:{game:Game;onChange:React.Dispatch<React.SetStateAction<Game>>;onNavigate:(tab:StoryTab)=>void}){
  const [view,setView]=useState<'Current Goals'|'Plot'>('Current Goals');
- const goals=currentGoals(game.progression),plot=plotEntries(game.progression);
+ const goals=currentGoals(game.progression,game.inventory),plot=plotEntries(game.progression);
  function visit(location:StoryLocation){if(location.tab==='Story')setView('Current Goals');else onNavigate(location.tab);}
  return <><div className="page-heading"><div className="overline">YOUR GUILD’S JOURNEY</div><h2>Story</h2><p>Follow your current goals or revisit what your guild has discovered.</p></div>
  <nav className="subtabs" aria-label="Story tabs" role="tablist">{(['Current Goals','Plot'] as const).map(t=><button key={t} id={t==='Plot'?'story-plot-tab':'story-goals-tab'} role="tab" aria-selected={view===t} aria-controls={t==='Plot'?'story-plot':'story-goals'} className={view===t?'selected':''} onClick={()=>setView(t)}>{t}</button>)}</nav>

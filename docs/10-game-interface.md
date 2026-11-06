@@ -1,3 +1,22 @@
+# Finalized dungeon settings layout and threshold behavior — Nov 6 2026 (DESIGN ONLY)
+
+In **Guild → Settings → Dungeon Defaults**, expose:
+- **Depth Limit:** Unlimited by default or any positive whole-room count.
+- **Insufficient Skill Threshold:** 1% proposed global default; 0% Off.
+
+In every **expanded dungeon**, place both controls together:
+- **Depth Limit:** Inherit Global / Unlimited override / Custom N rooms.
+- **Insufficient Skill Threshold:** Inherit Global / Off / Custom percent.
+Show the **effective setting** and whether it is inherited or overridden. An inherited dungeon updates if the global value changes.
+
+**Remove every per-member/per-assignment depth-limit input.** Members → Assignments shows only the selected dungeon, current status and personal expedition history. All members assigned to a given dungeon use its effective common depth cap. Preserve current depth-limit stopping semantics (room count), while distinguishing **Room N** and canonical **Floor F = ten rooms** for rewards and ordinary safe recall.
+
+**Threshold runtime and Info:** evaluate effective progress efficiency when entering EACH room. If below threshold, show a 30-game-second grace period, after which incomplete room triggers its authored failure (not a safe exit). Finish within the grace to continue. Explain numerator, benchmark denominator, 0.01 fallback, gear effects, 0%=Off, and role-dependent outcomes in **Info → Skills/Dungeons**. Manual recall's independent 30-second exceptional timeout remains distinct; do not display threshold auto-bail as normal recall.
+
+Older UI instructions below requiring member-specific depth-limit editing or speculating about full-floor preflight are historical and superseded.
+
+---
+
 # Proposed configurable Insufficient Skill Threshold UI — November 6, 2026 (DESIGN ONLY)
 
 Place **Insufficient Skill Threshold** near **Depth Limit** in each dungeon's expanded settings, with an **Inherit global default** choice. The global default belongs in Guild/Configuration or Info Settings (settings location TBD), but **Info → Skills/Dungeons** must describe what the threshold means. Candidate default **1% efficiency**; **0% disables the check**. Keep the control separate from permission/Skill learning gates and from manual Recall.

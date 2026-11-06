@@ -63,3 +63,24 @@ Source: src/story.ts provides goal/history projections and location metadata; St
 ## Story-only opening gates
 
 Fresh launch and reload select Story. Before founding, no other main tab is rendered, the clock controls are disabled, no guild work runs, and Plot has an introductory empty state. Load a save remains a utility control rather than another tab. Opening reveals Guild/Info; welcoming the guaranteed friend reveals Members. Recruitment now looks for additional adventurers, after the friend has joined. Dungeon queues remain empty until discovery; add controls are disabled when no dungeon is unlocked.\n
+### Section colors and event log
+
+`src/sections.ts` owns the stable section numbers and rainbow palette. Only the numeric prefixes on main tabs are colored; event bars and filter numbers reuse the same palette. Shops reserves 05 for the upcoming shop system; Info is 06.
+
+New plot entries also create a single Story-section Unlock event at the same in-game timestamp, including automatic first-clear and first-return milestones. Unlock bodies use the player-facing action title (or milestone title), never internal event IDs. Archive discovery includes skill access in one plot/log entry. Repeated actions do not duplicate unlocks.
+
+The event log uses a compact `D1 - 00:00:00 Unlock` header, a message beneath it, and a section-colored left bar. Member names are inline for expedition events. The bottom Filter sections disclosure supports independent checkboxes, All, and None; filtering only changes visibility, not stored history. The existing latest-100-event retention remains. Existing saves without section tags use a compatibility mapping; new tags are validated on import.
+
+### Travel and sales
+
+The calendar shows Emberveil as the home location. Active expedition tiles and member panels show outbound/exploring/homeward stage, stage progress, and total time until home. Check-driven exploration estimates retain the ~ marker; a homeward countdown is exact. Return home initiates travel and disappears during an existing return. Dungeon entries list their location and each leg’s travel time. Resources includes quantity inputs, provisional sale prices, and pending trade countdowns/progress.
+
+
+### Main stats, attributes and guildmaster
+
+The Guild page shows the guildmaster’s own nine-stat profile and innate-magic designation. Member/candidate stats show all nine roots. Luck is displayed as a modifier with maximum/affinity rather than a consumable fraction. The attribute panel offers By main stat and By activity views, exposing all 27 attributes with their root, grouping, trained value, affinity and effective fallback. Learned skills remain a separate panel. Ordinary members rely on relics/artifacts for magical effects.
+
+
+### Dungeon attribute matching
+
+The dungeon catalog has a member-comparison selector, an Attribute emphasis summary with percentages, an expandable per-check breakdown and relative importance, and the selected member’s advisory weighted capability. Individual check outcomes and resource availability remain decisive; this is not a success-probability estimate.

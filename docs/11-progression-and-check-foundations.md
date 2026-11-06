@@ -1,10 +1,10 @@
-# Progression and Check Foundations — 0.3
+# Progression and Check Foundations — Current
 
 November 5, 2026. Functional preparation based on Maya's accepted design; numerical rules below are provisional implementation choices. This is a game-specific system inspired by D&D attributes, not an implementation of official D&D rules.
 
 ## Implemented boundaries
 
-The framework is executable: saved progression, guarded unlocks and feature visibility, Story threads/actions, member profiles, attribute fallback, learned skills, work and costs, success rolls, failure tables, check-room sequencing, dungeon return/rewards and save migration. The archive demonstrates the complete system. This does not finalize plot, the whole attribute list, content scaling, traits, decay, resource conversions or the guildmaster skill tree.
+The framework is executable: saved progression, guarded unlocks and feature visibility, Story threads/actions, member profiles, attribute fallback, learned skills, work and costs, success rolls, failure tables, check-room sequencing, dungeon return/rewards and save migration. The archive demonstrates the complete system. The accepted main-stat/attribute matrix is now implemented; plot, content scaling, traits, decay, resource conversions and guildmaster spells/skill-tree actions remain incomplete.
 
 ## Saved event facts and derived unlocks
 
@@ -17,7 +17,7 @@ Temporary opening sequence:
 | No completed events | Story only; no roster, hidden tabs or running clock |\n| Open the guild | Guild and utility Info become available |
 | Welcome your friend | Guaranteed first member; Members available |\n| Open recruitment | Recruitment work enabled for additional members |
 | Founding friend joined | First expedition goal available under Current Goals |
-| Survey outskirts | Activities and Briarwood Trail available |
+| Explore the Ritual Catacombs | Activities and Ritual Catacombs available |
 | Return from first outing | Resources and Infrastructure available |
 | Clear first floor, investigate archive | Archive, member skill display and archive trap checks available |
 | Clear archive floor, survey ridge | Emberstone Delve available |
@@ -26,9 +26,9 @@ New story entries are authored in `progression.ts`: stable ID, thread, prerequis
 
 ## Attributes and skills
 
-`ATTRIBUTES` is a data-defined parent tree. Every root maps to a resource pool; children cannot declare another pool. Validation rejects cycles, missing ancestors and duplicate IDs. The final D&D-like roots and branches are not selected.
+`ATTRIBUTES` is a data-defined parent tree. Every root maps to a resource pool; children cannot declare another pool. Validation rejects cycles, missing ancestors and duplicate IDs. The accepted nine roots and 27 branches are centrally defined in attributes.ts, with three branches per root and per activity grouping.
 
-For compatibility with existing saves, the demonstration maps Strength → Might, Dexterity → Agility and Intelligence → Focus. The existing three resource pools remain in the interface. Finger Dexterity is the sample child of Dexterity. Adding Constitution or other independent pools is a later content/schema change, not silently completed here. There is no Physical wrapper.
+The UI and engine now use all nine main stats. Legacy Might/Agility/Focus map to Strength/Dexterity/Intelligence. Finesse migrates to Finesse. Each root can be configured as consumable or modifier; Luck is non-consumable and resource-charge validation rejects Luck costs. There is no Physical wrapper.
 
 Root capability uses the member's persistent maximum, not its depleted current balance. Specializations have a trained value and an individual affinity ceiling, with no Current resource field. Their starting ceilings temporarily copy the mapped root's affinity; rolled root identity is retained. No feature raises affinity in this preparation.
 
@@ -38,7 +38,7 @@ Provisional recursive fallback at retention `r`:
 
 An empty child under 100 parent at 50% retention gets 50; an empty grandchild gets 25. Child 40 under parent 100 gets 70. Perfect child 100 under parent 100 remains 100, not 150. General capability units and behavior across unequal caps require later balance review.
 
-Every learned skill stores level (0–99), experience and last-used game-second timestamp. Definitions link weighted attribute contributions and a specialization retention ratio. Current samples: Observation, Investigation and Lock Picking. Lock Picking uses 75% Finger Dexterity and 25% Intelligence. Disuse metadata is recorded during funded work; decay is explicitly disabled.
+Every learned skill stores level (0–99), experience and last-used game-second timestamp. Definitions link weighted attribute contributions and a specialization retention ratio. Current samples: Observation, Investigation and Lock Picking. Lock Picking uses 75% Finesse and 25% Design. Disuse metadata is recorded during funded work; decay is explicitly disabled.
 
 Temporary practice thresholds: next level costs `10 × (current level + 1)` XP. Successful checks grant 2 XP to each distinct contributing skill; level 99 retains zero overflow XP. Failed attempts record use without granting success practice. These are test defaults, not a final training design.
 
@@ -52,7 +52,7 @@ A check defines three separate weighted skill channels: speed, success and effic
 - Success chance is clamped to the check's configured minimum and maximum.
 - Efficiency is at least 1; resource costs divide by this value.
 
-The archive's disarm speed draws on Investigation (Intelligence), success draws on Lock Picking (mostly Finger Dexterity), and resource efficiency draws on Lock Picking's learned level. Faster attempts and reliable attempts are therefore separate capabilities.
+The archive's disarm speed draws on Investigation (Intelligence), success draws on Lock Picking (mostly Finesse), and resource efficiency draws on Lock Picking's learned level. Faster attempts and reliable attempts are therefore separate capabilities.
 
 ## Resource charging and resolution
 
@@ -62,7 +62,7 @@ A check has a total resource amount, weighted attribute distribution and chargin
 
 All required pools must afford the charge before any work or roll. Insufficient resources cause immediate return, even at a positive balance. No unpaid work, free attempts or negative balances are allowed. Exact depletion charges to zero and returns before a success roll, matching the zero-stat retreat rule. Cost mode is defined per check; per-second mode is tested, while the sample archive charges per attempt. Retry cooldowns do not charge work costs.
 
-Each game tick can advance work and resolve at most one check. Surplus work is discarded at an attempt boundary. On success, advance the room; on failure, select a weighted outcome. Supported outcomes: retry, cooldown, alternate check with explicit index, core-resource damage, gear loss and return. The sample enables retries, reassessment cooldowns and minor Agility injury. It does not enable punitive loot-loss failure.
+Each game tick can advance work and resolve at most one check. Surplus work is discarded at an attempt boundary. On success, advance the room; on failure, select a weighted outcome. Supported outcomes: retry, cooldown, alternate check with explicit index, core-resource damage, gear loss and return. The sample enables retries, reassessment cooldowns and minor Dexterity injury. It does not enable punitive loot-loss failure.
 
 Room state saves check index, work, cooldown, attempts, status and last outcome. A floor rewards loot only after all three trap checks succeed. Seeded rolls are part of the game's saved random state. Completed check training is retained if a later check causes retreat. Core and pending specialization growth are applied on return toward affinity; learned practice can increase during an outing.
 
@@ -72,7 +72,7 @@ Fresh games enable the trap route when the archive is discovered. Existing v0–
 
 Legacy task routes remain as the other sample dungeons. Check-room floors scale work, cost, damage and training with the existing linear floor multiplier. Their return estimates are marked ~; they are planning estimates, not predictions of random outcomes.
 
-## Save v3
+## Historical save v3
 
 Version 3 adds progression facts, skill profiles, specialties, active room state, run rule snapshots and pending specialization training. Existing storage keys remain stable, so deployed saves can be found. v2 migration preserves seed, roster, existing task position, current stats, carried loot, inventory, depth caps and cooldowns; new profile fields initialize without consuming RNG. v0/v1 first undergo their existing safe-return conversion, then receive v3 fields. Unknown future versions and invalid event/skill/specialty/check state are rejected. Backup recovery remains available.
 
@@ -91,7 +91,7 @@ Version 3 adds progression facts, skill profiles, specialties, active room state
 
 ## Next design work
 
-Choose real opening plot and content beats; final root pools and attribute tree; skill catalog/practice rates; scaling, cost and success formulas; affinity ceilings; decay; traits; gear conversion; failure penalties and resource refunds. Every addition should reuse definitions, include a save migration when needed, and pass a whole-game scenario before release.
+Choose real opening plot and content beats; additional learned skills and activity uses; skill catalog/practice rates; scaling, cost and success formulas; affinity ceilings; decay; traits; gear conversion; failure penalties and resource refunds. Every addition should reuse definitions, include a save migration when needed, and pass a whole-game scenario before release.
 
 ## Story subtabs — Current Goals and Plot
 
@@ -106,3 +106,18 @@ Source: src/story.ts provides goal/history projections and location metadata; St
 ## Opening revision
 
 The grounded premise and opening gates are authoritative in 01-concept-and-core-loop.md. A fresh progression object has no completed events. Existing v3 saves with an established guild retain access. The friend grant is a guarded story action; normal applicants cannot become the first member in a fresh game. No schema fields changed. Unfounded state must contain no members, candidate or active runs and must remain in planning.\n
+
+## Current schema v5 and training
+
+See 02-adventurers-and-stat-growth.md for the accepted matrix and provisional defaults. All member/candidate/guildmaster profiles contain nine roots and 27 attributes. Guildmaster stats are separate from the roster and innate magic access is gated to the guildmaster ID. No spell action is introduced by this foundation.
+
+Successful checks collect pending training for contributing specialization attributes, taking the strongest contribution per attribute across speed/success/efficiency so the same use is not counted three times. Explicit authored training can supply a higher amount. Training applies once on arrival home, with the existing diminishing affinity-gap formula. Failed checks grant no successful attribute practice. Learned skill experience still updates during exploration.
+
+The archive now draws on Observation/Scouting for noticing, Planning/Observation for investigation, and Finesse/Design for lock picking; resource costs resolve to their root pools. Checks can reference any accepted attribute without creating a child resource pool.
+
+Schema v5 migrates v0–v4, preserving historical roots, learned skills, old Finesse training, active routes/loot and pending trades. New fields initialize deterministically. Journey/trade behavior is described in 04. Stats/profile completeness, attribute ceilings, non-consumable behavior and guildmaster identity are validated.
+
+
+## Dungeon profile authoring
+
+`src/dungeon-profiles.ts` owns unique ordered planning check profiles, positive normalized per-check importance and per-attribute weights, aggregate attribute mixes and an advisory member-fit function. Definitions only accept the shared 27 specialization IDs; malformed/duplicate weights fail validation. The archive derives its profile from the actual check channels; starter/delve profiles prepare their future bespoke check routes while retaining existing fixed-task gameplay. Planning profiles do not rewrite resource costs or success probabilities. Additional dungeon mechanics should reuse these attributes and author unique live checks separately.

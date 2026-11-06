@@ -58,3 +58,8 @@ The earlier reincarnation/demon-king premise was considered and rejected. Do not
 The friend is temporarily named “Your friend”; no final name, gender, backstory, class, unique trait or authored stat profile is established. Current stats use the prototype seeded recruit generator. The first dungeon remains the prototype trail; names, the exact first job, narrative copy and later opening beats remain open. A newly joined friend has no queued dungeon until discovery, preventing spoilers before the feature unlock.
 
 Existing saves keep established guilds and rosters; they are not reset or given a second founding friend. Opening actions and the friend grant are one-time events. Clock/work cannot start before the guild opens. Save loading remains available from the Story-only screen.
+
+
+## Setting and magic direction — November 5, 2026
+
+Use Threadless as inspiration roughly a thousand years after the campaign, without altering campaign canon. Emberveil is a small town beginning to revive; members venture into the nearby Ritual Catacombs, then reach further locations as the guild and town grow. The player guildmaster has unusually high Soul and is the sole innate magic user. Adventurers work through ordinary abilities and relics/artifacts. Their accepted nine-stat/27-attribute structure is maintained in 02; magic actions and new production chains remain future content.

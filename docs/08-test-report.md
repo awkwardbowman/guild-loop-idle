@@ -1,3 +1,23 @@
+# Dungeon attribute-profile validation
+
+November 5, 2026. **94 tests passed, 0 failed**; TypeScript/Vite production build passed. Every dungeon has a distinct planning-check sequence, normalized attribute/importance weights, and a member-comparison score. New cases verify exact profile coverage, archive dependencies, weighted fit without mutation, and invalid-profile rejection. Planning profiles are advisory; bespoke live check content for the starter/delve remains future work.
+
+# Nine-stat / 27-attribute validation
+
+November 5, 2026. **90 tests passed, 0 failed**; TypeScript/Vite production build passed. Current results supersede historical counts below.
+
+New regression cases assert the exact approved 27 matches, three per root/activity, correct underlying pools, independent member/guildmaster profiles, exclusive innate-magic eligibility, high guildmaster Soul, modifier-only Luck, no zero-Luck retreat, contributing-attribute training only on success, exact schema-v5 save roundtrip, real v4 Might/Agility/Focus and Finger Dexterity migration, pending trip/trade preservation, exhausted returning members, and malformed-profile rejection. Existing checks, progression, travel/trade and continuous-play regressions also pass.
+
+Visual acceptance remains outstanding because the remote browser could not reach the workspace preview. Spell actions, imbuement production and death/revival behavior are not covered as implemented features.
+
+# Location, travel and trade validation
+
+November 5, 2026. **82 tests passed, 0 failed**; TypeScript/Vite production build passed. This supersedes the current counts below, which are retained as historical evidence.
+
+Added coverage for exact 15-second outbound and return boundaries; no dungeon work during travel; delayed loot/growth/recovery; recall during outbound/exploration; repeated-return guards; exhausted members saved in return transit; route snapshots; save continuation across midnight; exact delayed payouts; inventory commitment and overselling guards; concurrent trades; invalid route/timer/trade rejection; and v3 in-flight migration without outbound replay. Updated earlier fixed-time dungeon tests to account for actual travel rather than bypassing it. Existing attribute/check/economy regression tests pass.
+
+Visual browser verification remains unavailable: the remote browser could not reach this workspace's local preview in the preceding interface pass. This change is prepared for review; no production deployment is claimed.
+
 # Story-only Opening Validation
 
 November 5, 2026. Current suite: **70 tests passed, 0 failed**. Production build passed.

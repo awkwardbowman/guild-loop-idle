@@ -1,15 +1,13 @@
 import type { Pools, Stat } from './content.ts';
-export type AttributeDefinition = {id:string;name:string;parent?:string;pool?:Stat};
-// Pool names retain v2 save compatibility. These root mappings are provisional.
-export const ATTRIBUTES: AttributeDefinition[] = [
- {id:'strength',name:'Strength',pool:'might'}, {id:'dexterity',name:'Dexterity',pool:'agility'}, {id:'intelligence',name:'Intelligence',pool:'focus'},
- {id:'finger_dexterity',name:'Finger Dexterity',parent:'dexterity'}
-];
+import {ATTRIBUTES,STATS,STAT_INFO,zeroPools} from './attributes.ts';
+import type {AttributeDefinition} from './attributes.ts';
+export {ATTRIBUTES} from './attributes.ts';
+export type {AttributeDefinition} from './attributes.ts';
 export type SkillDefinition={id:string;name:string;affinities:{attribute:string;weight:number}[];specialization:number};
 export const SKILLS: SkillDefinition[]=[
- {id:'observation',name:'Observation',affinities:[{attribute:'intelligence',weight:.75},{attribute:'dexterity',weight:.25}],specialization:.5},
- {id:'investigation',name:'Investigation',affinities:[{attribute:'intelligence',weight:1}],specialization:.5},
- {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finger_dexterity',weight:.75},{attribute:'intelligence',weight:.25}],specialization:.5}
+ {id:'observation',name:'Observation',affinities:[{attribute:'observation',weight:.75},{attribute:'scouting',weight:.25}],specialization:.5},
+ {id:'investigation',name:'Investigation',affinities:[{attribute:'planning',weight:.75},{attribute:'observation',weight:.25}],specialization:.5},
+ {id:'lock_picking',name:'Lock Picking',affinities:[{attribute:'finesse',weight:.75},{attribute:'design',weight:.25}],specialization:.5}
 ];
 export type Specialization={value:number;affinity:number};
 export type LearnedSkill={level:number;experience:number;lastUsedAt:number|null};
@@ -41,8 +39,8 @@ function skillPower(actor:CheckActor,id:string){const d=SKILLS.find(s=>s.id===id
 function channel(actor:CheckActor,c:Channel){let attributes=0,levels=0;for(const x of c.skills){const p=skillPower(actor,x.skill);attributes+=p.attribute*x.weight;levels+=p.level*x.weight;}return c.base+attributes*c.attributeFactor+levels*c.levelFactor;}
 export function checkMetrics(actor:CheckActor,check:CheckDefinition){return {speed:Math.max(.01,channel(actor,check.speed)),chance:Math.min(check.chanceMax,Math.max(check.chanceMin,channel(actor,check.success))),efficiency:Math.max(1,channel(actor,check.efficiency))};}
 export function resourceCost(actor:CheckActor,check:CheckDefinition,scale=1):Pools {
- const costs:Pools={might:0,agility:0,focus:0};const efficiency=checkMetrics(actor,check).efficiency;
- for(const c of check.cost.distribution)costs[rootPool(c.attribute)]+=check.cost.amount*scale*c.weight/efficiency;
+ const costs=zeroPools();const efficiency=checkMetrics(actor,check).efficiency;
+ for(const c of check.cost.distribution){const pool=rootPool(c.attribute);if(!STAT_INFO[pool].consumable)throw Error('Non-consumable stat cannot fund a cost');costs[pool]+=check.cost.amount*scale*c.weight/efficiency;}
  return costs;
 }
 function pay(actor:CheckActor,cost:Pools):boolean {if((Object.keys(cost) as Stat[]).some(s=>cost[s]>0&&(actor.stats[s].current<=0||actor.stats[s].current<cost[s])))return false;for(const s of Object.keys(cost) as Stat[])actor.stats[s].current=Math.max(0,actor.stats[s].current-cost[s]);return true;}
@@ -51,7 +49,7 @@ export function gainSkillExperience(skill:LearnedSkill,amount:number,now:number)
 // Disuse metadata is stored now. No deterioration is applied until its design is approved.
 export const SKILL_DECAY={enabled:false} as const;
 export function stepRoom(input:CheckActor,room:CheckRoom,state:RoomState,random:()=>number,now:number,scale=1){
- const actor=structuredClone(input),next=structuredClone(state),training:Pools={might:0,agility:0,focus:0};
+ const actor=structuredClone(input),next=structuredClone(state),training=zeroPools();
  const specialtyTraining:Record<string,number>={};
  if(!Number.isFinite(scale)||scale<=0||!Number.isInteger(now)||now<0)throw Error('Invalid check time or scaling');
  const messages:string[]=[];if(next.status!=='active')return {actor,state:next,training,specialtyTraining,messages};
@@ -70,7 +68,13 @@ export function stepRoom(input:CheckActor,room:CheckRoom,state:RoomState,random:
  const roll=random();if(roll<0||roll>=1||!Number.isFinite(roll))throw Error('Invalid random roll');
  if(roll<metrics.chance){
   next.lastOutcome='success';messages.push(`${check.name}: success`);
-  for(const t of check.specializationTraining??[])specialtyTraining[t.attribute]=(specialtyTraining[t.attribute]??0)+t.amount*scale;
+  const practice=new Map<string,number>();
+  for(const contribution of [...check.speed.skills,...check.success.skills,...check.efficiency.skills]){
+   const skill=SKILLS.find(skill=>skill.id===contribution.skill)!;
+   for(const affinity of skill.affinities)if(ATTRIBUTES.some(attribute=>attribute.id===affinity.attribute&&attribute.parent))practice.set(affinity.attribute,Math.max(practice.get(affinity.attribute)??0,affinity.weight*contribution.weight));
+  }
+  for(const t of check.specializationTraining??[])practice.set(t.attribute,Math.max(practice.get(t.attribute)??0,t.amount));
+  for(const [attribute,amount]of practice)specialtyTraining[attribute]=amount*scale;
   for(const s of Object.keys(training) as Stat[])training[s]=(check.training[s]??0)*scale;
   const trained=new Set([...check.speed.skills,...check.success.skills,...check.efficiency.skills].map(x=>x.skill));
   for(const id of trained)gainSkillExperience(actor.skills[id],check.skillExperience,now);
@@ -84,7 +88,7 @@ export function stepRoom(input:CheckActor,room:CheckRoom,state:RoomState,random:
   if(outcome.kind==='alternate'){if(outcome.nextCheck===undefined||!room.checks[outcome.nextCheck])throw Error('Missing alternate approach');next.index=outcome.nextCheck;}
   if(outcome.damage)for(const [s,amount]of Object.entries(outcome.damage))actor.stats[s as Stat].current=Math.max(0,actor.stats[s as Stat].current-(amount??0)*scale);
   if(outcome.gearLoss)actor.gear=Math.max(0,actor.gear-outcome.gearLoss*scale);
-  if(Object.values(actor.stats).some(s=>s.current<=0))return bail('Injury forced return');
+  if(STATS.some(stat=>STAT_INFO[stat].consumable&&actor.stats[stat].current<=0))return bail('Injury forced return');
  }
  return {actor,state:next,training,specialtyTraining,messages};
 }
@@ -93,20 +97,20 @@ export function validateRoom(room:CheckRoom){
  for(const c of room.checks){
   if(ids.has(c.id)||!c.id)throw Error('Duplicate check');ids.add(c.id);
   const finite=(n:number)=>Number.isFinite(n)&&n>=0;
-  if(!finite(c.work)||c.work===0||!finite(c.cost.amount)||!finite(c.skillExperience)||!finite(c.chanceMin)||!finite(c.chanceMax)||c.chanceMin<0||c.chanceMax>1||!['attempt','second'].includes(c.cost.per)||Object.entries(c.training).some(([s,n])=>!['might','agility','focus'].includes(s)||!finite(n))||c.chanceMin>c.chanceMax)throw Error('Invalid check values');
+  if(!finite(c.work)||c.work===0||!finite(c.cost.amount)||!finite(c.skillExperience)||!finite(c.chanceMin)||!finite(c.chanceMax)||c.chanceMin<0||c.chanceMax>1||!['attempt','second'].includes(c.cost.per)||Object.entries(c.training).some(([s,n])=>!STATS.includes(s as Stat)||!finite(n))||c.chanceMin>c.chanceMax)throw Error('Invalid check values');
   for(const ch of [c.speed,c.success,c.efficiency]){if(!finite(ch.base)||!finite(ch.attributeFactor)||!finite(ch.levelFactor)||!ch.skills.length||Math.abs(ch.skills.reduce((a,x)=>a+x.weight,0)-1)>1e-9||ch.skills.some(x=>!SKILLS.some(s=>s.id===x.skill)||!finite(x.weight)))throw Error('Invalid skill channel');}
   if(!c.cost.distribution.length||Math.abs(c.cost.distribution.reduce((a,x)=>a+x.weight,0)-1)>1e-9||c.cost.distribution.some(x=>!finite(x.weight)))throw Error('Invalid cost distribution');
-  c.cost.distribution.forEach(x=>rootPool(x.attribute));
+  c.cost.distribution.forEach(x=>{if(!STAT_INFO[rootPool(x.attribute)].consumable)throw Error('Non-consumable cost');});
   for(const t of c.specializationTraining??[])if(!ATTRIBUTES.some(a=>a.id===t.attribute&&a.parent)||!finite(t.amount))throw Error('Invalid specialization training');
   if(!c.failures.length||!c.failures.some(f=>f.weight>0))throw Error('Missing failure outcomes');
   for(const f of c.failures){if(!['retry','cooldown','alternate','damage','loss','return'].includes(f.kind)||!finite(f.weight)||(f.seconds!==undefined&&(!Number.isInteger(f.seconds)||f.seconds<0))||(f.damage&&Object.values(f.damage).some(n=>!finite(n)))||(f.gearLoss!==undefined&&!finite(f.gearLoss)))throw Error('Invalid failure outcome');if(f.kind==='alternate'&&(f.nextCheck===undefined||!room.checks[f.nextCheck]))throw Error('Missing alternate approach');}
  }
 }
 const ch=(skill:string,base:number,attributeFactor:number,levelFactor:number):Channel=>({skills:[{skill,weight:1}],base,attributeFactor,levelFactor});
-function sampleCheck(id:string,name:string,skill:string,cost:CheckDefinition['cost']['distribution'],training:Partial<Pools>):CheckDefinition{return {id,name,work:4,speed:ch(skill,1,1,.75),success:ch(skill,.55,.25,.2),chanceMin:.05,chanceMax:.98,efficiency:ch(skill,1,0,1),cost:{amount:2,distribution:cost,per:'attempt'},training,skillExperience:2,failures:[{id:'Try again',weight:6,kind:'retry'},{id:'Reassess the mechanism',weight:3,kind:'cooldown',seconds:3},{id:'Scraped hand',weight:1,kind:'damage',damage:{agility:1}}]};}
+function sampleCheck(id:string,name:string,skill:string,cost:CheckDefinition['cost']['distribution'],training:Partial<Pools>):CheckDefinition{return {id,name,work:4,speed:ch(skill,1,1,.75),success:ch(skill,.55,.25,.2),chanceMin:.05,chanceMax:.98,efficiency:ch(skill,1,0,1),cost:{amount:2,distribution:cost,per:'attempt'},training,skillExperience:2,failures:[{id:'Try again',weight:6,kind:'retry'},{id:'Reassess the mechanism',weight:3,kind:'cooldown',seconds:3},{id:'Scraped hand',weight:1,kind:'damage',damage:{dexterity:1}}]};}
 export const TRAP_ROOM:CheckRoom={id:'archive_trap',name:'Archive trap room',checks:[
- sampleCheck('see_trap','Notice the trap','observation',[{attribute:'intelligence',weight:1}],{focus:1}),
- sampleCheck('find_trigger','Find the trigger','investigation',[{attribute:'intelligence',weight:.75},{attribute:'dexterity',weight:.25}],{focus:1,agility:.25}),
- {...sampleCheck('disarm','Disarm the trap','lock_picking',[{attribute:'finger_dexterity',weight:.75},{attribute:'intelligence',weight:.25}],{agility:1,focus:.25}),speed:ch('investigation',1,1,.5),specializationTraining:[{attribute:'finger_dexterity',amount:1}]}
+ sampleCheck('see_trap','Notice the trap','observation',[{attribute:'observation',weight:1}],{perception:1}),
+ sampleCheck('find_trigger','Find the trigger','investigation',[{attribute:'planning',weight:.75},{attribute:'observation',weight:.25}],{intelligence:1,perception:.25}),
+ {...sampleCheck('disarm','Disarm the trap','lock_picking',[{attribute:'finesse',weight:.75},{attribute:'intelligence',weight:.25}],{dexterity:1,intelligence:.25}),speed:ch('investigation',1,1,.5),specializationTraining:[{attribute:'finesse',amount:1}]}
 ]};
 validateAttributeTree(ATTRIBUTES);validateRoom(TRAP_ROOM);

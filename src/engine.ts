@@ -1,30 +1,44 @@
-import { freshProgression, hasFeature, hasEvent, dungeonUnlocked, recordEvent, availableStoryActions } from './progression.ts';
+import {STAT_INFO,zeroPools} from './attributes.ts';
+import {travelSeconds,locationById} from './locations.ts';
+import type {LocationId} from './locations.ts';
+import {EVENT_TEXT} from './story.ts';
+import {reportSection} from './sections.ts';
+import type {Section} from './sections.ts';
+import { freshProgression, hasFeature, hasEvent, dungeonUnlocked, recordEvent, availableStoryActions, STORY_ACTIONS } from './progression.ts';
 import type { Progression, StoryActionId, EventId } from './progression.ts';
 import { newSkillProfile, newRoomState, stepRoom, TRAP_ROOM, checkMetrics } from './skill-system.ts';
 import type { SkillProfile, RoomState, CheckActor } from './skill-system.ts';
-import { DAY_SECONDS, WARP_SECONDS, RESET_SECONDS, STATS, VERSION, DUNGEONS, dungeonById, UPGRADE_INFO } from './content.ts';
+import { DAY_SECONDS, WARP_SECONDS, RESET_SECONDS, STATS, VERSION, DUNGEONS, dungeonById, UPGRADE_INFO, SALE_VALUES } from './content.ts';
 import type { Pools, Upgrade } from './content.ts';
 export type StatValues = { current: number; max: number; affinity: number };
 export type Assignment = { dungeonId: string; maxDepth: number | null };
 export type Member = SkillProfile & { id: string; name: string; tier: number; stats: Record<keyof Pools, StatValues>; queue: Assignment[]; queueIndex: number; cooldown: number; resetSeconds: number; enabled: boolean; runs: number };
-export type Run = { specializationTraining: Record<string,number>; rules: 'tasks' | 'checks'; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; gold: number };
-export type Report = { day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
-export type Game = { progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { gold: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
-export const zero = (): Pools => ({ might: 0, agility: 0, focus: 0 });
+export type Run = { stage: 'outbound' | 'exploring' | 'returning'; originLocationId:LocationId; destinationLocationId:LocationId; travelRemaining:number; outboundSeconds:number; returnSeconds:number; outcome:{reason:string;detail:string}|null; specializationTraining: Record<string,number>; rules: 'tasks' | 'checks'; room: RoomState | null; memberId: string; dungeonId: string; personalLimit: number | null; floor: number; task: number; progress: number; elapsed: number; training: Pools; startMax: Pools; loot: Record<string, number>; gold: number };
+export type Report = { section?: Section; day: number; time: number; member: string; reason: string; detail: string; growth: Pools };
+export type Trade = {id:number;locationId:LocationId;resourceId:string;quantity:number;gold:number;remaining:number;duration:number};
+export type Guildmaster=SkillProfile & {id:'guildmaster';name:string;stats:Member['stats'];innateMagic:true};
+export type Game = { guildmaster:Guildmaster; homeLocationId:LocationId; trades:Trade[]; nextTradeId:number; progression: Progression; version: number; seed: number; nextId: number; day: number; elapsed: number; phase: 'planning' | 'running'; guild: { gold: number; materials: number; gear: number; gearCap: number; gearRegen: number; slots: number; rosterCap: number; priority: 'recruitment' | 'infrastructure'; work: number; upgrades: Record<Upgrade, number> }; members: Member[]; candidate: Member | null; active: Run[]; dungeonLimits: Record<string, number | null>; pinnedResources: string[]; reports: Report[]; inventory: Record<string, number>; stats: { clears: number; retreats: number; warps: number } };
+export const zero=zeroPools;
 const copy = <T,>(v: T): T => structuredClone(v);
 function rand(g: Game) { g.seed = (Math.imul(1664525, g.seed) + 1013904223) >>> 0; return g.seed / 4294967296; }
-function log(g: Game, member: string, reason: string, detail: string, growth = zero()) { g.reports.unshift({ day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
+function log(g: Game, member: string, reason: string, detail: string, growth = zero(), section:Section = reportSection({member,reason})) { g.reports.unshift({ section, day: g.day, time: g.elapsed, member, reason, detail, growth }); g.reports = g.reports.slice(0, 100); }
 export function recruit(g: Game): Member {
  const tier = rand(g) < .22 ? 2 : 1;
  const names = ['Rowan','Mira','Bram','Sable','Tess','Orin','Jun','Wren','Iris','Ash'];
  const id = `member-${g.nextId++}`;
  const name = `${names[Math.floor(rand(g) * names.length)]} ${id.split('-')[1]}`;
  const stats = {} as Member['stats'];
- for (const stat of STATS) { const affinity = 35 + tier * 25 + Math.floor(rand(g) * 45); const max = 10 + Math.floor(rand(g) * 8); stats[stat] = { current: max, max, affinity }; }
+ for (const stat of ['strength','dexterity','intelligence',...STATS.filter(stat=>!['strength','dexterity','intelligence'].includes(stat))] as (keyof Pools)[]) { const affinity = 35 + tier * 25 + Math.floor(rand(g) * 45); const max = 10 + Math.floor(rand(g) * 8); stats[stat] = { current: max, max, affinity }; }
  return { ...newSkillProfile(stats), id, name, tier, stats, queue: dungeonUnlocked(g.progression,'wood')?[{ dungeonId: 'wood', maxDepth: 1 }]:[], queueIndex: 0, cooldown: 0, resetSeconds: RESET_SECONDS, enabled: true, runs: 0 };
 }
+/** Provisional starting values; the guildmaster alone has innate magic. */
+export function newGuildmaster():Guildmaster {
+ const stats=Object.fromEntries(STATS.map(stat=>[stat,{current:stat==='soul'?100:12,max:stat==='soul'?100:12,affinity:stat==='soul'?300:60}])) as Member['stats'];
+ return {id:'guildmaster',name:'Guildmaster',innateMagic:true,stats,...newSkillProfile(stats)};
+}
+export const canCastInnateMagic=(g:Game,actorId:string)=>actorId===g.guildmaster.id&&g.guildmaster.innateMagic;
 export function initialGame(seed = 73129): Game {
- const g: Game = { progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { gold: 12, materials: 0, gear: 8, gearCap: 8, gearRegen: .12, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['gold','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
+ const g: Game = { guildmaster:newGuildmaster(),homeLocationId:'emberveil',trades:[],nextTradeId:1,progression: freshProgression(), version: VERSION, seed: seed >>> 0, nextId: 1, day: 1, elapsed: 0, phase: 'planning', guild: { gold: 12, materials: 0, gear: 8, gearCap: 8, gearRegen: .12, slots: 2, rosterCap: 5, priority: 'recruitment', work: 0, upgrades: { slots: 0, quarters: 0, gear: 0, regen: 0 } }, members: [], candidate: null, active: [], dungeonLimits: Object.fromEntries(DUNGEONS.map(d=>[d.id,null])), pinnedResources: ['gold','gear','materials'], reports: [], inventory: {}, stats: { clears: 0, retreats: 0, warps: 0 } };
  log(g, 'Story', 'A beginning', 'You and a friend are ready to build a guild.');
  g.pinnedResources=[];
  return g;
@@ -33,8 +47,8 @@ export function initialGame(seed = 73129): Game {
 export function sandboxGame(seed=73129):Game { const g=initialGame(seed);g.progression.completed.guild_founded={day:1,time:0};g.progression.completed.legacy_access={day:1,time:0};
  for (let i = 0; i < 3; i++) g.members.push(recruit(g));
  g.members[0].name = 'Rowan'; g.members[1].name = 'Mira'; g.members[2].name = 'Bram';
- g.members[0].stats.might.max = g.members[0].stats.might.current = 18;
- g.members[1].stats.focus.max = g.members[1].stats.focus.current = 20;
+ g.members[0].stats.strength.max = g.members[0].stats.strength.current = 18;
+ g.members[1].stats.intelligence.max = g.members[1].stats.intelligence.current = 20;
  g.members[1].queue = [{dungeonId:'ruins',maxDepth:1}]; g.members[2].queue = [{dungeonId:'quarry',maxDepth:1}];
  g.progression.completed.guild_founded={day:1,time:0};g.progression.completed.legacy_access={day:1,time:0};g.pinnedResources=['gold','gear','materials'];
  return g;
@@ -43,7 +57,7 @@ export function growth(max: number, affinity: number, training: number) { return
 export const floorScale = (floor: number) => 1 + (floor - 1) * .2;
 export const taskDuration = (run: Pick<Run,'dungeonId'|'floor'|'task'> & {rules?:Run['rules']}) => run.rules==='checks' ? TRAP_ROOM.checks[run.task].work*floorScale(run.floor) : Math.ceil(dungeonById(run.dungeonId).tasks[run.task].duration * floorScale(run.floor));
 export function effectiveLimit(g: Game, run: Pick<Run,'dungeonId'|'personalLimit'>) { return Math.min(g.dungeonLimits[run.dungeonId] ?? Infinity, run.personalLimit ?? Infinity); }
-function finish(g: Game, run: Run, reason: string, detail: string) {
+function arriveHome(g: Game, run: Run, reason: string, detail: string) {
  const m = g.members.find(m => m.id === run.memberId)!;
  const gains = zero();
  for (const stat of STATS) { gains[stat] = growth(run.startMax[stat], m.stats[stat].affinity, run.training[stat]); m.stats[stat].max += gains[stat]; }
@@ -57,6 +71,14 @@ function finish(g: Game, run: Run, reason: string, detail: string) {
  log(g, m.name, reason, `${detail} Banked ${run.gold} gold and ${Object.values(run.loot).reduce((a,b)=>a+b,0)} loot. Reset ${m.resetSeconds}s.`, gains);
  g.active = g.active.filter(r => r !== run);
 }
+function finish(g:Game,run:Run,reason:string,detail:string){
+ if(run.stage==='returning')return;
+ run.stage='returning';run.travelRemaining=run.returnSeconds;run.outcome={reason,detail};
+ // Exploration state is no longer active; preserve carried rewards and pending training.
+ run.task=0;run.progress=0;run.room=null;
+ if(!run.travelRemaining){arriveHome(g,run,reason,detail);return;}
+ log(g,g.members.find(m=>m.id===run.memberId)!.name,'Returning',`${detail} Travel home: ${run.travelRemaining}s.`);
+}
 function dispatch(g: Game) {
  if(!hasFeature(g.progression,'activities'))return;
  for (const m of g.members) {
@@ -67,8 +89,9 @@ function dispatch(g: Game) {
   g.guild.gear -= d.gear;
   const startMax=zero(); for(const s of STATS) { m.stats[s].current=m.stats[s].max; startMax[s]=m.stats[s].max; }
   const rules = d.id==='ruins'&&(hasEvent(g.progression,'skill_checks_enabled')||hasEvent(g.progression,'archive_discovered'))?'checks':'tasks';
-  g.active.push({specializationTraining:{},rules,room:rules==='checks'?newRoomState():null,memberId:m.id,dungeonId:d.id,personalLimit:entry.maxDepth,floor:1,task:0,progress:0,elapsed:0,training:zero(),startMax,loot:{},gold:0});
-  log(g,m.name,'Departed',`${d.name} · target ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity) === Infinity ? 'unlimited depth' : `floor ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity)}`}.`);
+  const outboundSeconds=travelSeconds(g.homeLocationId,d.locationId),returnSeconds=travelSeconds(d.locationId,g.homeLocationId);
+  g.active.push({stage:outboundSeconds?'outbound':'exploring',originLocationId:g.homeLocationId,destinationLocationId:d.locationId,travelRemaining:outboundSeconds,outboundSeconds,returnSeconds,outcome:null,specializationTraining:{},rules,room:rules==='checks'?newRoomState():null,memberId:m.id,dungeonId:d.id,personalLimit:entry.maxDepth,floor:1,task:0,progress:0,elapsed:0,training:zero(),startMax,loot:{},gold:0});
+  log(g,m.name,'Departed',`${d.name} · ${outboundSeconds}s travel · target ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity) === Infinity ? 'unlimited depth' : `floor ${Math.min(g.dungeonLimits[d.id]??Infinity,entry.maxDepth??Infinity)}`}.`);
  }
 }
 export function startDay(input: Game): Game { if(!hasEvent(input.progression,'guild_founded')&&!hasEvent(input.progression,'legacy_access'))return input;const g=copy(input); g.phase='running'; dispatch(g); return g; }
@@ -87,7 +110,19 @@ function tick(g: Game) {
  const canWork=hasFeature(g.progression,g.guild.priority==='recruitment'?'recruitment':'infrastructure');
  if(canWork&&(g.guild.priority==='infrastructure'||!g.candidate)) g.guild.work++;
  if(g.guild.work>=20) { g.guild.work-=20; if(g.guild.priority==='recruitment') {g.candidate=recruit(g);log(g,'Guild','Applicant arrived',`${g.candidate.name} is waiting.`);} else {g.guild.materials++;log(g,'Guild','Infrastructure','+1 building material.');} }
+ for(const trade of [...g.trades]){
+  trade.remaining--;
+  if(trade.remaining===0){g.guild.gold+=trade.gold;g.trades=g.trades.filter(t=>t.id!==trade.id);log(g,'Guild','Sale completed',`${trade.quantity} ${DUNGEONS.flatMap(d=>d.loot).find(item=>item.id===trade.resourceId)?.name??trade.resourceId} sold for ${trade.gold} gold.`,zero(),'Resources');}
+ }
  for(const run of [...g.active]) {
+  if(run.stage!=='exploring'){
+   run.travelRemaining--;
+   if(run.travelRemaining===0){
+    if(run.stage==='returning'){arriveHome(g,run,run.outcome!.reason,run.outcome!.detail);}
+    else {run.stage='exploring';log(g,g.members.find(m=>m.id===run.memberId)!.name,'Arrived',`${dungeonById(run.dungeonId).name} · exploration begins.`);}
+   }
+   continue;
+  }
   const m=g.members.find(m=>m.id===run.memberId)!;const d=dungeonById(run.dungeonId);const task=d.tasks[run.task];
   // A newly lowered global cap is applied at the next floor boundary.
   if(run.task===0&&run.progress===0&&(run.rules==='tasks'||run.room?.attempts===0)&&run.floor>effectiveLimit(g,run)) {finish(g,run,'Depth reached','Global depth limit reached.');continue;}
@@ -111,7 +146,7 @@ function tick(g: Game) {
   run.progress++;
   if(run.progress>=taskDuration(run)) {
    for(const s of STATS) m.stats[s].current=Math.max(0,m.stats[s].current-task.cost[s]*floorScale(run.floor));
-   if(STATS.some(s=>m.stats[s].current<=0)) {finish(g,run,'Retreated',`Stat exhausted on ${d.name} F${run.floor}.`);continue;}
+   if(STATS.some(s=>STAT_INFO[s].consumable&&m.stats[s].current<=0)) {finish(g,run,'Retreated',`Stat exhausted on ${d.name} F${run.floor}.`);continue;}
    for(const s of STATS) run.training[s]+=task.training[s]*floorScale(run.floor);
    run.task++;run.progress=0;
    if(run.task>=d.tasks.length) {
@@ -129,7 +164,11 @@ export function advance(input: Game, seconds: number): Game {
  if(input.phase!=='running'||!seconds||(!hasEvent(input.progression,'guild_founded')&&!hasEvent(input.progression,'legacy_access')))return input;
  const g=copy(input);for(let i=0;i<seconds;i++)tick(g);return g;
 }
-export function returnETA(g: Game, run: Run): number {
+export function returnETA(g:Game,run:Run):number {
+ if(run.stage==='returning')return run.travelRemaining;
+ return (run.stage==='outbound'?run.travelRemaining:0)+explorationETA(g,run)+run.returnSeconds;
+}
+function explorationETA(g: Game, run: Run): number {
  if(run.rules==='checks') {
   const member=g.members.find(m=>m.id===run.memberId)!;const actor={...member,gear:g.guild.gear};
   const scale=floorScale(run.floor),limit=effectiveLimit(g,run);
@@ -147,13 +186,13 @@ export function returnETA(g: Game, run: Run): number {
   if(current.progress<taskDuration(current))return seconds;
   const d=dungeonById(current.dungeonId);const task=d.tasks[current.task];
   for(const s of STATS)pools[s]-=task.cost[s]*floorScale(current.floor);
-  if(STATS.some(s=>pools[s]<=0))return seconds;
+  if(STATS.some(s=>STAT_INFO[s].consumable&&pools[s]<=0))return seconds;
   current.task++;current.progress=0;
   if(current.task>=d.tasks.length){if(current.floor>=effectiveLimit(g,current))return seconds;current.floor++;current.task=0;}
  }
  return seconds;
 }
-export function recall(input:Game,id:string):Game {const g=copy(input);const r=g.active.find(r=>r.memberId===id);if(!r)return input;finish(g,r,'Recalled','Manual safe return.');return g;}
+export function recall(input:Game,id:string):Game {const g=copy(input);const r=g.active.find(r=>r.memberId===id);if(!r||r.stage==='returning')return input;finish(g,r,'Recalled','Manual safe return.');return g;}
 export function changePriority(input:Game,priority:Game['guild']['priority']):Game {if(!hasFeature(input.progression,priority==='recruitment'?'recruitment':'infrastructure')||input.guild.priority===priority)return input;const g=copy(input);g.guild.priority=priority;g.guild.work=0;return g;}
 export function acceptCandidate(input:Game):Game {if(!hasEvent(input.progression,'first_member_recruited')&&!hasEvent(input.progression,'legacy_access'))return input;if(!hasFeature(input.progression,'recruitment')||!input.candidate||input.members.length>=input.guild.rosterCap)return input;const g=copy(input);g.members.push(g.candidate!);if(!g.members.at(-1)!.queue.length&&dungeonUnlocked(g.progression,'wood'))g.members.at(-1)!.queue=[{dungeonId:'wood',maxDepth:1}];g.candidate=null;noteEvent(g,'first_member_recruited');return g;}
 export function declineCandidate(input:Game):Game {const g=copy(input);g.candidate=null;return g;}
@@ -168,10 +207,32 @@ export function upgradeCost(g:Game,key:Upgrade){const n=g.guild.upgrades[key]+1;
 export function buyUpgrade(input:Game,key:Upgrade):Game {if(!hasFeature(input.progression,'infrastructure'))return input;const cost=upgradeCost(input,key);if(input.guild.gold<cost.gold||input.guild.materials<cost.materials)return input;const g=copy(input);g.guild.gold-=cost.gold;g.guild.materials-=cost.materials;g.guild.upgrades[key]++;if(key==='slots')g.guild.slots++;if(key==='quarters')g.guild.rosterCap++;if(key==='gear')g.guild.gearCap+=4;if(key==='regen')g.guild.gearRegen+=.1;return g;}
 export function calendar(day:number,seconds:number){const y=Math.floor((day-1)/360)+1,month=Math.floor(((day-1)%360)/30)+1,date=((day-1)%30)+1;const pad=(n:number)=>String(n).padStart(2,'0');return {date:`${pad(date)} / ${pad(month)} / ${String(y).padStart(4,'0')}`,time:`${pad(Math.floor(seconds/3600))}:${pad(Math.floor(seconds%3600/60))}:${pad(seconds%60)}`};}
 
-function noteEvent(g:Game,id:EventId){if(recordEvent(g.progression,id,{day:g.day,time:g.elapsed}))log(g,'Guild','Milestone',id.replaceAll('_',' '));}
+function noteEvent(g:Game,id:EventId){
+ if(!recordEvent(g.progression,id,{day:g.day,time:g.elapsed}))return;
+ // Archive discovery already describes its skill unlock in the same plot entry.
+ if(id==='skill_checks_enabled'&&hasEvent(g.progression,'archive_discovered')&&!hasEvent(g.progression,'legacy_access'))return;
+ log(g,'Story','Unlock',STORY_ACTIONS.find(a=>a.event===id)?.title??EVENT_TEXT[id].title,zero(),'Story');
+}
 export function completeStoryAction(input:Game,id:StoryActionId):Game {
  const action=availableStoryActions(input.progression).find(a=>a.id===id);if(!action)return input;
  const g=copy(input);if(action.id==='welcome_friend'){const friend=recruit(g);friend.name='Your friend';g.members.push(friend);}
- noteEvent(g,action.event);if(action.event==='trail_discovered'){for(const m of g.members)if(!m.queue.length)m.queue=[{dungeonId:'wood',maxDepth:1}];}if(action.event==='archive_discovered')noteEvent(g,'skill_checks_enabled');log(g,'Guild','Unlocked',action.title);return g;
+ noteEvent(g,action.event);if(action.event==='trail_discovered'){for(const m of g.members)if(!m.queue.length)m.queue=[{dungeonId:'wood',maxDepth:1}];}if(action.event==='archive_discovered')noteEvent(g,'skill_checks_enabled');return g;
 }
 export const checkActorFor=(g:Game,id:string):CheckActor|null=>{const m=g.members.find(m=>m.id===id);return m?structuredClone({...m,gear:g.guild.gear}):null;};
+
+/** Items are committed immediately; sale proceeds arrive only after the trade timer. */
+export function sellResource(input:Game,resourceId:string,quantity:number):Game {
+ if(!hasFeature(input.progression,'resources')||!Number.isSafeInteger(quantity)||quantity<=0||!Object.hasOwn(SALE_VALUES,resourceId)||(input.inventory[resourceId]??0)<quantity||input.trades.length>=100)return input;
+ const gold=SALE_VALUES[resourceId]*quantity;if(!Number.isSafeInteger(gold)||gold>1e9)return input;
+ const g=copy(input),duration=locationById(g.homeLocationId).tradeSeconds;
+ g.inventory[resourceId]-=quantity;
+ g.trades.push({id:g.nextTradeId++,locationId:g.homeLocationId,resourceId,quantity,gold,remaining:duration,duration});
+ log(g,'Guild','Trade started',`${quantity} ${DUNGEONS.flatMap(d=>d.loot).find(item=>item.id===resourceId)?.name??resourceId} committed · ${gold} gold in ${duration}s.`,zero(),'Resources');
+ return g;
+}
+export function runStageLabel(run:Run):string {
+ return run.stage==='outbound'?'Travelling to dungeon':run.stage==='returning'?'Travelling home':'Exploring';
+}
+export function runProgress(run:Run):{value:number;max:number} {
+ return run.stage==='exploring'?{value:run.progress,max:taskDuration(run)}:{value:(run.stage==='outbound'?run.outboundSeconds:run.returnSeconds)-run.travelRemaining,max:run.stage==='outbound'?run.outboundSeconds:run.returnSeconds};
+}

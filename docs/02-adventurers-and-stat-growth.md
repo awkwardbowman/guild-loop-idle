@@ -1,3 +1,13 @@
+# Accepted endurance growth clarification — November 6, 2026 (DESIGN ONLY)
+
+The character **does not spend Constitution itself**. The dungeon resource is an **overall Endurance Capacity**, provisionally derived from the character's owned Constitution Skills (Toughness + Endurance + Vitality, using effective values). A character needs any one owned Constitution Skill for Con-1 dungeon entry. Only this **run-specific capacity meter** drains at an authored per-room rate. The nine Attributes, including Constitution, Soul and Luck, remain non-consumable performance/training statistics in this revised design.
+
+**On clearing each whole canonical floor**, provide general **Constitution XP** in addition to the normal Skill and Attribute training attributed to completed checks and rooms. The general Constitution XP is not the same as Skill XP for Toughness/Endurance/Vitality, and the reward must happen exactly once per floor completion (not once per room). **Still specify how that XP increases the effective Constitution Skills or the derived endurance-capacity growth.** This avoids earning general XP with no actual stamina impact. Current architecture counts room number in a field named `floor`; canonical floor = 10 rooms, subject to upcoming explicit boundary implementation. Room-limited early runs might never clear a whole floor, so balance this carefully.
+
+For planned gear, the agreed **contribution calculation sequence is Catchup → Flat → Percent**; Catchup N cannot lower values that are stronger than N. Apply equipment after capability fallback, without granting missing Skills, Composite Skills or eligibility. Other growth/cap models and existing legacy per-root Current values are historical pending migration.
+
+---
+
 # Agreed character mechanics refinement — November 6, 2026 (planned, NOT implemented)
 
 **Supersedes earlier notes proposing zero contribution for unselected Attributes, draining non-Constitution pools, or eligibility based on Constitution Attribute selection alone.**

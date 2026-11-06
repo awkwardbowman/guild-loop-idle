@@ -1,3 +1,17 @@
+# Confirmed next-PR design: Endurance capacity, full-floor training, gear order and recall — November 6, 2026
+
+**Approved direction (not implemented):** Constitution is **not a directly drained Attribute**. Dungeon runs consume a separate overall **Endurance Capacity** derived from available Constitution Skills (Toughness, Endurance and Vitality); Con-1 eligibility still requires at least one such Skill. Every room's per-second endurance drain is independent of the weighted work requirements and scales with floor depth. Soul/Luck and all Attributes are non-consumable.
+
+**On successfully clearing a full canonical floor**, award **general Constitution XP**, in addition to normal per-check/per-room Skill and Attribute training. Do not credit a failed partial floor or repeat award on save reload. Since the current engine calls each *room* a `floor`, a canonical floor must be explicitly derived from **10 cleared rooms** before making a bonus/recall decision. Full-floor-only XP might be inaccessible to early characters capped at room 1: address as balance, not by silently awarding every-room bonus. Define how general Constitution XP actually increases the derived Endurance maximum.
+
+**Gear order** on each applicable check value: first catchup (no reductions; Catchup N = max(V,(V+N)/2)), then flat, then percent. Multi-bonus stacking still needs a rule. Gear never grants eligibility.
+
+**Recall** replaces instant safe exit with a queued request; wait until **the next completed full-floor boundary** for safe return. A **30-second hard fallback** stops a run stuck/slow inside a floor, but is an exceptional interruption and should not count as a safe successful clear or award floor XP; specific failure/penalty remains to author. If already between floors, allow immediate safe recall. Preserve existing depth limit logic. Suggested timer basis: 30 *game/simulation* seconds (not yet specified by the user). Save/reload, pause, room-to-floor conversion and regression tests are required.
+
+This design supersedes earlier notes describing `Constitution depletion` as spending the Constitution stat itself, immediate recall, generic safe return on fatigue, or full-floor XP at every room. No PR has been opened or gameplay modified by these docs.
+
+---
+
 # Updated next-PR scope: single Constitution drain and Skill totals — Nov 6 2026
 
 **New agreed direction, NOT implemented; this supersedes the older text below suggesting zero work from unselected Attributes, charging other stats, and mandatory Constitution check weights.**

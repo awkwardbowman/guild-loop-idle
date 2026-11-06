@@ -1,3 +1,9 @@
+# Backlog disposition — November 6, 2026
+
+Implemented: single repeating dungeon assignment per member; distinct queued status and live roster-ordered dungeon wait lists; current-activity-first member controls; persistent member/dungeon depth and last-return history; newest-first Plot; separate member/material/equipment rarity and tier, with Common T1 starters and safe old-save migration. Tier has no authored maximum within rarity. Current recruitment numbers, equipment permissions and loot rates are preserved.
+
+Deferred: crafting recipes/execution; cross-rarity stat curves and recruit distributions; joint rarity/tier/depth drop weighting; new material families and later lore renaming. The historical 10^tier rule remains a Common recruitment default, not an approved cross-rarity formula. These deferrals do not block this backlog merge.
+
 # Decisions and Open Questions
 
 Updated November 5, 2026. Source: the initial game-design conversation with Maya on this date.

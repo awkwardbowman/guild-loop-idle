@@ -1,3 +1,5 @@
+import {REQUESTS} from './requests.ts';
+import {equipmentCapacity} from './equipment.ts';
 import {isRarity} from './rarity.ts';
 import {RESOURCES,initialStorage,cargoSize} from './resources.ts';
 import {EQUIPMENT,carryingLimit} from './equipment.ts';
@@ -19,10 +21,11 @@ const integer = (v: unknown, min = 0, max = 1e9) => num(v,min,max) && Number.isI
 const text = (v: unknown, max = 200) => typeof v === 'string' && v.length <= max;
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 function validateMember(m: Member) {
- requireValue(object(m) && text(m.id,60) && /^member-\d+$/.test(m.id) && text(m.name,60) && integer(m.tier,1,10) && integer(m.runs), 'member identity');
+ requireValue(object(m) && text(m.id,60) && /^member-\d+$/.test(m.id) && text(m.name,60) && integer(m.tier,1,Number.MAX_SAFE_INTEGER) && isRarity(m.rarity) && integer(m.runs), 'member identity');
  validateProfile(m);
  requireValue(['legacy','recruit','arya','clyde'].includes(m.origin)&&integer(m.carryCapacity,1,1000000)&&integer(m.bestRoom)&&Array.isArray(m.equipped)&&new Set(m.equipped).size===m.equipped.length&&m.equipped.every(id=>EQUIPMENT.some(item=>item.id===id)),'member equipment');
  if(m.origin!=='legacy')requireValue(STATS.reduce((sum,stat)=>sum+m.stats[stat].affinity,0)<=tierBudget(m.tier)+1e-7,'tier stat budget');
+ requireValue(object(m.dungeonHistory)&&Object.entries(m.dungeonHistory).every(([id,h])=>DUNGEONS.some(d=>d.id===id)&&object(h)&&integer(h.bestRoom,0,1000000)&&(h.lastReturn===null||(object(h.lastReturn)&&integer(h.lastReturn.room,0,h.bestRoom)&&text(h.lastReturn.reason)&&text(h.lastReturn.detail,500)&&integer(h.lastReturn.day,1)&&integer(h.lastReturn.time,0,DAY_SECONDS-1)))),'dungeon history');
  validateRoute(m.queue);
  requireValue(integer(m.queueIndex,0,Math.max(0,m.queue.length-1)) && integer(m.cooldown,0,86400) && integer(m.resetSeconds,1,86400) && typeof m.enabled==='boolean', 'member schedule');
 }
@@ -30,9 +33,9 @@ function validateProfile(m:Pick<Member,'stats'|'specializations'|'skills'>){
  requireValue(object(m.stats)&&Object.keys(m.stats).length===STATS.length, 'member stats');
  for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,.001,1e12) && num(v.max,.001,v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
  requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,.001,1e12)&&num(v.value,0,v.affinity);}), 'specialization values');
- requireValue(object(m.skills)&&Object.keys(m.skills).length===SKILLS.length&&SKILLS.every(d=>{const v=m.skills[d.id];return object(v)&&integer(v.level,0,99)&&num(v.experience,0,v.level===99?0:10*(v.level+1)-1e-9)&&(v.lastUsedAt===null||integer(v.lastUsedAt));}), 'learned skills');
+ requireValue(object(m.skills)&&Object.keys(m.skills).length===SKILLS.length&&SKILLS.every(d=>{const v=m.skills[d.id];return object(v)&&(v.discovered===undefined||typeof v.discovered==='boolean')&&integer(v.level,0,99)&&num(v.experience,0,v.level===99?0:10*(v.level+1)-1e-9)&&(v.lastUsedAt===null||integer(v.lastUsedAt));}), 'learned skills');
 }
-function validateRoute(route: Assignment[]) { requireValue(Array.isArray(route) && route.length <= 20 && route.every(e => object(e) && DUNGEONS.some(d=>d.id===e.dungeonId) && validDepth(e.maxDepth)), 'dungeon queue'); }
+function validateRoute(route: Assignment[]) { requireValue(Array.isArray(route) && route.length <= 1 && route.every(e => object(e) && DUNGEONS.some(d=>d.id===e.dungeonId) && validDepth(e.maxDepth)), 'dungeon queue'); }
 function pools(p: unknown) { return object(p) && STATS.every(s=>num(p[s])); }
 export function validateGame(input: unknown): Game {
  requireValue(object(input), 'expected a game object');
@@ -46,13 +49,15 @@ export function validateGame(input: unknown): Game {
  requireValue(Array.isArray(g.trades)&&g.trades.length<=100&&new Set(g.trades.map(t=>t.id)).size===g.trades.length&&g.trades.every(t=>object(t)&&integer(t.id,1,g.nextTradeId-1)&&isLocationId(t.locationId)&&Object.hasOwn(SALE_VALUES,t.resourceId)&&integer(t.quantity,1)&&integer(t.chips,1)&&integer(t.duration,1,86400)&&integer(t.remaining,1,t.duration)), 'pending trades');
  requireValue(integer(g.seed,0,4294967295) && integer(g.nextId,1) && integer(g.day,1) && integer(g.elapsed,0,DAY_SECONDS-1), 'clock or random state');
  requireValue(object(g.progression)&&object(g.progression.completed)&&(Object.hasOwn(g.progression.completed,'guild_founded')||Object.keys(g.progression.completed).every(id=>['history_remembered','friends_introduced'].includes(id)))&&Object.entries(g.progression.completed).every(([id,stamp])=>EVENT_IDS.includes(id as typeof EVENT_IDS[number])&&object(stamp)&&integer(stamp.day,1,g.day)&&integer(stamp.time,0,DAY_SECONDS-1)&&(stamp.day<g.day||stamp.time<=g.elapsed)), 'progression events');
+ requireValue(object(g.requests)&&Object.entries(g.requests).every(([id,completion])=>{const request=REQUESTS.find(request=>request.id===id);return request&&object(completion)&&integer(completion.completedAt,0,(g.day-1)*DAY_SECONDS+g.elapsed)&&Object.hasOwn(g.progression.completed,request.event)&&(request.skillId?typeof completion.studentId==='string'&&/^member-\d+$/.test(completion.studentId):completion.studentId===undefined);}),'shop requests');
  requireValue(g.phase === 'running' || g.phase === 'planning', 'phase');
  const v = g.guild; requireValue(object(v), 'guild');
- requireValue(integer(v.chips) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
+ requireValue(integer(v.chips,0,1e12) && integer(v.materials) && num(v.gear) && integer(v.gearCap,1,10000) && v.gear <= v.gearCap && num(v.gearRegen,0,100) && integer(v.slots,1,100) && integer(v.rosterCap,1,100), 'guild resources');
  requireValue((v.priority==='recruitment'||v.priority==='infrastructure') && integer(v.work,0,19) && object(v.upgrades) && ['slots','quarters','gear','regen'].every(k=>integer((v.upgrades as Record<string,number>)[k],0,100)), 'guild work or upgrades');
  requireValue(Array.isArray(g.members) && g.members.length <= v.rosterCap, 'roster capacity'); g.members.forEach(validateMember);
+ for(const m of [...g.members,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.dungeonHistory).every(h=>h.lastReturn===null||h.lastReturn.day<g.day||(h.lastReturn.day===g.day&&h.lastReturn.time<=g.elapsed)),'future dungeon history');
  for(const m of [...g.members,g.guildmaster,...(g.candidate?[g.candidate]:[])])requireValue(Object.values(m.skills).every(s=>s.lastUsedAt===null||s.lastUsedAt<=(g.day-1)*DAY_SECONDS+g.elapsed), 'future skill timestamp');
- if(!Object.hasOwn(g.progression.completed,'guild_founded'))requireValue(g.members.length===0&&g.candidate===null&&g.active.length===0&&g.trades.length===0&&g.phase==='planning','unopened guild');
+ if(!Object.hasOwn(g.progression.completed,'guild_founded'))requireValue(g.members.length===0&&g.candidate===null&&g.active.length===0&&g.trades.length===0&&(g.phase==='planning'||g.phase==='running'),'unopened guild');
  const ids = g.members.map(m=>m.id); requireValue(new Set(ids).size === ids.length, 'duplicate members');
  if (g.candidate !== null) { validateMember(g.candidate); requireValue(!ids.includes(g.candidate.id), 'candidate already in roster'); ids.push(g.candidate.id); }
  requireValue(ids.every(id=>Number(id.split('-')[1])<g.nextId), 'next member ID');
@@ -63,7 +68,7 @@ export function validateGame(input: unknown): Game {
  requireValue(Array.isArray(g.pinnedResources)&&new Set(g.pinnedResources).size===g.pinnedResources.length&&g.pinnedResources.every(id=>resourceIds.includes(id)), 'pinned resources');
  for (const r of g.active) {
   requireValue(object(r) && g.members.some(m=>m.id===r.memberId) && DUNGEONS.some(d=>d.id===r.dungeonId), 'active member or dungeon');
-  requireValue(validDepth(r.personalLimit)&&integer(r.floor,1,1000000)&&integer(r.elapsed,0,r.stage==='returning'?WARP_SECONDS:WARP_SECONDS-1), 'run position');
+  requireValue(integer(r.reachedRoom,0,r.floor)&&validDepth(r.personalLimit)&&integer(r.floor,1,1000000)&&integer(r.elapsed,0,r.stage==='returning'?WARP_SECONDS:WARP_SECONDS-1), 'run position');
   requireValue(object(r.specializationTraining)&&Object.entries(r.specializationTraining).every(([id,n])=>ATTRIBUTES.some(a=>a.id===id&&a.parent)&&num(n)), 'pending specialization training');
   requireValue(r.rules==='tasks'||r.rules==='checks'||r.rules==='rooms', 'run rules');
   requireValue(integer(r.carryCapacity,1,10000000)&&Array.isArray(r.loadout)&&new Set(r.loadout).size===r.loadout.length&&r.loadout.every(id=>g.equipment.unlocked.includes(id)), 'run equipment snapshot');
@@ -79,11 +84,11 @@ export function validateGame(input: unknown): Game {
   requireValue(integer(r.task,0,d.tasks.length-1)&&num(r.progress,0,taskDuration(r)-1e-9)&&pools(r.training)&&pools(r.startMax)&&integer(r.chips), 'task state');
   requireValue(object(r.loot)&&Object.entries(r.loot).every(([id,n])=>(r.rules==='rooms'?RESOURCES.some(resource=>resource.id===id&&id!=='chips'):d.loot.some(l=>l.id===id))&&integer(n)), 'carried loot');
   const m=g.members.find(m=>m.id===r.memberId)!;
-  requireValue(m.cooldown===0&&STATS.every(s=>(r.stage==='returning'||!STAT_INFO[s].consumable||m.stats[s].current>0) && r.startMax[s]===m.stats[s].max), 'active stat snapshot');
+  requireValue(m.cooldown===0&&STATS.every(s=>(r.rules==='rooms'||r.stage==='returning'||!STAT_INFO[s].consumable||m.stats[s].current>0) && r.startMax[s]===m.stats[s].max), 'active stat snapshot');
  }
  const lootIds=RESOURCES.filter(resource=>!['chips','materials'].includes(resource.id)).map(resource=>resource.id as string);
- requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)&&n<=g.storage[k].cap)&&g.guild.chips<=g.storage.chips.cap&&g.guild.materials<=g.storage.materials.cap, 'inventory');
- requireValue(g.members.every(member=>member.equipped.length<=g.equipment.capacity&&member.equipped.every(id=>g.equipment.unlocked.includes(id))), 'equipped items');
+ requireValue(object(g.inventory)&&Object.entries(g.inventory).every(([k,n])=>lootIds.includes(k)&&integer(n)&&n<=g.storage[k].cap)&&g.guild.materials<=g.storage.materials.cap, 'inventory');
+ requireValue(g.members.every(member=>member.equipped.length<=equipmentCapacity(member)&&member.equipped.every(id=>g.equipment.unlocked.includes(id))), 'equipped items');
  requireValue(object(g.stats)&&integer(g.stats.clears)&&integer(g.stats.retreats)&&integer(g.stats.warps), 'lifetime totals');
  requireValue(Array.isArray(g.reports)&&g.reports.length<=100&&g.reports.every(r=>object(r)&&(r.section===undefined||isSection(r.section))&&integer(r.day,1,g.day)&&integer(r.time,0,DAY_SECONDS-1)&&text(r.member,60)&&text(r.reason)&&text(r.detail,500)&&pools(r.growth)), 'reports');
  for(const report of g.reports){requireValue(report.rarity===undefined||isRarity(report.rarity),'report rarity');requireValue(report.drops===undefined||(object(report.drops)&&Object.entries(report.drops).every(([id,amount])=>RESOURCES.some(resource=>resource.id===id)&&integer(amount,0,1e9))),'report drops');}
@@ -123,7 +128,7 @@ export function parseSave(raw: string): Game {
  requireValue(raw.length<=2_000_000,'file exceeds 2 MB');
  let data: unknown; try { data=JSON.parse(raw); } catch { throw new Error('This file is not valid JSON. Your current game was not changed.'); }
  requireValue(object(data)&&data.format==='guild-loops','not a Guild Loops save');
- requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===5||data.version===VERSION,'unsupported version; this save may need a newer game');
+ requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===5||data.version===6||data.version===7||data.version===VERSION,'unsupported version; this save may need a newer game');
  if(typeof data.version==='number'&&data.version<6){
   requireValue(object(data.game)&&object(data.game.guild)&&Array.isArray(data.game.active),'legacy currency');const game=data.game;
   for(const holder of [game.guild,...(game.active as unknown[]),...(Array.isArray(game.trades)?game.trades:[])]){requireValue(object(holder),'legacy currency holder');if(Object.hasOwn(holder,'gold')&&!Object.hasOwn(holder,'chips'))holder.chips=holder.gold;delete holder.gold;}
@@ -204,6 +209,29 @@ export function parseSave(raw: string): Game {
   const gmDefaults=newSkillProfile(g.guildmaster.stats);g.guildmaster.skills={...gmDefaults.skills,...g.guildmaster.skills};
   for(const run of g.active){run.generated??=null;run.loadout??=[];run.carryCapacity??=1000000;}
   for(const report of g.reports){report.detail=report.detail.replace(/\bgold\b/gi,'Chips');}
+  g.version=6;
+ }
+ if(typeof data.version==='number'&&data.version<7){
+  const g=data.game as unknown as Game;requireValue(g.version===6,'legacy weighted-room version');g.requests??={};
+  for(const member of [...g.members,g.guildmaster,...(g.candidate?[g.candidate]:[])]){
+   const defaults=newSkillProfile(member.stats);member.skills={...defaults.skills,...member.skills};
+   if('origin' in member&&member.origin==='arya')member.skills.combat.discovered=true;
+   if('origin' in member&&member.origin==='clyde')member.skills.herbology={level:2,experience:0,lastUsedAt:null,discovered:true};
+   if('equipped' in member)member.equipped=member.equipped.slice(0,equipmentCapacity(member));
+  }
+  // Existing unlocked templates are retained when the new teaching gate is introduced.
+  if(g.equipment.unlocked.length)g.progression.completed.leather_crafting_learned={day:g.day,time:g.elapsed};
+  for(const run of g.active){if(run.generated){const check=roomById(run.dungeonId,run.generated.id).checks[run.generated.index];run.generated.work=Math.min(run.generated.work,Math.max(0,check.work*1.04**(run.floor-1)-1e-8));run.progress=run.generated.work;}}
+  g.version=7;
+ }
+ if(typeof data.version==='number'&&data.version<8){
+  const g=data.game as unknown as Game;requireValue(g.version===7,'legacy assignment version');
+  for(const member of [...g.members,...(g.candidate?[g.candidate]:[])]){
+   requireValue(Array.isArray(member.queue)&&member.queue.length<=20&&member.queue.every(e=>object(e)&&DUNGEONS.some(d=>d.id===e.dungeonId)&&validDepth(e.maxDepth))&&integer(member.queueIndex,0,Math.max(0,member.queue.length-1)),'legacy assignment');
+   member.rarity=0;member.dungeonHistory={};
+   member.queue=member.queue.length?[member.queue[member.queueIndex]]:[];member.queueIndex=0;
+  }
+  for(const run of g.active){run.reachedRoom=run.stage==='outbound'||run.elapsed===0?0:run.rules==='rooms'&&run.stage==='exploring'&&!run.generated?Math.max(0,run.floor-1):run.floor;const m=g.members.find(m=>m.id===run.memberId);if(m)m.dungeonHistory[run.dungeonId]={bestRoom:run.reachedRoom,lastReturn:null};}
   g.version=VERSION;
  }
  return validateGame(data.game);

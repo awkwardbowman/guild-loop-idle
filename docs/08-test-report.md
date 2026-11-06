@@ -1,3 +1,23 @@
+# Backlog validation — November 6, 2026
+
+134 automated tests pass; TypeScript and Vite production build pass; git diff --check passes. New cases cover one-destination replacement/rejection, actual roster waiting order, queued counts, independent member/dungeon history and return reason, save v7→v8 route migration with preserved active state/stats/RNG, malformed rarity/history/route rejection, tiers above the former ceiling, Common T1 equipment access, material metadata and newest-first deterministic Plot ordering. Superseded multi-queue/old Plot assertions were replaced with current behavior checks.
+
+Browser verification of this pass is blocked: the cloud browser cannot connect to the local preview (ERR_CONNECTION_REFUSED), and the local Playwright browser executable is unavailable. Visual/mobile acceptance is not claimed. Prior pass visual results below are historical evidence only. No production deployment is claimed by these checks.
+
+# Weighted engine, requests, shops and storage validation
+
+November 5, 2026. **128 tests pass, 0 fail**; TypeScript/Vite production build and diff checks pass. New numeric cases reproduce the agreed 300-work examples at 100/200 Power; verify weighted parent aggregation, deterministic work/no success RNG, atomic shortages, exact final-tick funding, no generic Constitution drain, injury vs safe return, walk-before-heal timing, reduced loot, guaranteed boss scrap, skill-only herb eligibility, fixed consumed requests/selected learner, tier-based equipment, bulk/Max storage pricing, uncapped Chips, v6 save migration and bounded ETA forecasting without mutating live state. Old pacing/retry/shop-slot assumptions were replaced rather than retained as current assertions; unrelated legacy route regressions remain.
+
+Seeded new opening (73129) reached the leather lesson at approximately 25 game minutes and Elder Ash referral at approximately 47 game minutes. These are provisional seeded observations, not final balance targets.
+
+Desktop browser verified removed Resources main tab, fixed attention positions, no navigation indicators, Emberveil/Gavin Shop/Requests tabs, fixed-width tier tags, owned/required cost text and teaching gate. Selecting Clyde consumed 12 scraps, marked the shared request Completed and logged the guild gear unlock. Guild Storage shows owned/max, infinite Chips, red full old Hides/Ore stock, bulk quantity dropdown including Max, pinned Scraps with max in the sidebar, and timed Trade controls. Current dungeon estimate reflects the weighted short outing. Automated playthrough validates consumed 5-Herb referral and equipment purchase. Mobile viewport acceptance and actual crafting recipe are not claimed.
+
+# Discovered-skills browser validation
+
+November 5, 2026. **118 tests passed, 0 failed** and TypeScript/Vite production build passes. New coverage verifies empty starting skill lists (including seeded friends), failed checks staying undiscovered, successful-use discovery and save roundtrip, malformed flag rejection, participating-attribute matching, combined text/checklist filtering, name/level sorting, mastered discovery and old-profile fallback. Existing gameplay/drop/save regressions pass.
+
+Desktop browser verified Guild Master’s empty Skills list beside the 27-entry checklist; member rows show only name, combination symbols and level, with no Practice column. Selecting Power leaves Combat; combining that filter with lock search gives the no-match state. Clearing filters and choosing Level descending orders Combat, Athletics, Lock Picking and Scavenging by actual level in the existing test save. Mobile viewport acceptance remains unverified.
+
 # Calendar, attribute matrix, rarity and dungeon-event validation
 
 November 5, 2026. **115 tests pass, 0 fail**; TypeScript/Vite build passes. Added checks for queue delta events without reorder/cap-edit spam, allowed-only Dungeon logs, boss/treasure actual drops, one failure per exhausted outing, no manual-recall failure, old verbose-history hiding, saved structured drops/room state, malformed drop/rarity rejection, complete activity/stat visual mappings and the exact nine-color rarity palette. Existing deterministic production/drop simulations pass with resource depth bias separated from display rarity. The legacy archive test now asserts absence of Skill check chatter.

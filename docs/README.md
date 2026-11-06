@@ -1,3 +1,7 @@
+# Current delivery — November 6, 2026
+
+Save v8 adds single assignments, queue visibility, per-dungeon member history, newest-first Plot and separate rarity/tier classification. See 06 for assignments, 10 for UI, 02/03 for classification, 08 for verification and 09 for remaining work. Weighted engine/shop and discovered-skill changes are included in this delivery.
+
 # Guild Loops Idle — Design Index
 
 Updated: November 5, 2026

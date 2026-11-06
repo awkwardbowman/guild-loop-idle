@@ -1,3 +1,25 @@
+# Assignment and run history — November 6, 2026
+
+Each member has at most one repeating dungeon assignment, with a personal room cap. Assigning another destination replaces the waiting assignment; active destination, loadout and personal cap remain snapshotted. Waiting members are shown as Queued, separately from idle, healing and active expeditions. Dungeon headers display active/capacity followed by the waiting count, with a roster-ordered expanded list and live relevant stat pools. Active, disabled and healing members are excluded from that ready queue.
+
+Each member stores per-dungeon farthest room and most recent return room/reason/detail/timestamp, independent of the compact event log. Reasons retain depth limit, resource exhaustion, injury, time limit, recall and carrying/missing-skill distinctions. A run tracks the last entered room so recall after clearing a room does not claim entry to the next. No old per-dungeon history is fabricated from the global best-room counter. Active older trips seed only observable current depth; historical outings show — until observed.
+
+The deterministic weighted v7 engine remains current: no success RNG or generic Constitution drain, atomic weighted parent-pool payment, injury only on applicable Constitution exhaustion, walking home before healing, and uninjured immediate readiness. Earlier v6 formulas below are historical. New rarity/tier metadata does not change loot rates; joint rarity/tier/depth weighting remains deferred.
+
+# Current dungeon engine — weighted seconds (save v7)
+
+This section supersedes prior generated-room success-roll, retry, generic Constitution exertion and per-attempt cost descriptions below. Historical task/check engines remain for older prototype routes; the current Arya/Clyde opening uses weighted rooms.
+
+Each authored check has a work requirement and weighted attribute contributions. Every one-second tick computes progress as the weighted sum of trained effective attributes (including existing parent fallback and equipment modifiers). It aggregates the same contribution weights into their parent resource pools and pays them once per second. Luck contributes progress without a consumable pool. The final tick pays in full. Room depth increases required work by 1.04^(room−1); costs per tick are not inflated separately.
+
+Example: 75% Power + 25% Constitution, 300 work. Effective Power 100 / Constitution 10 gives 77.5 work each second and clears after four paid ticks: 3 Strength and 1 Constitution. Effective Power 200 gives 152.5 work and clears after two ticks: 1.5 Strength and .5 Constitution. Current resource depletion does not reduce the trained-value rate. No success roll occurs. Only room selection and eligible treasure finds are random. Costs are checked atomically before work; unaffordable ticks make no partial payment or progress. Exact funding of the final tick succeeds.
+
+Constitution shortage during a funded-skill trap/combat encounter returns the member Injured. Other shortages return safely; missing mandatory skills return safely, and missing optional skills skip the opportunity. Injured members walk home, then use their existing recovery duration (currently 12 seconds). Current weighted-room fatigue, manual recall, cargo/room limits and time-limit returns have no healing delay or failed-dungeon log. Safe returns refill pools on arrival; healing completion refills injured members. Old fatigue-labeled failure history is hidden.
+
+Arya starts with known Combat and Clyde with known Herbology. Other composite abilities stay undiscovered; checks do not spontaneously teach unowned skills. The boss requires Combat. Herbology alone gates herb access; there is no extra Perception minimum. Normal Catacomb rooms give one Chip. Boss completion reserves one Leather Scrap before any Chip reward. Treasure makes one eligible draw from Chips/Scraps/Herbs, with Herbs excluded without Herbology or sufficient carrying space. Early rooms do not drop Hides/Ore. All current rarity is Common.
+
+Local-route ETA now forecasts a bounded isolated copy using the actual weighted engine and current RNG/state, without changing the real guild. It remains approximate because future assignment/action changes can affect the shared state. Carried drops, injury return state and partial work are validated/saved; v6 generated work is bounded into the new work requirement during migration.
+
 # Dungeons and Expeditions — Current Rooms
 
 Updated November 5, 2026. The new opening uses **rooms** as progression units; ten rooms represent a floor for flavor. Personal/global limits count rooms.

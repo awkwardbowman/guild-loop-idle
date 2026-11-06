@@ -1,14 +1,14 @@
 export const RESOURCES=[
- {id:'chips',name:'Chips',size:1,cap:80,rarity:0,depthBias:0,sale:0},
- {id:'leather',name:'Leather Scraps',size:1,cap:12,rarity:0,depthBias:0,sale:1},
- {id:'hide',name:'Animal Hides',size:2,cap:8,rarity:0,depthBias:1,sale:2},
- {id:'ore',name:'Ore',size:2,cap:8,rarity:0,depthBias:1,sale:2},
- {id:'herb',name:'Herbs',size:3,cap:5,rarity:0,depthBias:2,sale:3},
- {id:'materials',name:'Building Materials',size:1,cap:10,rarity:0,depthBias:0,sale:1},
- {id:'timber',name:'Heartwood',size:1,cap:12,rarity:0,depthBias:0,sale:1},
- {id:'ink',name:'Living Ink',size:2,cap:8,rarity:0,depthBias:1,sale:2},
- {id:'relic',name:'Ward Fragments',size:3,cap:5,rarity:0,depthBias:2,sale:3},
- {id:'crystal',name:'Sun Crystals',size:3,cap:5,rarity:0,depthBias:2,sale:4}
+ {id:'chips',name:'Chips',tier:1,size:1,cap:80,rarity:0,depthBias:0,sale:0},
+ {id:'leather',name:'Leather Scraps',tier:1,size:1,cap:12,rarity:0,depthBias:0,sale:1},
+ {id:'hide',name:'Animal Hides',tier:2,size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'ore',name:'Ore',tier:2,size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'herb',name:'Herbs',tier:3,size:3,cap:5,rarity:0,depthBias:2,sale:3},
+ {id:'materials',name:'Building Materials',tier:1,size:1,cap:10,rarity:0,depthBias:0,sale:1},
+ {id:'timber',name:'Heartwood',tier:1,size:1,cap:12,rarity:0,depthBias:0,sale:1},
+ {id:'ink',name:'Living Ink',tier:2,size:2,cap:8,rarity:0,depthBias:1,sale:2},
+ {id:'relic',name:'Ward Fragments',tier:3,size:3,cap:5,rarity:0,depthBias:2,sale:3},
+ {id:'crystal',name:'Sun Crystals',tier:3,size:3,cap:5,rarity:0,depthBias:2,sale:4}
 ] as const;
 export const resourceById=(id:string)=>RESOURCES.find(resource=>resource.id===id)!;
 export const initialStorage=()=>Object.fromEntries(RESOURCES.map(resource=>[resource.id,{cap:resource.cap,level:0}]));
@@ -36,3 +36,12 @@ export function rollLoot(entries:LootEntry[],budget:number,depth:number,random:(
  return result;
 }
 export const cargoSize=(loot:Record<string,number>,chips=0)=>chips+Object.entries(loot).reduce((sum,[id,amount])=>sum+resourceById(id).size*amount,0);
+
+export type StorageQuantity=1|10|100|'max';
+/** Sum every increasing price; Max means all affordable upgrades within the existing level ceiling. */
+export function storageQuote(storage:{cap:number;level:number},chips:number,quantity:StorageQuantity){
+ let cap=storage.cap,level=storage.level,total=0,count=0;const wanted=Math.min(quantity==='max'?100:quantity,100-level);
+ while(count<wanted){const price=storageUpgradePrice(level),next=nextStorageCap(cap);if(!Number.isSafeInteger(total+price)||next>1e12||(quantity==='max'&&total+price>chips))break;total+=price;cap=next;level++;count++;}
+ return {count,price:total,cap,level,affordable:count>0&&total<=chips};
+}
+export const storageCap=(game:{storage:Record<string,{cap:number}>},id:string)=>id==='chips'?Infinity:game.storage[id].cap;

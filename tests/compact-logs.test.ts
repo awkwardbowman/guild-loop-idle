@@ -23,7 +23,7 @@ test('CL02 routine dungeon chatter is suppressed; boss/treasure events retain va
  const corrupt=JSON.parse(exportSave(g));corrupt.game.reports[0].rarity=999;assert.throws(()=>parseSave(JSON.stringify(corrupt)),/rarity/);
 });
 test('CL03 exhausted dungeons produce one failure, while manual recall produces no failure',()=>{
- let g=opening();g=advance(g,1);g.members[0].stats.constitution.current=0;g=advance(g,31);assert.equal(g.reports.filter(r=>r.reason==='Dungeon failed').length,1);
+ let g=opening();g=advance(g,1);g.active[0].endurance.current=0;g=advance(g,14);g.active[0].generated={id:'crypt_guardian',index:0,work:0,attempts:0};g=advance(g,16);assert.equal(g.reports.filter(r=>r.reason==='Dungeon failed').length,1);
  let h=advance(opening(),1);h=recall(h,h.active[0].memberId);h=advance(h,15);assert.equal(h.reports.filter(r=>r.reason==='Dungeon failed').length,0);
  assert.equal(visibleReport({member:'Arya',reason:'Room entered',section:'Activities'}),false);assert.equal(visibleReport({member:'Arya',reason:'Retreated',section:'Activities'}),false);
 });

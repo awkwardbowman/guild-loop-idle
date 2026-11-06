@@ -1,3 +1,42 @@
+# Current PR #7 / save v9 contract — November 6, 2026
+
+The full specialization/endurance/settings scope is implemented. Maya authorized provisional choices for character axes, growth, Composite prerequisites, gear stacking and recall failure. Leather crafting recipe execution stays deferred. Earlier contracts below describe historical versions only where they conflict with this section.
+
+## Character values and training
+
+`specialization.ts` owns persisted five/five selections, authored Skill ownership, missing-Skill fallback, Potential, matrix/totals, discipline sums and Composite prerequisites. Fixed picks are listed in [02](02-adventurers-and-stat-growth.md). Recruits choose strongest-five root affinities and densest-five authored Disciplines deterministically without extra RNG, guaranteeing a Constitution Skill when Constitution is chosen. Picks do not change during normal play.
+
+Owned Skill Value = `1 + saved specialized training`; Potential = `1 + saved specialized affinity`. Selected root fallback = `max(1, saved root.max)`; unselected fallback = `0.01`. No weight renormalization. On success, only owned pairwise Skills and selected roots earn 0.01×contribution-weight pending training, applied through the existing capped growth function on home arrival. Composite XP (2 per success) and new lessons require all authored component Skills; existing learned abilities remain stored and usable. No action gains eligibility from gear.
+
+One general Constitution XP per successfully completed canonical floor (ten rooms, no skips) adds `0.01 × total XP` to each owned Constitution Skill's Value and Potential. It is committed once at the boundary and survives reload, increases future derived capacity, and grants neither Skill XP nor root-stat consumption. A migrated partial floor starts its success counter at zero, preventing retroactive bonuses.
+
+## Work and endurance
+
+Gear: strongest Catchup N applies `max(V,(V+N)/2)`, then sum flat bonuses, then multiply by `1 + sum(percent bonuses)`. Apply after capability fallback, independently per check contribution. Capacity sums only owned Constitution Skills with the same modifiers. The run stores `{current,max}` separately from all nine root stats. A paid room second costs `0.05 × (1 + 0.2 × (canonicalFloor-1))`; canonical floor = `floor((room-1)/10)+1`. Every room uses this drain, including optional attempts. An unaffordable tick performs no work; an exactly funded completion succeeds. Faster work pays fewer seconds. Generated rooms no longer drain parent pools or require Combat Composite.
+
+Room content must supply `failure: injury|return` and positive `referenceRate`; current benchmark is provisionally 10 work/second. Trap/boss failure injures and heals after home arrival; other authored failures force return without injury. Previously completed cargo/training stays; incomplete work grants no loot/XP. Loss/death/revival remain deferred. Pure `roomCheckStep` computes work and successful practice; `tickGenerated` owns endurance, timers and failure resolution. No Speed-based interval modifier currently exists.
+
+## Timers, settings and boundary precedence
+
+Global `{depthLimit:null,skillThreshold:1}`; absent per-dungeon keys inherit, explicit null Depth Limit means Unlimited and explicit zero threshold disables it. No individual caps are persisted. Depth Limit counts rooms and applies before room entry/after room completion; a live lowered cap never cuts an active room short.
+
+Efficiency at room entry is `sum(work) / sum(work/effectiveRate) / room.referenceRate` across ordered checks. Work difficulty scales both actual and reference completion time and cancels. It uses real fallback/modifiers, independent of personal Potential. Low-skill is strict `< threshold/100`. Store `roomStartedAt`, `roomEfficiency` and `lowSkill` once; 30 elapsed game seconds of incomplete work invokes the current room's authored failure. Later settings apply at the next room entry.
+
+Store `recallRequestedAt` independently. Ordinary recall returns after the next completed ten-room boundary. Already outbound or between full floors can return immediately. At 30 seconds, an incomplete room invokes its failure; a room completed on that tick retains its reward but a partial-floor return is labeled Interrupted and receives no full-floor XP. Order: fund work → resolve successful check/room and any full-floor XP → safe recall/depth exit → low-skill timeout → exceptional recall → depleted-at-room-boundary return → historical ward timeout. A resolved outing cannot fail or reward again. Cargo and ward exits remain separate.
+
+## Save contract and compatibility
+
+v9 validates five unique known axes, nonnegative integer Constitution XP, separate meter bounds, settings/override ranges, and recall/entry timestamps within saved outing time. Current saves reject retired personal/assignment cap fields. v0–v8 migration preserves raw stats, trained specializations, learned Composite records, active work, loot, RNG, travel, trade clocks and history. Each old per-dungeon cap is preserved as an override; missing global default is Unlimited. Unequal member caps are dropped rather than combined. Active room capacity preserves the old CON current/max fraction; current-room grace begins at migration time; full-floor success counter starts at zero. No refill or retrospective floor reward occurs.
+
+Historical task/check outings retain their original work and resource rules, and migrate to the new shared limit settings. All new generated outings use the v9 work/endurance system. No new backend, sync, offline progression, recipe execution, death or revival is added. Balance and the numeric defaults above remain provisional.
+
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Current Room and Progression Contract — v6
 
 November 5, 2026. The accepted opening supersedes the historical single-friend/task-route content below.

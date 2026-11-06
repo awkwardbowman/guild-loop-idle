@@ -9,8 +9,8 @@ function opening(){let g=initialGame();for(const action of ['remember_history','
 test('SB01 starting skills remain hidden, failures do not discover, successful use reveals and persists',()=>{
  const g=opening();assert.deepEqual(browseLearnedSkills(g.guildmaster),[]);assert.deepEqual(browseLearnedSkills(g.members[0]).map(skill=>skill.id),['combat']);assert.deepEqual(browseLearnedSkills(g.members[1]).map(skill=>skill.id),['herbology']);
  const member=g.members[0],check=roomDungeon('wood').rooms.find(room=>room.group==='combat')!.checks[0];
- const generated={id:'crypt_scavenger',index:0,work:100,attempts:0};
- const tired=structuredClone(member);tired.stats.strength.current=0;const failed=roomCheckStep({...tired,gear:0},check,generated,1,[],()=>.999,20);assert.equal(failed.outcome,'exhausted');assert.equal(failed.actor.skills.combat.experience,0);
+ const generated={id:'crypt_scavenger',index:0,work:0,attempts:0};
+ const tired=structuredClone(member);tired.skills.combat.discovered=false;const failed=roomCheckStep({...tired,gear:0},{...check,work:100},generated,1,[],()=>.999,20);assert.equal(failed.outcome,'working');assert.equal(failed.actor.skills.combat.experience,0);
  const success=roomCheckStep({...member,gear:0},check,generated,1,[],()=>0,21);assert.equal(success.outcome,'success');assert.deepEqual(browseLearnedSkills(success.actor).map(skill=>skill.id),['combat']);
  g.members[0].skills=success.actor.skills;g.elapsed=21;assert.equal(browseLearnedSkills(parseSave(exportSave(g)).members[0])[0].id,'combat');
  const corrupt=JSON.parse(exportSave(g));corrupt.game.members[0].skills.combat.discovered='yes';assert.throws(()=>parseSave(JSON.stringify(corrupt)),/learned skills/);

@@ -12,5 +12,5 @@ export function StatSymbols({mix,limit=3}:{mix:StatEmphasis[];limit?:number}){re
 
 export function ActivitySymbol({group,stat,label=false}:{group:import('./attributes.ts').ActivityGroup;stat?:Stat;label?:boolean}){
  const name=ACTIVITY_GROUPS.find(item=>item.id===group)!.name;
- return <span className="stat-symbol activity-symbol" style={{'--stat-color':stat?STAT_VISUALS[stat].color:'#b8c4d1'} as React.CSSProperties} title={name}><svg viewBox="0 0 24 24" role="img" aria-label={name}><path d={ACTIVITY_VISUALS[group].path}/></svg>{label&&<span>{name}</span>}</span>;
+ return <span className="stat-symbol activity-symbol" style={{'--stat-color':stat?STAT_VISUALS[stat].color:'#000000'} as React.CSSProperties} title={name}><svg viewBox="0 0 24 24" role="img" aria-label={name}><path d={ACTIVITY_VISUALS[group].path}/></svg>{label&&<span>{name}</span>}</span>;
 }

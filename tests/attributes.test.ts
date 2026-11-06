@@ -1,3 +1,4 @@
+import {legacyEnvelope} from './legacy-save.ts';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {STATS,STAT_INFO,SPECIALIZATIONS,ACTIVITY_GROUPS,ATTRIBUTES,attributesForGroup,zeroPools} from '../src/attributes.ts';
@@ -27,7 +28,7 @@ test('AT03 group attributes fall back to distinct parent stats without extra res
  assert.deepEqual(resourceCost(actor,check),{...zeroPools(),dexterity:1,intelligence:1});
 });
 test('AT04 luck is a non-consumable modifier; depleted luck does not force a return',()=>{
- assert.equal(STAT_INFO.luck.consumable,false);let game=sandboxGame();for(const member of game.members)member.enabled=false;game.members[0].enabled=true;
+ assert.equal(STAT_INFO.luck.consumable,false);let game=sandboxGame();game.dungeonLimits.wood=1;for(const member of game.members)member.enabled=false;game.members[0].enabled=true;
  game=startDay(game);game.members[0].stats.luck.current=0;assert.deepEqual(parseSave(exportSave(game)),game);game=advance(game,25);assert.equal(game.stats.clears,1);assert.equal(game.active[0].stage,'returning');
  const actor={...game.members[0],gear:100},check=structuredClone(TRAP_ROOM.checks[0]);check.cost.distribution=[{attribute:'discovery',weight:1}];
  assert.throws(()=>resourceCost(actor,check),/Non-consumable/);assert.throws(()=>validateRoom({id:'luck-cost',name:'Invalid',checks:[check]}),/Non-consumable/);
@@ -51,14 +52,14 @@ function oldSchema(game:ReturnType<typeof initialGame>,version=4):any{
 test('AT06 v4 saves migrate real old pools and trained/pending Finesse while retaining trip, trade and RNG state',()=>{
  let game=advance(startDay(sandboxGame()),20);game.members[0].specializations.finesse={value:3,affinity:77};game.reports[0].growth.dexterity=2;
  const raw=oldSchema(game);raw.game.trades=[{id:1,locationId:'emberveil',resourceId:'timber',quantity:2,chips:2,duration:15,remaining:8}];raw.game.nextTradeId=2;
- const migrated=parseSave(JSON.stringify(raw));assert.equal(migrated.version,8);assert.equal(migrated.seed,game.seed);assert.deepEqual(migrated.members[0].stats.dexterity,game.members[0].stats.dexterity);assert.deepEqual(migrated.members[0].specializations.finesse,{value:3,affinity:77});assert.equal(migrated.active[0].specializationTraining.finesse,.75);assert.equal(migrated.active[0].stage,game.active[0].stage);assert.equal(migrated.active[0].progress,game.active[0].progress);assert.equal(migrated.reports[0].growth.dexterity,2);assert.deepEqual(migrated.trades,raw.game.trades);assert.equal(migrated.members[0].stats.luck.max,12);
+ const migrated=parseSave(JSON.stringify(legacyEnvelope(raw)));assert.equal(migrated.version,9);assert.equal(migrated.seed,game.seed);assert.deepEqual(migrated.members[0].stats.dexterity,game.members[0].stats.dexterity);assert.deepEqual(migrated.members[0].specializations.finesse,{value:3,affinity:77});assert.equal(migrated.active[0].specializationTraining.finesse,.75);assert.equal(migrated.active[0].stage,game.active[0].stage);assert.equal(migrated.active[0].progress,game.active[0].progress);assert.equal(migrated.reports[0].growth.dexterity,2);assert.deepEqual(migrated.trades,raw.game.trades);assert.equal(migrated.members[0].stats.luck.max,12);
  assert.deepEqual(advance(parseSave(exportSave(migrated)),40),advance(migrated,40));
 });
 test('AT07 v4 returning and exhausted members retain their return countdown and cannot receive duplicated rewards',()=>{
  let game=startDay(sandboxGame());game=recall(game,game.members[0].id);game.members[0].stats.strength.current=0;game=advance(game,5);
- const migrated=parseSave(JSON.stringify(oldSchema(game)));assert.equal(migrated.active[0].stage,'returning');assert.equal(migrated.active[0].travelRemaining,10);const complete=advance(migrated,10);assert.equal(complete.members[0].runs,1);assert.equal(complete.members[0].cooldown,12);
+ const migrated=parseSave(JSON.stringify(legacyEnvelope(oldSchema(game))));assert.equal(migrated.active[0].stage,'returning');assert.equal(migrated.active[0].travelRemaining,10);const complete=advance(migrated,10);assert.equal(complete.members[0].runs,1);assert.equal(complete.members[0].cooldown,12);
 });
 test('AT08 malformed current schema, incomplete attributes and missing legacy roots reject without losing the caller state',()=>{
- const game=sandboxGame();for(const mutate of [(g:any)=>delete g.members[0].stats.soul,(g:any)=>delete g.members[0].specializations.opportunity,(g:any)=>g.guildmaster.innateMagic=false,(g:any)=>g.guildmaster.specializations.inspiration.value=1e12]){const raw=JSON.parse(exportSave(game));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(raw)));}
- const legacy=oldSchema(game);delete legacy.game.members[0].stats.agility;assert.throws(()=>parseSave(JSON.stringify(legacy)),/legacy stat/);assert.equal(game.members[0].stats.dexterity.current,game.members[0].stats.dexterity.max);
+ const game=sandboxGame();for(const mutate of [(g:any)=>delete g.members[0].stats.soul,(g:any)=>delete g.members[0].specializations.opportunity,(g:any)=>g.guildmaster.innateMagic=false,(g:any)=>g.guildmaster.specializations.inspiration.value=1e12]){const raw=JSON.parse(exportSave(game));mutate(raw.game);assert.throws(()=>parseSave(JSON.stringify(legacyEnvelope(raw))));}
+ const legacy=oldSchema(game);delete legacy.game.members[0].stats.agility;assert.throws(()=>parseSave(JSON.stringify(legacyEnvelope(legacy))),/legacy stat/);assert.equal(game.members[0].stats.dexterity.current,game.members[0].stats.dexterity.max);
 });

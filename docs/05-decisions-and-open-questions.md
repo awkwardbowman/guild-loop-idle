@@ -1,3 +1,15 @@
+# Implementation decisions for PR #7 — November 6, 2026
+
+Maya explicitly authorized choosing and documenting provisional defaults and implementing the full scope. Implemented: five/five specialization and sparse Skills matrix/totals; 0.01 fallback without weight renormalization; owned-Constitution-Skill entry gate; separate Endurance Capacity; successful ten-room floor Constitution XP that raises future capacity; Catchup → Flat → Percent; queued recall and independent room-grace timer; global/per-dungeon settings; retirement of assignment caps; v9 migration and Info explanations.
+
+Provisional decisions are centralized in [02](02-adventurers-and-stat-growth.md), [04](04-dungeons-and-expeditions.md) and [11](11-progression-and-check-foundations.md). Those engineering choices are authorized for this PR, not declarations of final balance. Green includes exactly 90%. Fixed role/recruit picks, XP contribution, strongest-catchup/additive stacking and authored return/injury outcomes are no longer implementation blockers. Remaining work: craft recipe execution; balance playtesting; future Composite teaching/content, Potential reveal, Speed intervals, death/revival and optional sync.
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Approved depth-limit simplification and room threshold behavior — Nov 6 2026
 
 - **Remove per-unit/per-assignment Depth Limit.** One shared limit per dungeon, with an **inheritable global default** (default Unlimited) and explicit local override (Unlimited or positive integer room count). Current v8 has both dungeon-wide `dungeonLimits` and per-member `queue[].maxDepth` / active `personalLimit`; only the new shared policy is authoritative once implemented. Do not merge inconsistent old member limits into a new group cap during migration.

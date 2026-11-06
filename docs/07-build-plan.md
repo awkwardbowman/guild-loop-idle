@@ -1,3 +1,13 @@
+# PR #7 delivery gate — November 6, 2026
+
+Implemented as a review branch: specialization/Skills UI, Endurance Capacity and floor growth, room-authored failures, independent skill-grace/recall timers, shared dungeon defaults/overrides and save v9 migration. Provisional decisions are documented in 11; recipe execution is deferred. Gates: regression suite, production build, desktop/mobile browser flow, save/import continuation, diff check and published-source identity. Actual outcomes are in 08. No production deployment or merge is implied.
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Build Plan and Validation Gates
 
 November 5, 2026. Execution plan authorized by Maya: plan → implement functional group → write test cases → validate → fix → repeat → main-game playtest → next-phase review.

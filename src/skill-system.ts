@@ -18,7 +18,7 @@ export const SKILLS: SkillDefinition[]=[
 ];
 export type Specialization={value:number;affinity:number};
 export type LearnedSkill={discovered?:boolean;level:number;experience:number;lastUsedAt:number|null};
-export type SkillProfile={specializations:Record<string,Specialization>;skills:Record<string,LearnedSkill>};
+export type SkillProfile={selections?:import('./specialization.ts').Selections;constitutionExperience?:number;specializations:Record<string,Specialization>;skills:Record<string,LearnedSkill>};
 export type CheckActor=SkillProfile & {stats:Record<Stat,{current:number;max:number;affinity:number}>;gear:number};
 export function newSkillProfile(stats:CheckActor['stats']):SkillProfile {
  return {specializations:Object.fromEntries(ATTRIBUTES.filter(a=>a.parent).map(a=>[a.id,{value:0,affinity:stats[rootPool(a.id)].affinity}])),skills:Object.fromEntries(SKILLS.map(s=>[s.id,{discovered:false,level:0,experience:0,lastUsedAt:null}]))};

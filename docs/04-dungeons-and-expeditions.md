@@ -1,3 +1,24 @@
+# Current PR #7 implementation — room work, endurance and return rules (November 6, 2026)
+
+The full scope is implemented for generated room outings in save v9, with Maya authorizing provisional details. Historical task/check outings retain their saved work/pool rules; all assignments now use shared dungeon limits. See [11](11-progression-and-check-foundations.md) for exact formulas and migration.
+
+- Con-1 requires an owned Constitution Skill. Combat Composite is not a gate for generic dungeon checks; Clyde can attempt them with weak weighted contributions.
+- Endurance maximum is the sum of owned Constitution Skill effective values, with gear. Every attempted room second costs `0.05 × (1 + 0.2 × (canonicalFloor - 1))`, independent of work weights. Canonical floor = `floor((roomNumber - 1)/10) + 1`. Attributes do not drain in new outings.
+- Each room explicitly authors a failure and reference rate. Provisional danger outcomes: trap/boss = injury and existing healing on home arrival; neutral/combat/puzzle/treasure = forced return without injury. Completed cargo is kept. Loss/death/revival remain future content. No incomplete-room reward or floor XP is granted on failure.
+- Benchmark is provisionally 10 work/second. Room efficiency = total base check work / sum(base check work / actor effective check rate) / benchmark. Difficulty multiplies actor and benchmark required work equally and cancels in the rate ratio. This is not Value/Potential. Tick speed is currently one work step per game second; future Speed interval changes must update both prediction and work together.
+- Evaluate threshold once on each room entry. Strictly below threshold grants 30 game seconds. Completion on the 30th second wins; an unfinished room invokes its failure. Threshold changes apply at next room entry, not retrospectively.
+- Manual recall queues until the next ten-room boundary. Its independent 30-second fallback invokes the current incomplete room's failure. If a room completes on that deadline inside a partial floor, keep that completed reward and label the return **Interrupted**, with no general floor XP. Outbound or between-full-floor recall is immediately safe. Simultaneous timeouts resolve once, with low-skill expiry taking precedence over recall expiry for the reason text.
+- General Constitution XP requires all ten successful rooms within that canonical floor. Skips invalidate that floor's bonus. Completed-check practice remains earned on a partial floor. Depth limits count rooms, can stop mid-canonical-floor at a room boundary, and grant no full-floor XP for that partial floor. Lowering a limit never interrupts an already active room.
+- Both grace and recall clocks use saved outing elapsed game seconds; no offline progression is introduced. Capacity is snapshotted at departure and never refilled by mid-outing XP. Existing cargo-full and 300-second ward returns remain separate.
+
+Active v8 rooms retain work, cargo, RNG and travel. Their new meter preserves the old CON pool fraction; current-room evaluation starts at migration time, and no earlier clears are retroactively credited as a successful full floor. Per-dungeon caps—including explicit Unlimited—are preserved; individual caps are discarded without merging them.
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Approved dungeon-level depth-limit ownership and insufficient-skill behavior — November 6, 2026 (NOT IMPLEMENTED)
 
 **Depth Limit ownership:** remove the per-member/per-assignment depth cap. A dungeon has **one effective depth limit shared by all adventurers assigned to it**. Support a global default and a per-dungeon override; a dungeon set to **Inherit** automatically uses the current global setting, while an overridden dungeon keeps its own value. Global default **Unlimited**; explicit Unlimited also allowed as a local override, so it does not become limited if the global value changes. Preserve the existing room-count depth unit and the existing boundary behavior for depth-limit exits (the new ten-room canonical-floor model for floor XP/normal recall does NOT silently change this). Each dungeon has an explicit override mode `inherit | unlimited | cap(positive integer)`; the global limit is `unlimited | cap(positive integer)`. Effective limit is one shared value, not the minimum of a member's cap and the dungeon's cap.

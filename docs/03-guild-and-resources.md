@@ -1,3 +1,15 @@
+# Current PR #7 implementation — shared settings (November 6, 2026)
+
+Guild → Settings → Dungeon Defaults provides a global Depth Limit (initially Unlimited) and Insufficient Skill Threshold (initially 1%, 0% Off). Each expanded dungeon card can inherit or override both independently; explicit Unlimited differs from inheritance. Limits count rooms and apply at room boundaries. Assignment/member caps are removed from current saves and UI. A default change affects all inheriting dungeons, including active trips at their next boundary/room entry.
+
+Armor's Constitution bonus now increases owned Constitution Skills' check effectiveness and the separate Endurance Capacity maximum. Equipment order is strongest Catchup → sum flat bonuses → sum percentages. Equipment never grants capability or eligibility. Existing raw stats, materials, prices, carrying limits and storage remain intact. Recipe execution, other resource chains and final balance remain deferred.
+
+---
+
+## Historical design and implementation notes
+
+The sections below record earlier builds and proposals. The current contract above and the v9 contract in 11 supersede conflicts.
+
 # Current resource and equipment classification — November 6, 2026
 
 Resource and equipment definitions now hold rarity and tier separately. Existing drops/equipment remain Common. Leather Scraps are T1, Animal Hides T2, Ore T2 and Herbs provisionally T3. Resource tooltips expose both fields; shop tags show rarity and tier. Stable IDs, quantities, costs, bonuses, carrying sizes, loot probabilities and loadout behavior are preserved by this classification pass. This sits on top of the prior weighted-engine/shop pass: equipment capacity is per ally tier; Chips are uncapped; storage offers bulk purchases; Gavin's shared requests consume their fixed materials and teach a selected ally before gear purchases. Earlier global shop-slot ceilings below are historical. No new rarity/tier equip restriction is introduced. Hardened Hide, Scales, ore-family extensions and lore renaming remain future content; a tier-aware loot curve is deferred until balanced and validated.

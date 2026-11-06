@@ -1,7 +1,7 @@
 import type {Stat} from './attributes.ts';
-export type Equipment={id:string;name:string;tier:number;rarity:number;description:string;chips:number;leather:number;bonuses:Partial<Record<Stat,number>>;carry:number};
+export type Equipment={id:string;name:string;tier:number;rarity:number;description:string;chips:number;leather:number;bonuses:Partial<Record<Stat,number>>;flat?:Partial<Record<Stat,number>>;catchup?:Partial<Record<Stat,number>>;carry:number};
 export const EQUIPMENT:Equipment[]=[
- {id:'leather_armor',name:'Rough Leather Armor',tier:1,rarity:0,description:'+10% Constitution effectiveness; physical exertion costs less.',chips:4,leather:3,bonuses:{constitution:.1},carry:0},
+ {id:'leather_armor',name:'Rough Leather Armor',tier:1,rarity:0,description:'+10% Constitution effectiveness; increases Endurance Capacity.',chips:4,leather:3,bonuses:{constitution:.1},carry:0},
  {id:'reinforced_armor',name:'Reinforced Leather Armor',tier:2,rarity:0,description:'+25% Constitution effectiveness; supports longer outings.',chips:12,leather:8,bonuses:{constitution:.25},carry:0},
  {id:'leather_pack',name:'Leather Satchel',tier:1,rarity:0,description:'+12 carrying capacity.',chips:5,leather:4,bonuses:{},carry:12}
 ];
@@ -11,3 +11,11 @@ export const carryingLimit=(base:number,loadout:string[])=>base+loadout.reduce((
 export const SHOP_CAPACITY={tanner:1,herbalist:5} as const;
 
 export const equipmentCapacity=(member:{tier:number})=>member.tier;
+
+/** Strongest catchup, then additive flats, then additive percentages. Never grant capability. */
+export function applyModifiers(value:number,modifiers:{catchup?:number;flat?:number;percent?:number}[]){
+ const catchup=Math.max(0,...modifiers.map(m=>m.catchup??0));
+ return Math.max(value,(value+catchup)/2)+modifiers.reduce((sum,m)=>sum+(m.flat??0),0);
+}
+export function modifiedValue(value:number,modifiers:{catchup?:number;flat?:number;percent?:number}[]){return applyModifiers(value,modifiers)*(1+modifiers.reduce((sum,m)=>sum+(m.percent??0),0));}
+export function equipmentValue(value:number,loadout:string[],stat:Stat){return modifiedValue(value,loadout.map(id=>{const item=equipmentById(id);return {catchup:item.catchup?.[stat],flat:item.flat?.[stat],percent:item.bonuses[stat]};}));}

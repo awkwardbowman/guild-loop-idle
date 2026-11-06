@@ -1,3 +1,13 @@
+# Confirmed settings design — global dungeon defaults, no member-specific depth caps (Nov 6 2026)
+
+**Approved for next implementation PR; not in v8:** simplify Depth Limit to a shared per-dungeon setting, optionally inheriting a **global default** (initial Unlimited). Remove the current per-member/assignment limit and its UI. Use one dungeon settings area for both **Depth Limit** and **Insufficient Skill Threshold**; the latter inherits candidate global 1% unless explicitly overridden (0% disables). Put global defaults under Guild → Settings → Dungeon Defaults, per-dungeon controls in expanded dungeon settings.
+
+**Threshold behavior confirmed:** when entering **each generated room**, compute actor predicted actual work/second versus the room reference work/second; if ratio below selected threshold, grant **30 game seconds** to finish. Incomplete at deadline → invoke **that room's authored failure outcome**; completion inside grace → continue. This can fail mid-canonical-floor without breaking the rule against safe running. Manual recall is independent: queued until safe full-floor boundary, with separate 30-second exceptional fallback. Timeouts resolving together must never double-award/fail.
+
+**Migration:** effectiveLimit currently `min(global dungeon limit, run.personalLimit)`; remove per-assignment caps rather than merging unequal member caps into a dungeon restriction. Preserve per-dungeon caps as overrides; global missing=Unlimited. Depth limits continue counting rooms and keep existing boundary exits, while floor-clear XP and safe manual recall use ten-room canonical floor boundaries. Add tests for inherited updates, overrides, explicit Unlimited, old saves, active runs, adjacent timeout races, and role-specific progress.
+
+---
+
 # New design option: Insufficient Skill Threshold — November 6, 2026 (not implemented)
 
 Add a configurable **Insufficient Skill Threshold** to dungeon settings, proposed as inherited global default with per-dungeon override. Initial candidate threshold **1%**, 0%=disabled. The ratio must compare estimated effective work rate (after actual Skill/Attribute/0.01 baseline fallback, weighted check contributions, Catchup→Flat→Percent gear and any tick-speed effect) against a **room-authored reference work rate**, rather than a member's own personal Potential. A 90% Power/10% Finesse room should be severely slow for Clyde but still attemptable unless projected efficiency is truly below threshold.

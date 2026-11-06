@@ -9,7 +9,7 @@ test('plot unlocks produce one readable Story event each, including automatic mi
  for(const action of ['remember_history','meet_friends','found_guild'] as const)game=completeStoryAction(game,action);
  assert.ok(game.reports.some(report=>report.reason==='Unlock'&&report.detail==='Arya and Clyde'));
  const unchanged=completeStoryAction(game,'found_guild');assert.equal(unchanged,game);
- game=advance(startDay(game),150);
+ game=startDay(game);for(let seconds=0;seconds<400&&!game.progression.completed.first_return;seconds++)game=advance(game,1);assert.ok(game.progression.completed.first_return);
  for(const entry of plotEntries(game.progression))assert.ok(game.reports.some(r=>r.section==='Story'&&r.reason==='Unlock'&&r.day===entry.day&&r.time===entry.time));
  const before=game.reports.filter(r=>r.reason==='Unlock').length;
  game=completeStoryAction(game,'open_recruitment');

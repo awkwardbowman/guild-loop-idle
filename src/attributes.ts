@@ -6,6 +6,7 @@ export const zeroPools=():Pools=>Object.fromEntries(STATS.map(stat=>[stat,0])) a
 export const STAT_INFO:Record<Stat,{name:string;consumable:boolean}>={
  strength:{name:'Strength',consumable:true},dexterity:{name:'Dexterity',consumable:true},constitution:{name:'Constitution',consumable:true},speed:{name:'Speed',consumable:true},perception:{name:'Perception',consumable:true},intelligence:{name:'Intelligence',consumable:true},charisma:{name:'Charisma',consumable:true},soul:{name:'Soul',consumable:true},luck:{name:'Luck',consumable:false}
 };
+export const STAT_SHORT:Record<Stat,string>={strength:'STR',dexterity:'DEX',constitution:'CON',speed:'SPD',perception:'PER',intelligence:'INT',charisma:'CHA',soul:'SOU',luck:'LCK'};
 export const ACTIVITY_GROUPS=[
  {id:'combat',name:'Combat'}, {id:'dungeoneering',name:'Dungeoneering'}, {id:'exploration',name:'Exploration'},
  {id:'crafting',name:'Crafting'}, {id:'social',name:'Social'}, {id:'trade',name:'Trade'},

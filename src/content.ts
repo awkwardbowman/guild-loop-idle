@@ -4,20 +4,20 @@ import type {Pools} from './attributes.ts';
 export {STATS,STAT_INFO,zeroPools} from './attributes.ts';
 export type {Stat,Pools} from './attributes.ts';
 export type Task = { name: string; duration: number; cost: Pools; training: Pools };
-export type Dungeon = { id: string; locationId: LocationId; name: string; subtitle: string; description: string; gear: number; chips: number; accent: string; tasks: Task[]; loot: { id: string; name: string; weight: number }[] };
+export type Dungeon = { id: string; locationId: LocationId; name: string; subtitle: string; maxConcurrent: number; description: string; gear: number; chips: number; accent: string; tasks: Task[]; loot: { id: string; name: string; weight: number }[] };
 const p = (strength:number,dexterity:number,intelligence:number):Pools=>({...zeroPools(),strength,dexterity,intelligence});
 export const DUNGEONS: Dungeon[] = [
- { id: 'wood', locationId: 'catacombs', name: 'Ritual Catacombs', subtitle: 'NEAR EMBERVEIL', description: 'Beneath a forgotten shrine, faded ritual marks and broken stones recall an age a thousand years gone. Small creatures now shelter in its quiet passages.', gear: 2, chips: 8, accent: 'green', tasks: [
+ { id: 'wood', locationId: 'catacombs', name: 'Ritual Catacombs', subtitle: 'NEAR EMBERVEIL', maxConcurrent: 1, description: 'Beneath a forgotten shrine, faded ritual marks and broken stones recall an age a thousand years gone. Mostly empty, its quiet passages shelter small creatures, broken masonry, and old plants.', gear: 2, chips: 8, accent: 'green', tasks: [
   { name: 'Shift the fallen masonry', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
   { name: 'Cross the broken crypt', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
   { name: 'Track the crypt scavenger', duration: 4, cost: p(2,2,3), training: p(1,1,2) }
  ], loot: [{ id: 'timber', name: 'Heartwood', weight: 7 }, { id: 'herb', name: 'Silverleaf', weight: 3 }] },
- { id: 'ruins', locationId: 'old_quarter', name: 'Whispering Archive', subtitle: 'THE OLD QUARTER', description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
+ { id: 'ruins', locationId: 'old_quarter', name: 'Whispering Archive', subtitle: 'THE OLD QUARTER', maxConcurrent: 1, description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
   { name: 'Decipher the outer seal', duration: 4, cost: p(1,1,5), training: p(.5,.5,3) },
   { name: 'Navigate the shifting shelves', duration: 4, cost: p(1,4,3), training: p(.5,2,2) },
   { name: 'Unbind the keeper', duration: 5, cost: p(3,2,6), training: p(1,1,4) }
  ], loot: [{ id: 'ink', name: 'Living ink', weight: 7 }, { id: 'relic', name: 'Ward fragment', weight: 3 }] },
- { id: 'quarry', locationId: 'ridge', name: 'Emberstone Delve', subtitle: 'BENEATH THE RIDGE', description: 'Heavy stone, narrow ledges, and a guardian that will test an unseasoned recruit.', gear: 4, chips: 22, accent: 'amber', tasks: [
+ { id: 'quarry', locationId: 'ridge', name: 'Emberstone Delve', subtitle: 'BENEATH THE RIDGE', maxConcurrent: 1, description: 'Heavy stone, narrow ledges, and a guardian that will test an unseasoned recruit.', gear: 4, chips: 22, accent: 'amber', tasks: [
   { name: 'Break through the shale', duration: 5, cost: p(7,2,1), training: p(4,1,.5) },
   { name: 'Traverse the furnace ledge', duration: 5, cost: p(4,6,2), training: p(3,3,1) },
   { name: 'Face the stone guardian', duration: 6, cost: p(9,3,4), training: p(5,1,2) }

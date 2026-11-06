@@ -1,3 +1,4 @@
+import {isRarity} from './rarity.ts';
 import {RESOURCES,initialStorage,cargoSize} from './resources.ts';
 import {EQUIPMENT,carryingLimit} from './equipment.ts';
 import {roomById,roomDungeon} from './rooms.ts';
@@ -85,6 +86,8 @@ export function validateGame(input: unknown): Game {
  requireValue(g.members.every(member=>member.equipped.length<=g.equipment.capacity&&member.equipped.every(id=>g.equipment.unlocked.includes(id))), 'equipped items');
  requireValue(object(g.stats)&&integer(g.stats.clears)&&integer(g.stats.retreats)&&integer(g.stats.warps), 'lifetime totals');
  requireValue(Array.isArray(g.reports)&&g.reports.length<=100&&g.reports.every(r=>object(r)&&(r.section===undefined||isSection(r.section))&&integer(r.day,1,g.day)&&integer(r.time,0,DAY_SECONDS-1)&&text(r.member,60)&&text(r.reason)&&text(r.detail,500)&&pools(r.growth)), 'reports');
+ for(const report of g.reports){requireValue(report.rarity===undefined||isRarity(report.rarity),'report rarity');requireValue(report.drops===undefined||(object(report.drops)&&Object.entries(report.drops).every(([id,amount])=>RESOURCES.some(resource=>resource.id===id)&&integer(amount,0,1e9))),'report drops');}
+ for(const run of g.active)requireValue(run.roomLoot===undefined||(object(run.roomLoot)&&Object.entries(run.roomLoot).every(([id,amount])=>RESOURCES.some(resource=>resource.id===id)&&integer(amount,0,1e9))),'room loot');
  return structuredClone(g);
 }
 export function exportSave(g: Game): string { return JSON.stringify({ format: 'guild-loops', version: VERSION, game: validateGame(g) }, null, 2); }

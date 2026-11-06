@@ -1,3 +1,4 @@
+import {isRarity} from './rarity.ts';
 import type {Pools} from './attributes.ts';
 import {zeroPools,STATS,SPECIALIZATIONS} from './attributes.ts';
 import type {CheckActor} from './skill-system.ts';
@@ -8,20 +9,20 @@ import {equipmentBonus} from './equipment.ts';
 export const ROOM_GROUPS=['neutral','combat','trap','puzzle','boss','treasure'] as const;
 export type RoomGroup=typeof ROOM_GROUPS[number];
 export type RoomCheck={id:string;name:string;skill:string;requiredLevel:number;attributes:{attribute:string;weight:number}[];work:number;cost:Partial<Pools>;loot:LootEntry[];harvest?:boolean};
-export type DungeonRoom={id:string;name:string;group:RoomGroup;weight:number;mandatory:boolean;checks:RoomCheck[]};
+export type DungeonRoom={id:string;name:string;group:RoomGroup;rarity:number;weight:number;mandatory:boolean;checks:RoomCheck[]};
 export type RoomDungeon={dungeonId:string;groups:Record<RoomGroup,number>;rooms:DungeonRoom[]};
 export type GeneratedRoom={id:string;index:number;work:number;attempts:number};
 const makeCheck=(id:string,name:string,skill:string,attributes:[string,number][],cost:Partial<Pools>,loot:LootEntry[],requiredLevel=0):RoomCheck=>({id,name,skill,requiredLevel,attributes:attributes.map(([attribute,weight])=>({attribute,weight})),work:4,cost,loot});
 const salvage=[{id:'leather',weight:5},{id:'hide',weight:1},{id:'ore',weight:.3},{id:'herb',weight:.12}];
 const catacombs:DungeonRoom[]=[
- {id:'crypt_passage',name:'Dusty passage',group:'neutral',weight:5,mandatory:true,checks:[makeCheck('pick_way','Pick a way through','athletics',[['agility',.5],['observation',.5]],{dexterity:.006},[{id:'leather',weight:2}])]},
- {id:'crypt_nest',name:'Abandoned nesting alcove',group:'neutral',weight:2,mandatory:false,checks:[makeCheck('search_nest','Search old nesting material','scavenging',[['observation',.5],['discovery',.5]],{perception:.008},salvage)]},
- {id:'crypt_scavenger',name:'A territorial scavenger',group:'combat',weight:5,mandatory:true,checks:[makeCheck('drive_off','Drive it away','combat',[['power',.4],['precision',.4],['toughness',.2]],{strength:.012,dexterity:.006},salvage)]},
- {id:'crypt_snare',name:'A rusted tripwire',group:'trap',weight:5,mandatory:true,checks:[makeCheck('step_past','Get past the snare','lock_picking',[['finesse',.6],['agility',.4]],{dexterity:.01,intelligence:.003},[{id:'leather',weight:3},{id:'ore',weight:.8}])]},
- {id:'crypt_runes',name:'Faded ritual markings',group:'puzzle',weight:5,mandatory:false,checks:[makeCheck('read_marks','Read the old markings','crypt_lore',[['planning',.6],['observation',.4]],{intelligence:.01},salvage,1)]},
- {id:'crypt_guardian',name:'An oversized crypt beetle',group:'boss',weight:5,mandatory:true,checks:[makeCheck('beetle','Turn back the beetle','combat',[['power',.5],['toughness',.5]],{strength:.02,constitution:.004},[{id:'hide',weight:4},{id:'leather',weight:4},{id:'ore',weight:1}])]},
- {id:'crypt_cache',name:'Forgotten supply cache',group:'treasure',weight:5,mandatory:false,checks:[makeCheck('open_cache','Recover the cache','scavenging',[['finesse',.35],['observation',.4],['discovery',.25]],{dexterity:.004,perception:.006},salvage)]},
- {id:'crypt_garden',name:'A damp herb-lined alcove',group:'treasure',weight:2,mandatory:false,checks:[{...makeCheck('harvest_herbs','Harvest the delicate herbs','harvesting',[['handiwork',.3],['observation',.5],['attunement',.2]],{dexterity:.004,perception:.008},[{id:'herb',weight:5},{id:'leather',weight:1}],1),harvest:true}]}
+ {id:'crypt_passage',name:'Dusty passage',group:'neutral',rarity:0,weight:5,mandatory:true,checks:[makeCheck('pick_way','Pick a way through','athletics',[['agility',.5],['observation',.5]],{dexterity:.006},[{id:'leather',weight:2}])]},
+ {id:'crypt_nest',name:'Abandoned nesting alcove',group:'neutral',rarity:0,weight:2,mandatory:false,checks:[makeCheck('search_nest','Search old nesting material','scavenging',[['observation',.5],['discovery',.5]],{perception:.008},salvage)]},
+ {id:'crypt_scavenger',name:'A territorial scavenger',group:'combat',rarity:0,weight:5,mandatory:true,checks:[makeCheck('drive_off','Drive it away','combat',[['power',.4],['precision',.4],['toughness',.2]],{strength:.012,dexterity:.006},salvage)]},
+ {id:'crypt_snare',name:'A rusted tripwire',group:'trap',rarity:0,weight:5,mandatory:true,checks:[makeCheck('step_past','Get past the snare','lock_picking',[['finesse',.6],['agility',.4]],{dexterity:.01,intelligence:.003},[{id:'leather',weight:3},{id:'ore',weight:.8}])]},
+ {id:'crypt_runes',name:'Faded ritual markings',group:'puzzle',rarity:0,weight:5,mandatory:false,checks:[makeCheck('read_marks','Read the old markings','crypt_lore',[['planning',.6],['observation',.4]],{intelligence:.01},salvage,1)]},
+ {id:'crypt_guardian',name:'An oversized crypt beetle',group:'boss',rarity:0,weight:5,mandatory:true,checks:[makeCheck('beetle','Turn back the beetle','combat',[['power',.5],['toughness',.5]],{strength:.02,constitution:.004},[{id:'hide',weight:4},{id:'leather',weight:4},{id:'ore',weight:1}])]},
+ {id:'crypt_cache',name:'Forgotten supply cache',group:'treasure',rarity:0,weight:5,mandatory:false,checks:[makeCheck('open_cache','Recover the cache','scavenging',[['finesse',.35],['observation',.4],['discovery',.25]],{dexterity:.004,perception:.006},salvage)]},
+ {id:'crypt_garden',name:'A damp herb-lined alcove',group:'treasure',rarity:0,weight:2,mandatory:false,checks:[{...makeCheck('harvest_herbs','Harvest the delicate herbs','harvesting',[['handiwork',.3],['observation',.5],['attunement',.2]],{dexterity:.004,perception:.008},[{id:'herb',weight:5},{id:'leather',weight:1}],1),harvest:true}]}
 ];
 export const ROOM_DUNGEONS:RoomDungeon[]=[
  {dungeonId:'wood',groups:{neutral:5,combat:5,trap:2,puzzle:1,boss:.25,treasure:2},rooms:catacombs},
@@ -71,7 +72,7 @@ export function validateRoomDungeon(dungeon:RoomDungeon){
  if(!dungeon.dungeonId||ROOM_GROUPS.some(group=>!positive(dungeon.groups[group]))||new Set(dungeon.rooms.map(room=>room.id)).size!==dungeon.rooms.length)throw Error('Invalid room group weights');
  for(const group of ROOM_GROUPS)if(!dungeon.rooms.some(room=>room.group===group))throw Error('Empty room group');
  for(const room of dungeon.rooms){
-  if(!positive(room.weight)||!room.checks.length)throw Error('Invalid room weight or checks');
+  if(!positive(room.weight)||!room.checks.length||!isRarity(room.rarity))throw Error('Invalid room weight or checks');
   for(const check of room.checks){
    if(!SKILLS.some(skill=>skill.id===check.skill)||!Number.isInteger(check.requiredLevel)||check.requiredLevel<0||!positive(check.work)||Math.abs(check.attributes.reduce((sum,attribute)=>sum+attribute.weight,0)-1)>1e-9||check.attributes.some(attribute=>!SPECIALIZATIONS.some(known=>known.id===attribute.attribute)||!positive(attribute.weight))||Object.entries(check.cost).some(([stat,cost])=>!STATS.includes(stat as keyof Pools)||!Number.isFinite(cost)||cost<0))throw Error('Invalid room check');
   }

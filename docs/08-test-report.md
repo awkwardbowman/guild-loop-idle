@@ -1,3 +1,25 @@
+# Calendar, attribute matrix, rarity and dungeon-event validation
+
+November 5, 2026. **115 tests pass, 0 fail**; TypeScript/Vite build passes. Added checks for queue delta events without reorder/cap-edit spam, allowed-only Dungeon logs, boss/treasure actual drops, one failure per exhausted outing, no manual-recall failure, old verbose-history hiding, saved structured drops/room state, malformed drop/rarity rejection, complete activity/stat visual mappings and the exact nine-color rarity palette. Existing deterministic production/drop simulations pass with resource depth bias separated from display rarity. The legacy archive test now asserts absence of Skill check chatter.
+
+Desktop browser verified: compact location/guild/day/date/timer; positive recruit and idle attention indicators in the sidebar and Members navigation; failed log uses the same healing symbol; Guild Master has no Story tab; all 27 attributes appear in one table and sorting switches between attribute and skill; potential is ???; unrecruited candidate has ??? across all nine root values; Common loot displays in light gray; boss/treasure logs include drops; old verbose dungeon logs stay hidden. Mobile viewport acceptance is unverified.
+
+# Dungeon capacity and automatic-time validation
+
+November 5, 2026. **111 tests passed, 0 failed**; TypeScript/Vite production build passes. New regressions verify outbound reservations, no over-cap exploration across 800 simulated seconds, both friends receiving turns, slot release at homeward departure, authored capacity >1 alongside guild limits, automatic startup of planning saves, deterministic save reload and accurate activity partitions. Story/event tests now use single-occupant timing and updated character-tab destinations.
+
+Desktop browser verified: one Ritual Catacombs sidebar card with three symbols and 1/1 slot · ~4m; live expedition/idle counts and zero trading/crafting member counts; clock advances with no Pause/Resume/speed controls; Plot rows show compact top-right destination buttons without location boilerplate; Current Goals has a top-right shortcut. Mobile viewport acceptance and closed-page offline simulation are not claimed.
+
+# Character header/tab refinement
+
+November 5, 2026. Production build and **106 tests pass**. Desktop browser verified Guild Master header shows nine maximum values and no innate-magic badge; Story, Attributes, Skills and Lore are separate tabs. Attributes/Skills tab selection works; Members shows nine maximums, visible Tier tag, and Story/Attributes/Skills/Assignments/Equipment/Lore with Assignments selected initially. Lore remains last. Same save and gameplay rules. Mobile viewport acceptance remains unverified.
+
+# Compact interface validation
+
+November 5, 2026. **106 tests passed, 0 failed**; production TypeScript/Vite build passes. Manual calculation checks confirm that each live dungeon emphasis sums to 100% and all nine symbols/colors are unique. Ritual Catacombs’ leading roots are Dexterity, Perception and Speed.
+
+Desktop browser verified: Story actions remain usable while lore is collapsed; founding opens the correct tabs; the dungeon starts collapsed with only title, three symbols, possible finds, room limit and queue button; queueing works while closed and open; expanded cards show lore, Travel Time: 15s, full root emphasis and collapsed skill opportunities with level eligibility. Members show collapsed icon/value stat summaries, loadouts, learned skills and specialized attributes; Info has the nine-symbol legend and mechanics sections. No group/room weights, floor equivalence or outbound/home countdown is presented on routine activity pages. Actual mobile viewport acceptance remains unverified. Simulation/save schema unchanged.
+
 # Emberveil opening validation — v6
 
 November 5, 2026. **106 tests passed, 0 failed**. Production TypeScript/Vite build and diff checks pass. Older counts below are historical.

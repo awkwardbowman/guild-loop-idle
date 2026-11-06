@@ -6,8 +6,17 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "check": "tsc -b"
+    "test": "node scripts/test-policy.mjs smoke",
+    "check": "tsc -b",
+    "test:smoke": "node scripts/test-policy.mjs smoke",
+    "test:targeted": "node scripts/test-policy.mjs targeted",
+    "test:select": "node scripts/test-policy.mjs select",
+    "test:changed": "node scripts/test-policy.mjs changed",
+    "test:content": "node scripts/test-policy.mjs content",
+    "test:full": "node scripts/test-policy.mjs full",
+    "test:release": "node scripts/test-policy.mjs release",
+    "test:version": "node scripts/test-policy.mjs version",
+    "test:catalog": "node scripts/test-policy.mjs catalog"
   },
   "dependencies": {
     "react": "^19.1.1",

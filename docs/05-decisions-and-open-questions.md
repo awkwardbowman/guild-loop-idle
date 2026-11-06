@@ -1,3 +1,18 @@
+# Confirmed dungeon and character progression corrections — November 6, 2026 (planned, not live)
+
+1. **Constitution is the only consumable Attribute**, and Soul/Luck are explicitly non-consumable. All other Attributes affect effectiveness without resource drainage; the previous multi-pool parent-cost model is superseded.
+2. **Con-1** dungeon eligibility = owning **any** Constitution Skill (Toughness, Endurance, Vitality), not a Combat requirement nor merely having an unselected Constitution baseline. All three owned Con Skills may contribute to shared endurance capacity (proposed sum).
+3. **Each room drains Constitution at a flat per-second rate**, scaling with floor depth but independent of its progress/check weights. Speedier completion conserves endurance; do not make it an invariant one-off fee per completed room.
+4. **Progress may always be attempted** on general dungeon checks. Preferred Skill Value → selected Attribute fallback → tiny unselected Attribute baseline **0.01**, with authored weights unchanged. Missing pairings remain visually blank in the 5×5 display; baseline never unlocks a Skill.
+5. **No automatic safe flight when exhausted.** Each room defines the appropriate failure outcome. Consequences and optional voluntary exit/recall rules require a separate design decision.
+6. Specialized actions may require an authored **Composite Skill**. Charisma/Intelligence/Perception gate Recruitment/Research/Scavenging assignments at the character action level; Constitution's Con-1 gates dungeons.
+7. Attribute or Discipline **rollups**: sum the character's authored/owned Skill Values in the related axis. The 5×5 display must show all five row totals, five column totals, and a grand total counting each owned Skill once. Dungeoneering group checks may use Force+Finesse+Agility. Speed-derived Agility/Scouting/Movement may later affect dungeon tick pace, area discovery and travel time.
+8. Planned check gear: percent multiplier, flat value boost, and **Catchup N** (`max(V,(V+N)/2)` as no-downside definition). Gear never gives an absent Skill, Composite Skill, selected affinity or Con-1 eligibility.
+
+**Unresolved:** floor-rate numerical scaling; whether hidden or not-yet-trained selected Constitution Skills provide any starting endurance; exact slow-check fallbacks; which room failure outcomes and recovery/loot/death effects are authored; manual recall/depth caps; Speed tick rounding; gear stacking order; 5/5 fixed starting rosters; save migration and test coverage. Existing v8 game code has NOT been changed. Earlier dated paragraphs below are historical and overridden where they disagree.
+
+---
+
 # November 6 design discussion — dungeon fallback and character action gates
 
 **New direction under discussion (not implemented):** Arya needs Power, Clyde must have Constitution and Crafting and can stay a non-Combat scavenger, Guild Master lacks Constitution and has Crafting. Dungeon entry is Constitution-only, *not* Power, Combat Discipline or Combat Composite. Per weighted check: use the defined Skill where trained; if absent, use the selected Attribute fallback; if the Attribute is unselected, its share contributes zero with no weight renormalization. Need to reconcile baseline-1 display with zero effective participation for unselected roots.

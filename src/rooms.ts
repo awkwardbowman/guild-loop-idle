@@ -25,10 +25,31 @@ const catacombs:DungeonRoom[]=[
  {id:'crypt_cache',name:'Forgotten supply cache',group:'treasure',failure:'return',referenceRate:10,rarity:0,weight:5,mandatory:false,checks:[makeCheck('open_cache','Recover the cache','scavenging',[['finesse',.35],['observation',.4],['discovery',.25]],salvage)]},
  {id:'crypt_garden',name:'A damp herb-lined alcove',group:'treasure',failure:'return',referenceRate:10,rarity:0,weight:2,mandatory:false,checks:[{...makeCheck('harvest_herbs','Harvest the delicate herbs','herbology',[['handiwork',.4],['observation',.6]],[{id:'herb',weight:5},{id:'leather',weight:1}],1),harvest:true}]}
 ];
+// Room names are authored by location; IDs, checks, loot and weights still use the shared early-room templates.
+const archiveRoomNames:Record<string,string>={
+ crypt_passage:'Dust-choked reading hall',
+ crypt_nest:'Nest of torn folios',
+ crypt_scavenger:'Ink-stained scavenger',
+ crypt_snare:'Snapped shelf tripwire',
+ crypt_runes:'Faded catalog wards',
+ crypt_guardian:'The librarian’s beetle',
+ crypt_cache:'Discarded provision locker',
+ crypt_garden:'Overgrown conservatory nook'
+};
+const delveRoomNames:Record<string,string>={
+ crypt_passage:'Shale-choked tunnel',
+ crypt_nest:'Abandoned miner’s nook',
+ crypt_scavenger:'Territorial ridge scavenger',
+ crypt_snare:'Loose scree tripline',
+ crypt_runes:'Weathered survey glyphs',
+ crypt_guardian:'Furnace-backed beetle',
+ crypt_cache:'Forgotten mining supplies',
+ crypt_garden:'Mineral spring herbs'
+};
 export const ROOM_DUNGEONS:RoomDungeon[]=[
  {dungeonId:'wood',groups:{neutral:5,combat:5,trap:2,puzzle:1,boss:.25,treasure:2},rooms:catacombs},
- {dungeonId:'ruins',groups:{neutral:3,combat:1,trap:5,puzzle:5,boss:.5,treasure:2},rooms:catacombs.map(room=>({...room,id:'archive_'+room.id,name:'Archive: '+room.name,checks:room.checks.map(check=>({...check,id:'archive_'+check.id,work:check.work*1.5,loot:check.loot.map(entry=>entry.id==='leather'?{id:'ink',weight:entry.weight}:entry.id==='hide'?{id:'relic',weight:entry.weight}:entry)}))}))},
- {dungeonId:'quarry',groups:{neutral:3,combat:5,trap:2,puzzle:1,boss:1,treasure:2},rooms:catacombs.map(room=>({...room,id:'delve_'+room.id,name:'Delve: '+room.name,checks:room.checks.map(check=>({...check,id:'delve_'+check.id,work:check.work*2,loot:check.loot.map(entry=>entry.id==='leather'?{id:'ore',weight:entry.weight}:entry.id==='hide'?{id:'crystal',weight:entry.weight}:entry)}))}))}
+ {dungeonId:'ruins',groups:{neutral:3,combat:1,trap:5,puzzle:5,boss:.5,treasure:2},rooms:catacombs.map(room=>({...room,id:'archive_'+room.id,name:archiveRoomNames[room.id]??room.name,checks:room.checks.map(check=>({...check,id:'archive_'+check.id,work:check.work*1.5,loot:check.loot.map(entry=>entry.id==='leather'?{id:'ink',weight:entry.weight}:entry.id==='hide'?{id:'relic',weight:entry.weight}:entry)}))}))},
+ {dungeonId:'quarry',groups:{neutral:3,combat:5,trap:2,puzzle:1,boss:1,treasure:2},rooms:catacombs.map(room=>({...room,id:'delve_'+room.id,name:delveRoomNames[room.id]??room.name,checks:room.checks.map(check=>({...check,id:'delve_'+check.id,work:check.work*2,loot:check.loot.map(entry=>entry.id==='leather'?{id:'ore',weight:entry.weight}:entry.id==='hide'?{id:'crystal',weight:entry.weight}:entry)}))}))}
 ];
 export const roomDungeon=(id:string)=>ROOM_DUNGEONS.find(dungeon=>dungeon.dungeonId===id)!;
 export const roomById=(dungeonId:string,id:string)=>roomDungeon(dungeonId).rooms.find(room=>room.id===id)!;

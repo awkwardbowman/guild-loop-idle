@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Guild Loops test catalog. Suite defaults plus explicit P0 overrides classify every registered case. Updated for the merged Endurance/Skills gameplay PR (147 tests).",
+  "description": "Guild Loops risk-based test catalog: test suites classified by risk and subsystem; maintain IDs when new tests are added.",
   "criticalIds": [
     "AT06",
     "AT07",
@@ -282,7 +282,8 @@
         "ST04",
         "ST05",
         "ST06",
-        "OP01"
+        "OP01",
+        "ST07"
       ]
     },
     "tests/travel-trade.test.ts": {
@@ -342,6 +343,34 @@
         "SE16",
         "SE17",
         "SE18"
+      ]
+    },
+    "tests/number-display.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "attributes",
+        "checks",
+        "dungeon",
+        "ui"
+      ],
+      "ids": [
+        "NM01",
+        "NM02"
+      ]
+    },
+    "tests/quick-ui-contract.test.ts": {
+      "priority": "P3",
+      "groups": [
+        "ui",
+        "content",
+        "guild",
+        "progression"
+      ],
+      "ids": [
+        "QS01",
+        "QS02",
+        "QS03",
+        "QS04"
       ]
     }
   },
@@ -682,6 +711,19 @@
     ],
     "SE18": [
       "save"
+    ],
+    "ST07": [
+      "ui"
+    ],
+    "NM02": [
+      "ui"
+    ],
+    "QS02": [
+      "progression"
+    ],
+    "QS03": [
+      "content",
+      "guild"
     ]
   }
 }

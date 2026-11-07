@@ -1,3 +1,45 @@
+# Approved main-campaign and dungeon discovery direction — November 6, 2026
+
+**STATUS: Future gameplay redesign, not implemented in the current v9 dungeon engine.** This section supersedes conflicting older floor, endpoint, and discovery assumptions below. See [05](05-decisions-and-open-questions.md) for decision log and unresolved thresholds.
+
+## World structure and endpoint
+
+- Dungeons outside the main story are typically **endless**; do not require a dungeon-ending event for progression or learning.
+- The opening **Catacombs of the Wound and Wish** beneath Emberveil are the **main campaign** and have exactly **100 authored floors**. Clearing floor 100, including its final boss/checkpoint requirement, is required to finish the game; exploring other cities is optional but should be practically useful to grow strong enough for the later floors.
+- Every dungeon has **boss checkpoints at floor endings**. Main-story boss sequence is more controlled, with authored gates/revelations and stronger difficulty escalation. Bosses are not simply random low-level encounters. Other dungeons can use more general checkpoints.
+- **Ten counted standard rooms form one floor**. Treasure rooms are optional **bonus rooms**, do not advance the ten-room floor counter, and may never appear consecutively. A mandatory boss-type encounter occurs at the floor end; whether it consumes the tenth counted slot or is a capstone after the ten standard slots remains an explicit design choice for implementation. The player-facing 1/10 discovery denominator describes the ten authored counted rooms and never includes bonus treasure rooms.
+- Floor identity, room identity and successful clears must be stored independently. Current v9's `run.floor` is actually a room counter; do not patch the labels alone without redesigning progression and save state.
+
+## Proposed floor-based exponential difficulty, with parameters intentionally undecided
+
+- Strong scaling is intended, with a **step up at every ten counted rooms**, plus possible within-floor adjustment. A candidate shape (not yet adopted, not numerically balanced) is `difficulty(room) = withinFloor(room) * q ^ floor((room-1)/10)`, where `q > 1` is a later tuning value. Each next floor moves up a level, and deeper floors may require stronger recruits/gear and outside exploration.
+- Do not deploy guessed `q` values or reinterpret the rough user sketch as an exact formula. Evaluate first-floor accessibility, higher-floor boss breakpoints, expected full-run length, stamina limits, gear and reward growth, and out-of-city value during balance playtests.
+
+## Discovery-based stat previews, per-dungeon and per-floor
+
+- Players learn what a dungeon demands by **successfully clearing encounters**, not by seeing the full authored distribution at unlock. Visiting/failing/skipping a room does not fill in its stat breakdown.
+- A floor with 10 authored counted room identities begins at **0/10 known** and **100% Unknown**. Successfully clearing one previously unlearned counted room reveals **1/10 known** (10% of counted room coverage); other nine remain Unknown. Re-clearing the same room identity does not increase the count. The known room's own attribute mix is weighted into the 10% known slice. Example: one room 60% Strength/40% Dexterity gives 6% Strength, 4% Dexterity, 90% Unknown in the floor's counted-room preview.
+- Each expanded dungeon presents **per-floor panels**, displaying discovered/total counted rooms, discovered stat mix and the explicit Unknown share. The dungeon-level overview aggregates across explored floors; do not expose future-floor content or requirements just because their definitions exist in source.
+- Show **three independently filterable distributions** for each floor: **Normal rooms**, **Treasure rooms**, **Boss rooms**. Each category displays its own known/unknown coverage and stat mix; the selected filter must not accidentally include treasure/boss stats in the normal-only view. The aggregate should default to standard counted rooms unless the player chooses other categories. A boss can be a known locked checkpoint without revealing its undiscovered actual skill/stat requirements.
+- **Open implementation issue:** For procedurally weighted rooms with repeats, define a stable authored identity/slot catalog per floor so “one of ten known” is truthful and does not count identical templates multiple times. If some floors have fewer or more authored encounter types than ten, separately define **cleared slots** versus **known unique types**; never conflate them. Different categories require meaningful denominators even if optional treasure appearances are indefinite.
+- Avoid spoilers through global skill catalog, tooltips, possible finds, filters, log records and character UI. Secret dungeon-specific Skill **names** should unlock only after a meaningful authored checkpoint; old “complete the entire dungeon first” is incompatible with endless dungeons and would withhold everything until floor 100 in the main dungeon. Precise reveal checkpoint (first boss defeat, discovery per check, etc.) remains to be decided. Do not implement misleading unrestricted names meanwhile.
+
+## Soul and who may enter
+
+- **Constitution-based dungeon entry remains universal** for all adventurers, irrespective of Clyde's lore role or Soul. Soul enables *special discovery and identification*, not general entry eligibility.
+- **The guildmaster alone starts with true Soul**, but cannot adventure. Later fixed, story-introduced **Threadless Leeches** are the only recruitable adventurers with functional Soul. They are **unique, predetermined characters**, not random recruitment variants.
+- **Every randomly generated adventurer has an inert Soul baseline of exactly 1** (not a randomized affinity, chosen Soul discipline, or effective Soul resource), and random recruits must never gain true Soul capability by accident. Future Soul-bearing scripted allies need an explicit character class/flag separate from the number, and fixed identity and unlock requirements; don't infer `canUseSoul` by testing `soul > 0`.
+- Later loot is initially **Common generic material/artifacts** for non-Soul explorers; special Soul-capable explorers may find or recognize specific materials directly. Generic artifacts can be processed, sometimes imperfectly; source/rarity/quality, processing odds and ownership rules remain for later. Avoid Inkwell Reach associations.
+- The proposed Weave-associated small hidden location replacing the current Quarry/Delve remains **future content**, not an immediately accessible dungeon: it is discoverable only by someone with functional Soul who can actually adventure. During closed beta, deliberately reset/wipe old test saves rather than preserving every obsolete Delve route; no legacy migration obligation.
+
+## Narrative
+
+- **Arya and Clyde predate Threadless**; their deeper history is a later reveal, not a reason to restrict their current dungeon entry.
+- **Gavin Wess** succeeds the historic Wess-associated Loomlight Hearth in Emberveil; the campaign's old innkeeper was **Marven Wess**, not Gavin. The exact genealogy is not yet told.
+- The Forgotten Highwoven Annex is a lore-rich destination intended to feature Clyde later, without locking out other qualified members.
+- Rooms may gain authored snippets later; leave existing room encounter math untouched until the floor redesign is built.
+
+---
 # Current PR #7 implementation — room work, endurance and return rules (November 6, 2026)
 
 The full scope is implemented for generated room outings in save v9, with Maya authorizing provisional details. Historical task/check outings retain their saved work/pool rules; all assignments now use shared dungeon limits. See [11](11-progression-and-check-foundations.md) for exact formulas and migration.

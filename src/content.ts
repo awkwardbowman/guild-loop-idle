@@ -7,12 +7,12 @@ export type Task = { name: string; duration: number; cost: Pools; training: Pool
 export type Dungeon = { id: string; locationId: LocationId; name: string; subtitle: string; maxConcurrent: number; description: string; gear: number; chips: number; accent: string; tasks: Task[]; loot: { id: string; name: string; weight: number }[] };
 const p = (strength:number,dexterity:number,intelligence:number):Pools=>({...zeroPools(),strength,dexterity,intelligence});
 export const DUNGEONS: Dungeon[] = [
- { id: 'wood', locationId: 'catacombs', name: 'Ritual Catacombs', subtitle: 'NEAR EMBERVEIL', maxConcurrent: 1, description: 'Beneath a forgotten shrine, faded ritual marks and broken stones recall an age a thousand years gone. Mostly empty, its quiet passages shelter small creatures, broken masonry, and old plants.', gear: 2, chips: 8, accent: 'green', tasks: [
+ { id: 'wood', locationId: 'catacombs', name: 'Catacombs of the Wound and Wish', subtitle: 'NEAR EMBERVEIL', maxConcurrent: 1, description: 'Beneath Emberveil's ancient Wound and Wish shrine, broken wards and weathered steps lead into catacombs that have outlasted a thousand years of history. The first passages shelter small creatures, abandoned keepsakes and forgotten gardens; the greater depths remain unknown.', gear: 2, chips: 8, accent: 'green', tasks: [
   { name: 'Shift the fallen masonry', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
   { name: 'Cross the broken crypt', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
   { name: 'Track the crypt scavenger', duration: 4, cost: p(2,2,3), training: p(1,1,2) }
  ], loot: [{ id: 'timber', name: 'Heartwood', weight: 7 }, { id: 'herb', name: 'Silverleaf', weight: 3 }] },
- { id: 'ruins', locationId: 'old_quarter', name: 'Whispering Archive', subtitle: 'THE OLD QUARTER', maxConcurrent: 1, description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
+ { id: 'ruins', locationId: 'old_quarter', name: 'Forgotten Highwoven Annex', subtitle: 'THE OLD QUARTER', maxConcurrent: 1, description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
   { name: 'Decipher the outer seal', duration: 4, cost: p(1,1,5), training: p(.5,.5,3) },
   { name: 'Navigate the shifting shelves', duration: 4, cost: p(1,4,3), training: p(.5,2,2) },
   { name: 'Unbind the keeper', duration: 5, cost: p(3,2,6), training: p(1,1,4) }

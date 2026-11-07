@@ -30,7 +30,7 @@ export const RESET_SECONDS = 12;
 export const VERSION = 9;
 export type Upgrade = 'slots' | 'quarters' | 'gear' | 'regen';
 export const UPGRADE_INFO: Record<Upgrade, { name: string; description: string; chips: number; materials: number }> = {
- slots: { name: 'Wayfarer's Dispatch Table', description: '+1 simultaneous expedition', chips: 24, materials: 2 },
+ slots: { name: "Wayfarer's Dispatch Table", description: '+1 simultaneous expedition', chips: 24, materials: 2 },
  quarters: { name: 'Guild Bunkhouse', description: '+1 member capacity', chips: 18, materials: 1 },
  gear: { name: 'Reclaimed Supply Stores', description: '+4 gear capacity', chips: 16, materials: 1 },
  regen: { name: 'Emberveil Workroom', description: '+0.1 gear regenerated / second', chips: 20, materials: 2 }

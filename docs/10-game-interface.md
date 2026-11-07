@@ -1,3 +1,9 @@
+# UI navigation and nomenclature cleanup — November 6, 2026
+
+**Implemented:** Members overview activity counts are passive textual statistics; only sidebar summary counts are clickable and navigate to Members. Top-level Info/Settings set `aria-current` on the selected tab, and Reset Guild retains the explicit confirmation. Guild empty-roster guidance now leads to Guild → Guild Hall → Recruitment. The reference rarity table no longer labels the rarity ladder as material tiers; it explicitly distinguishes Common T1–T3 materials. "Rooms traversed" reflects the existing clear counter, which includes skipped rooms. The story return objective references **Recall**, not a nonexistent "Return home" button. Regression tests in `tests/quick-ui-contract.test.ts` protect major static wiring and content IDs; browser acceptance remains separate.
+
+---
+
 # Global Settings and discovery UI direction — November 6, 2026
 
 **Implemented in the associated UI slice:** top-level **Settings** appears immediately after **Info** on the main tab strip, with global Dungeon Defaults (formerly Guild → Settings), save export/import and a danger-zone **Reset guild** action. Reset opens the existing Cancel/Confirm modal, and successful confirmation replaces the current guild with a fresh game and returns navigation to Story. Settings is visible before guild founding so broken beta saves can still be replaced; Info remains gated by opening the guild. Guild's old Settings subtab is removed to prevent competing defaults menus. New Settings navigation gets a functional regression assertion.

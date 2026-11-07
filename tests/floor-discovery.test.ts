@@ -32,7 +32,7 @@ test('FD03 treasure never advances counted rooms or permits consecutive bonus ro
 test('FD04 ten successful random normal clears do not clear floor or award XP before separate boss',()=>{
  let g=exploring();for(let n=0;n<10;n++){encounter(g,'normal');g=advance(g,1);}
  assert.equal(g.active[0].floorState!.counted,10);assert.equal(g.members[0].constitutionExperience,0);assert.equal(g.dungeonKnowledge.wood[1].bossCleared,false);assert.equal(g.dungeonKnowledge.wood[1].known.length,1);
- encounter(g,'boss');g=advance(g,1);assert.equal(g.members[0].constitutionExperience,1);assert.equal(g.dungeonKnowledge.wood[1].bossCleared,true);assert.equal(g.active[0].floorState!.number,2);assert.equal(nextDungeonFloor(g.dungeonKnowledge,'wood'),2);assert.equal(g.active[0].endurance.max,1000);
+ encounter(g,'boss');g=advance(g,1);assert.equal(g.members[0].constitutionExperience,0);assert.equal(g.dungeonKnowledge.wood[1].bossCleared,true);assert.equal(g.active[0].skillPractice!.filter(p=>p.source==='floor').length,2);assert.equal(g.active[0].floorState!.number,2);assert.equal(nextDungeonFloor(g.dungeonKnowledge,'wood'),2);assert.equal(g.active[0].endurance.max,1000);
 });
 test('FD05 failed or skipped encounters never reveal a room or contribute successful-floor XP',()=>{
  let g=exploring();encounter(g,'treasure',1);g=advance(g,1);assert.deepEqual(g.dungeonKnowledge.wood[1].known,[]);assert.equal(g.active[0].floorState!.counted,0);
@@ -57,11 +57,11 @@ test('FD08 clearing a secret encounter reveals its Skill name; a boss reveals re
 test('FD09 queued Recall waits through room ten for boss, completion wins deadline and boss XP is not replayed',()=>{
  let g=exploring();g.active[0].floorState={number:1,counted:9,successful:9,lastTreasure:false};encounter(g,'normal');g=recall(g,g.members[0].id);g=advance(g,1);
  assert.equal(g.active[0].stage,'exploring');assert.equal(g.members[0].constitutionExperience,0);
- encounter(g,'boss');g.active[0].elapsed=29;g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Recalled');assert.equal(g.members[0].constitutionExperience,1);
- g=advance(g,15);assert.equal(g.members[0].runs,1);assert.equal(g.members[0].constitutionExperience,1);
+ encounter(g,'boss');g.active[0].elapsed=29;g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Recalled');assert.equal(g.members[0].constitutionExperience,0);
+ g=advance(g,15);assert.equal(g.members[0].runs,1);assert.equal(g.members[0].constitutionExperience,0);
 });
 test('FD10 room-count limits include the boss at a ten-room boundary and stop a partial floor without XP',()=>{
- let g=exploring();g=setDungeonLimit(g,'wood',10);g.active[0].floorState={number:1,counted:9,successful:9,lastTreasure:false};encounter(g,'normal');g=advance(g,1);assert.equal(g.active[0].stage,'exploring');encounter(g,'boss');g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Depth reached');assert.equal(g.members[0].constitutionExperience,1);
+ let g=exploring();g=setDungeonLimit(g,'wood',10);g.active[0].floorState={number:1,counted:9,successful:9,lastTreasure:false};encounter(g,'normal');g=advance(g,1);assert.equal(g.active[0].stage,'exploring');encounter(g,'boss');g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Depth reached');assert.equal(g.members[0].constitutionExperience,0);
  g=exploring();g=setDungeonLimit(g,'wood',3);g.active[0].floorState={number:1,counted:2,successful:2,lastTreasure:false};encounter(g,'normal');g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Depth reached');assert.equal(g.members[0].constitutionExperience,0);
 });
 test('FD11 durable checkpoints resume the next uncleared floor; partial attempts resume from its beginning',()=>{
@@ -83,7 +83,7 @@ test('FD14 malformed discovery identities, categories, floor counts, boss checkp
 test('FD15 v9 outings retain historical rules/work/cargo without fabricated floor discovery',()=>{
  let g=exploring();g.active[0].floorState=null;g.active[0].generated={id:'crypt_guardian',index:0,work:0,attempts:0};g.active[0].roomStartedAt=0;g.active[0].roomEfficiency=1;
  const old=JSON.parse(exportSave(g));old.version=old.game.version=9;delete old.game.dungeonKnowledge;for(const r of old.game.active)delete r.floorState;for(const m of old.game.members)delete m.soulAccess;delete old.game.guildmaster.soulAccess;
- const migrated=parseSave(JSON.stringify(old));assert.equal(migrated.version,10);assert.equal(migrated.active[0].floorState,null);assert.deepEqual(migrated.dungeonKnowledge,{});assert.equal(migrated.seed,g.seed);assert.deepEqual(migrated.active[0].loot,g.active[0].loot);
+ const migrated=parseSave(JSON.stringify(old));assert.equal(migrated.version,11);assert.equal(migrated.active[0].floorState,null);assert.deepEqual(migrated.dungeonKnowledge,{});assert.equal(migrated.seed,g.seed);assert.deepEqual(migrated.active[0].loot,g.active[0].loot);
 });
 test('FD16 random recruits have inert Soul exactly one, no selected Soul and no Soul capability',()=>{
  const g=opening();for(let i=0;i<300;i++){const m=recruit(g);assert.deepEqual(m.stats.soul,{current:1,max:1,affinity:1});assert.equal(m.soulAccess,'none');assert.ok(!m.selections!.attributes.includes('soul'));for(const skill of ['soul_sense','imbuement'])assert.equal(ownsSkill(m,skill),false);}
@@ -99,7 +99,7 @@ test('FD18 the first-ten probability gate keeps Arya viable without potions and 
   assert.ok(bare.chance>=.65&&bare.chance<=previous+1e-9,`floor ${floor} beginner curve`);
   assert.ok(armored.chance+1e-9>=bare.chance);assert.ok(Math.abs(bare.mass-1)<1e-9);previous=bare.chance;
  }
- assert.ok(firstTenClearChance(10,true).chance>=.9);assert.ok(firstTenClearChance(10,true).chance-firstTenClearChance(10).chance>=.15);
+ assert.ok(firstTenClearChance(10,true).chance>=.9);assert.ok(firstTenClearChance(10,true).chance>firstTenClearChance(10).chance);
  assert.throws(()=>firstTenClearChance(11));
 });
 

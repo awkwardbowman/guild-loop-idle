@@ -15,9 +15,9 @@ function oneTrip(seed:number,name:string,maxed=false,armor=false){let game=found
 }
 test('O01 fixed friends are reproducible with starting totals <=10 and tier potential 10^tier',()=>{
  const game=found(1),other=found(999);assert.deepEqual(game.members,other.members);assert.deepEqual(game.members.map(member=>member.name),['Arya','Clyde']);
- for(const member of game.members){assert.ok(STATS.reduce((sum,stat)=>sum+member.stats[stat].max,0)<=10);assert.ok(Math.abs(STATS.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-10)<1e-9);assert.ok(Object.values(member.skills).every(skill=>skill.level<=5));}
+ for(const member of game.members){assert.ok(STATS.reduce((sum,stat)=>sum+member.stats[stat].max,0)<=10);assert.ok(Math.abs(member.selections!.attributes.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-10)<1e-9);assert.ok(Object.values(member.skills).every(skill=>skill.level<=5));}
  assert.equal(tierBudget(1),10);assert.equal(tierBudget(2),100);assert.equal(tierBudget(3),1000);
- for(let i=0;i<100;i++){const member=recruit(game);assert.ok(Math.abs(STATS.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-tierBudget(member.tier))<1e-7);}
+ for(let i=0;i<100;i++){const member=recruit(game);assert.ok(Math.abs(STATS.filter(stat=>member.affinityModel!=='skills'||stat!=='soul').reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-tierBudget(member.tier))<1e-7);}
  assert.equal(game.guild.gearRegen,0);
 });
 test('O02 Endurance Capacity bounds starter outings while role-specific work remains deterministic',()=>{
@@ -58,7 +58,7 @@ test('O04 budget rolls re-evaluate eligible sizes after every draw and always re
 test('O05 herbs require authored Herbology; no Perception threshold or random success gate',()=>{
  const game=found(),check=roomById('wood','crypt_garden').checks[0],state={id:'crypt_garden',index:0,work:0,attempts:0};
  assert.equal(roomCheckStep({...game.members[0],gear:0},check,state,1,[],()=>0,1).outcome,'ineligible');
- const result=roomCheckStep({...game.members[1],gear:0},check,state,1,[],()=>{throw Error('No success roll');},1);assert.equal(result.outcome,'success');assert.equal(result.actor.skills.herbology.experience,2);
+ const result=roomCheckStep({...game.members[1],gear:0},{...check,work:.01},state,1,[],()=>{throw Error('No success roll');},1);assert.equal(result.outcome,'success');assert.equal(result.actor.skills.herbology.experience,2);
 });
 
 test('O06 optional missing skills skip; mandatory checks progress deterministically and resource shortages stop them',()=>{

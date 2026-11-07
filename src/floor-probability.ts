@@ -1,4 +1,5 @@
 /** Analytic floor-clear odds. No clock advancement, RNG sampling or player-save access. */
+import {atAffinity} from './unit-potential.ts';
 import {initialGame,startingFriend} from './engine.ts';
 import {floorCatalog,roomDungeon,checkProgressRate,roomEfficiency,floorDifficulty,enduranceMaximum,enduranceDrain} from './rooms.ts';
 import type {DungeonRoom} from './rooms.ts';
@@ -27,11 +28,12 @@ export function floorClearProbability({normal,treasure,boss,capacity,drain,treas
  const budget=Math.floor((capacity+EPS)/drain),chance=[...times].filter(([t])=>t<=budget).reduce((n,[,p])=>n+p,0);
  return {chance:Math.min(1,Math.max(0,chance)),budget,mass:[...times.values()].reduce((a,b)=>a+b,0),minSeconds:Math.min(...times.keys()),maxSeconds:Math.max(...times.keys()),meanSeconds:[...times].reduce((n,[t,p])=>n+t*p,0)};
 }
-/** Conservative fresh-entry Arya: earned floor XP, no ordinary practice; optional existing armor. */
-export function firstTenClearChance(floor:number,armor=false,constitutionXP=floor-1){
+/** Fresh-entry Arya at declared Skill affinities; optional existing armor. */
+export function firstTenClearChance(floor:number,armor=false,constitutionXP=0){
  if(!Number.isInteger(floor)||floor<1||floor>10)throw Error('This balance procedure is defined for floors 1–10');
  if(!Number.isInteger(constitutionXP)||constitutionXP<0||constitutionXP>1e9)throw Error('Invalid Constitution XP');
- const member=startingFriend(initialGame(),'arya');member.constitutionExperience=constitutionXP;
+ if(constitutionXP!==0)throw Error('Use Skill training; the affinity benchmark has no separate Constitution XP bonus');
+ const member=atAffinity(startingFriend(initialGame(),'arya'));
  const loadout=armor?['leather_armor']:[],actor={...member,gear:0},catalog=floorCatalog('wood',floor),groups=roomDungeon('wood').groups,scale=floorDifficulty('wood',floor);
  if(catalog.normal.length!==10)throw Error('Update the procedure for a different standard-room catalog');
  const outcomes=(rooms:DungeonRoom[],standard=false):TimeOutcome[]=>{

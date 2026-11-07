@@ -21,14 +21,15 @@ export function ownsSkill(actor:SpecializedProfile,id:string):boolean{
  const skill=SPECIALIZATIONS.find(s=>s.id===id);return !!skill&&!!actor.selections?.attributes.includes(skill.parent)&&actor.selections.disciplines.includes(skill.group);
 }
 export const canDungeon=(actor:SpecializedProfile)=>SPECIALIZATIONS.some(s=>s.parent==='constitution'&&ownsSkill(actor,s.id));
-export function attributeValue(actor:Pick<SpecializedProfile,'stats'|'selections'>,stat:Stat){return actor.selections?.attributes.includes(stat)?Math.max(1,actor.stats[stat].max):0;}
+export function attributeValue(actor:Pick<SpecializedProfile,'stats'|'selections'|'affinityModel'>,stat:Stat){return actor.selections?.attributes.includes(stat)?(actor.affinityModel==='skills'?actor.stats[stat].max:Math.max(1,actor.stats[stat].max)):0;}
 export function skillValue(actor:SpecializedProfile,id:string):number{
  const skill=SPECIALIZATIONS.find(s=>s.id===id);
  if(!skill)return STATS.includes(id as Stat)?attributeValue(actor,id as Stat):0;
  if(!ownsSkill(actor,id))return attributeValue(actor,skill.parent);
+ if(actor.affinityModel==='skills')return actor.specializations[id].value;
  return 1+actor.specializations[id].value+(skill.parent==='constitution'?(actor.constitutionExperience??0)*.01:0);
 }
-export function skillPotential(actor:SpecializedProfile,id:string){const skill=SPECIALIZATIONS.find(s=>s.id===id)!;return 1+actor.specializations[id].affinity+(skill.parent==='constitution'?(actor.constitutionExperience??0)*.01:0);}
+export function skillPotential(actor:SpecializedProfile,id:string){const skill=SPECIALIZATIONS.find(s=>s.id===id)!;return actor.affinityModel==='skills'?actor.specializations[id].affinity:1+actor.specializations[id].affinity+(skill.parent==='constitution'?(actor.constitutionExperience??0)*.01:0);}
 export function canLearnComposite(actor:SpecializedProfile,id:string){const skill=SKILLS.find(s=>s.id===id);return !!skill&&skill.affinities.every(a=>ownsSkill(actor,a.attribute));}
 export function skillMatrix(actor:SpecializedProfile){
  const selections=actor.selections??defaultSelections(actor);

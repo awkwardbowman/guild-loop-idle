@@ -17,11 +17,7 @@ function expression(e:Expression,values:Allocation){
  }
  if(!finite(result))throw Error('Expression overflow');return result;
 }
-/** Fixed traits/loadout and nonnegative expressions make odds monotone in allocation. */
-export function challengeChance(challenge:Challenge,profile:Profile,loadout:Loadout){
- const c=challenge;
- if(!finite(c.drain)||c.drain===0||!Number.isInteger(c.timeLimit)||c.timeLimit<1||c.timeLimit>10000||!Number.isInteger(c.rooms)||c.rooms<1||c.rooms>1000||!finite(c.bonusChance)||c.bonusChance>1)throw Error('Invalid challenge limits');
- for(const value of Object.values(profile.allocation))if(!finite(value))throw Error('Invalid allocation');
+function profileChannels(profile:Profile,loadout:Loadout){
  const channels:Allocation={};
  for(const [key,value]of Object.entries(profile.channels)){
   let catchup=0,flat=0,percent=0;
@@ -32,6 +28,14 @@ export function challengeChance(challenge:Challenge,profile:Profile,loadout:Load
   const raw=expression(value,profile.allocation);channels[key]=(Math.max(raw,(raw+catchup)/2)+flat)*(1+percent);
  }
  for(const m of loadout.modifiers)if(!(m.channel in channels))throw Error(`Unknown equipment channel: ${m.channel}`);
+ return channels;
+}
+/** Fixed traits/loadout and nonnegative expressions make odds monotone in allocation. */
+export function challengeChance(challenge:Challenge,profile:Profile,loadout:Loadout){
+ const c=challenge;
+ if(!finite(c.drain)||c.drain===0||!Number.isInteger(c.timeLimit)||c.timeLimit<1||c.timeLimit>10000||!Number.isInteger(c.rooms)||c.rooms<1||c.rooms>1000||!finite(c.bonusChance)||c.bonusChance>1)throw Error('Invalid challenge limits');
+ for(const value of Object.values(profile.allocation))if(!finite(value))throw Error('Invalid allocation');
+ const channels=profileChannels(profile,loadout);
  const budget=Math.min(c.timeLimit,Math.floor((expression(c.capacity,channels)+EPS)/c.drain));
  const distribution=(rooms:Encounter[],optional=false)=>{
   if(!rooms.length)throw Error('Encounter category must be declared');
@@ -67,7 +71,7 @@ export function challengeChance(challenge:Challenge,profile:Profile,loadout:Load
  return {chance,budget,states:times.size};
 }
 export type ClassScope={id:string;budget:number;bounds:Record<string,{min:number;max:number}>;channels:Profile['channels'];traits:string[];loadouts:Loadout[]};
-/** Integer generation budgets only. Each scope fixes selections, unlocks and legal loadouts. */
+/** Continuous affinity budgets. Each scope fixes selections, unlocks and legal loadouts. */
 export function classCeiling(challenge:Challenge,scopes:ClassScope[],threshold:number,maxEvaluations=256){
  if(!scopes.length||!finite(threshold)||threshold>1||!Number.isInteger(maxEvaluations)||maxEvaluations<1)throw Error('Invalid class test');
  type Box={scope:ClassScope;loadout:Loadout;lo:Allocation;hi:Allocation;upper:number};
@@ -75,17 +79,37 @@ export function classCeiling(challenge:Challenge,scopes:ClassScope[],threshold:n
  let witness:{scope:string;loadout:string;allocation:Allocation;chance:number}|undefined;
  for(const scope of scopes){
   const entries=Object.entries(scope.bounds),lo:Allocation={},hi:Allocation={};
-  if(!Number.isInteger(scope.budget)||scope.budget<0||!entries.length||!scope.loadouts.length)throw Error('Invalid class scope');
-  for(const [key,b]of entries){if(!Number.isInteger(b.min)||!Number.isInteger(b.max)||b.min<0||b.max<b.min)throw Error('Invalid integer allocation bounds');lo[key]=b.min;hi[key]=b.max;}
+  if(!finite(scope.budget)||!entries.length||!scope.loadouts.length)throw Error('Invalid class scope');
+  for(const [key,b]of entries){if(!finite(b.min)||!finite(b.max)||b.max<b.min)throw Error('Invalid allocation bounds');lo[key]=b.min;hi[key]=b.max;}
   if(Object.values(lo).reduce((a,b)=>a+b,0)>scope.budget||Object.values(hi).reduce((a,b)=>a+b,0)<scope.budget)throw Error('Class has no legal allocation');
   for(const loadout of scope.loadouts)pending.push({scope,loadout,lo:{...lo},hi:{...hi},upper:1});
  }
+ // One optimistic union can prove a whole class without evaluating every selection/loadout.
+ const union:Allocation={},traits=new Set<string>();
+ for(const box of pending){
+  const minimum=Object.values(box.lo).reduce((a,b)=>a+b,0);
+  const hi=Object.fromEntries(Object.entries(box.hi).map(([k,v])=>[k,Math.min(v,box.scope.budget-minimum+box.lo[k])]));
+  const channels=profileChannels({allocation:hi,channels:box.scope.channels,traits:box.scope.traits},box.loadout);
+  for(const [key,value]of Object.entries(channels))union[key]=Math.max(union[key]??0,value);
+  for(const trait of box.scope.traits)traits.add(trait);
+ }
+ // Validate the original bonus even though its cost is relaxed in the upper bound.
+ if(!challenge.bonus.length||!Number.isFinite(challenge.bonus.reduce((n,r)=>n+r.weight,0))||challenge.bonus.reduce((n,r)=>n+r.weight,0)<=0)throw Error('Invalid bonus weights');
+ for(const r of challenge.bonus){
+  if(!finite(r.weight)||!r.checks.length||r.deadline!==undefined&&(!Number.isInteger(r.deadline)||r.deadline<1))throw Error('Invalid bonus encounter');
+  for(const check of r.checks){if(!finite(check.work)||check.work===0)throw Error('Invalid bonus work');expression(check.rate,union);}
+ }
+ // An optimistic bonus always takes one second, including when a real bonus is unavailable.
+ const globalUpper=challengeChance({...challenge,bonus:[{weight:1,checks:[{work:1,rate:{base:1}}]}]},{allocation:{},channels:Object.fromEntries(Object.entries(union).map(([k,base])=>[k,{base}])),traits:[...traits]},{id:'optimistic-union',modifiers:[]}).chance;
+ evaluations++;
+ if(globalUpper<threshold)return {status:'proven-below' as const,lower:0,upper:globalUpper,evaluations,witness};
+ for(const box of pending)box.upper=globalUpper;
  const evaluate=(box:Box,allocation:Allocation)=>{evaluations++;return challengeChance(challenge,{allocation,channels:box.scope.channels,traits:box.scope.traits},box.loadout).chance;};
  let resolvedUpper=0;
  while(pending.length&&evaluations+2<=maxEvaluations){
   pending.sort((a,b)=>a.upper-b.upper);const box=pending.pop()!;
   const keys=Object.keys(box.lo),sumLo=keys.reduce((n,k)=>n+box.lo[k],0),sumHi=keys.reduce((n,k)=>n+box.hi[k],0);
-  if(sumLo>box.scope.budget||sumHi<box.scope.budget)continue;
+  if(sumLo>box.scope.budget+EPS||sumHi<box.scope.budget-EPS)continue;
   const oldLo={...box.lo},oldHi={...box.hi};
   for(const k of keys){box.hi[k]=Math.min(oldHi[k],box.scope.budget-sumLo+oldLo[k]);box.lo[k]=Math.max(oldLo[k],box.scope.budget-sumHi+oldHi[k]);}
   // This vector may exceed the total budget: it is an optimistic bound, never a witness.
@@ -97,9 +121,9 @@ export function classCeiling(challenge:Challenge,scopes:ClassScope[],threshold:n
   if(lower>=threshold)return {status:'counterexample' as const,lower,upper:Math.max(lower,box.upper,resolvedUpper,...pending.map(b=>b.upper)),evaluations,witness};
   if(box.upper<threshold||box.upper<=lower){resolvedUpper=Math.max(resolvedUpper,box.upper);continue;}
   const split=keys.sort((a,b)=>(box.hi[b]-box.lo[b])-(box.hi[a]-box.lo[a]))[0];
-  if(box.lo[split]===box.hi[split]){resolvedUpper=Math.max(resolvedUpper,box.upper);continue;}
-  const mid=Math.floor((box.lo[split]+box.hi[split])/2);
-  pending.push({...box,hi:{...box.hi,[split]:mid}},{...box,lo:{...box.lo,[split]:mid+1}});
+  if(box.hi[split]-box.lo[split]<=1e-9){resolvedUpper=Math.max(resolvedUpper,box.upper);continue;}
+  const mid=(box.lo[split]+box.hi[split])/2;
+  pending.push({...box,hi:{...box.hi,[split]:mid}},{...box,lo:{...box.lo,[split]:mid}});
  }
  const upper=Math.max(lower,resolvedUpper,...pending.map(b=>b.upper));
  return {status:upper<threshold?'proven-below' as const:'inconclusive' as const,lower,upper,evaluations,witness};

@@ -7,7 +7,7 @@ const challenge:Challenge={id:'diplomacy-fixture',normal:[check],bonus:[{weight:
 const bare={id:'bare',modifiers:[]};
 const scope=(budget:number):ClassScope=>({id:`fixture-budget-${budget}`,budget,bounds:{charisma:{min:1,max:budget},intelligence:{min:1,max:budget},a:{min:1,max:budget},b:{min:1,max:budget},c:{min:1,max:budget}},channels:{influence:{weights:{charisma:1}},insight:{weights:{intelligence:1}}},traits:[],loadouts:[bare]});
 test('CP01 combat-independent odds and class proof reject the strongest legal low-budget class',()=>{
- const result=classCeiling(challenge,[scope(14)],.01);assert.equal(result.status,'proven-below');assert.equal(result.upper,0);assert.equal(result.evaluations,2);
+ const result=classCeiling(challenge,[scope(14)],.01);assert.equal(result.status,'proven-below');assert.equal(result.upper,0);assert.equal(result.evaluations,1);
  const result2=classCeiling(challenge,[scope(50)],.01);assert.equal(result2.status,'counterexample');assert.equal(result2.witness!.chance,1);
  assert.equal(Object.values(result2.witness!.allocation).reduce((a,b)=>a+b,0),50);
 });
@@ -15,7 +15,7 @@ test('CP02 bounded search encloses exhaustive five-attribute optimum and never m
  const small={...scope(10),bounds:{charisma:{min:1,max:8},intelligence:{min:1,max:8},a:{min:1,max:1},b:{min:1,max:1},c:{min:1,max:1}}};
  const c={...challenge,normal:[{...check,checks:[{work:2,rate:{weights:{insight:1}}}]}],boss:[{...check,checks:[{work:2,rate:{weights:{insight:1}}}]}],rooms:1};
  let best=0;for(let charisma=1;charisma<=6;charisma++)best=Math.max(best,challengeChance(c,{allocation:{charisma,intelligence:7-charisma,a:1,b:1,c:1},channels:small.channels,traits:[]},bare).chance);
- const limited=classCeiling(c,[small],.99,1);assert.equal(limited.status,'inconclusive');assert.equal(limited.evaluations,0);assert.ok(limited.lower<=best&&limited.upper>=best);
+ const limited=classCeiling(c,[small],.99,1);assert.equal(limited.status,'inconclusive');assert.equal(limited.evaluations,1);assert.ok(limited.lower<=best&&limited.upper>=best);
  const result=classCeiling(c,[small],.99,100);assert.equal(result.status,'counterexample');assert.equal(result.lower,best);
 });
 test('CP03 weighted failures, optional capability skips, deadlines, ordered checks and equipment are explicit',()=>{
@@ -38,4 +38,12 @@ test('CP04 allocation tradeoffs require branching; exhaustive legal odds remain 
  for(let charisma=1;charisma<5;charisma++)assert.equal(challengeChance(c,{allocation:{charisma,intelligence:5-charisma},channels:s.channels,traits:[]},bare).chance,0);
  assert.equal(classCeiling(c,[s],.01,2).status,'inconclusive');
  const result=classCeiling(c,[s],.01,100);assert.equal(result.status,'proven-below');assert.equal(result.upper,0);assert.ok(result.evaluations>2);
+});
+test('CP05 continuous fractional budgets and many selection scopes use a single optimistic class proof',()=>{
+ const scopes=Array.from({length:300},(_,i)=>({...scope(14.5),id:`selection-${i}`}));
+ const result=classCeiling(challenge,scopes,.01,1);assert.equal(result.status,'proven-below');assert.equal(result.evaluations,1);
+ const s={...scope(2.1),bounds:{charisma:{min:.1,max:2},intelligence:{min:.1,max:2}}};
+ const encounter={weight:1,checks:[{work:.1,rate:{weights:{insight:1}}}]};
+ const fractional=classCeiling({...challenge,normal:[encounter],boss:[encounter],rooms:1},[s],.99);
+ assert.equal(fractional.status,'counterexample');assert.ok(Math.abs(Object.values(fractional.witness!.allocation).reduce((a,b)=>a+b,0)-2.1)<1e-12);
 });

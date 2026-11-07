@@ -1,3 +1,13 @@
+# Save v11 Skill affinity model — November 7, 2026
+
+New Common T1 profiles use the generation/training contract in [02](02-adventurers-and-stat-growth.md): a 10-point owned base-Skill budget, truncated-exponential starting levels, derived Attribute/Discipline totals, 3% exponential training cost, and multiplicative 10% XP reductions for levels above affinity and above the activity. Affinity is reachable and can be exceeded. Floor rewards train owned Constitution Skills through that same system, rather than adding unbounded free Value/Potential.
+
+Practice is queued as validated `{id, xp, activity, source?}` events and settles on return; capacity remains the departure snapshot. Save v11 accepts over-affinity trained values while checking derived totals and the new Common T1 affinity budget. v0–v10 historical profiles/outings retain their original numbers and prior model, without rerolls or erased progress. Earlier contracts below apply to those historical profiles where they conflict with this section.
+
+The standard maximum benchmark deliberately uses exact affinity, with every declared legal loadout. It is a finite balancing convention rather than an absolute ceiling on indefinite grinding. The challenge/class procedure is at the top of [04](04-dungeons-and-expeditions.md).
+
+---
+
 # Floor model extension — November 6, 2026 · review save v10
 
 The floor/checkpoint model in [04](04-dungeons-and-expeditions.md) supersedes v9's room-counter grouping for new outings. `Run.floorState` separates floor number, ten counted standard encounters, successful standards and previous treasure; `Run.floor` remains a counted-room ordinal for legacy history and shared room-count limits. `Game.dungeonKnowledge` persists known room IDs/boss checkpoints; `Game.dungeonStarts` optionally selects an earlier unlocked starting floor. Historical outings have `floorState: null` and retain their original work/pool/floor-XP behavior until return.

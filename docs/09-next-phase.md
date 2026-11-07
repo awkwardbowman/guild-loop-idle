@@ -1,6 +1,6 @@
 # Affinity ceilings and reusable challenge tests — November 7, 2026
 
-Implemented a theme-independent profile calculator, bounded class-ceiling proofs and a current-member/current-gear dungeon adapter; see the reusable procedure at the top of [04](04-dungeons-and-expeditions.md). Common T1 has a total affinity ceiling of 10; broader recruitment budgets remain deferred. The player-facing training change is pending the allocation and diminishing-returns decisions. Until resolved, do not treat the current uncapped Constitution XP system as an affinity-capped maximum.
+Implemented a theme-independent profile calculator, bounded class-ceiling proofs and a current-member/current-gear dungeon adapter; see the reusable procedure at the top of [04](04-dungeons-and-expeditions.md). Common T1 has a total affinity ceiling of 10; broader recruitment budgets remain deferred. New Common T1 profiles now use allocated base-Skill affinity, derived totals, exponential training cost and above-affinity/activity penalties. Successful floors queue Constitution Skill practice. Historical saves retain their earlier model. The standard benchmark evaluates exact affinity; it does not claim an absolute limit on unlimited overtraining. Arya’s floor-10 benchmark passes at 99.78% bare, while floor 11 remains 0% with the best existing armor.
 
 ---
 

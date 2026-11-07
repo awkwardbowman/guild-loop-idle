@@ -1,10 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {atAffinity} from '../src/unit-potential.ts';
 import {initialGame,startingFriend} from '../src/engine.ts';
 import {memberFloorChance,bestMemberLoadout} from '../src/member-probability.ts';
 import {firstTenClearChance} from '../src/floor-probability.ts';
 test('MP01 arbitrary member adapter agrees with first-ten worksheet and compares all legal supplied gear',()=>{
- const member=startingFriend(initialGame(),'arya');member.constitutionExperience=9;
+ const member=atAffinity(startingFriend(initialGame(),'arya'));
  const before=JSON.stringify(member);
  assert.equal(memberFloorChance(member,'wood',10).chance,firstTenClearChance(10).chance);
  const best=bestMemberLoadout(member,'wood',10,['leather_armor','reinforced_armor','leather_pack']);

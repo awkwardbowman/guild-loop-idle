@@ -1,3 +1,4 @@
+import {ownsSkill} from './specialization.ts';
 import {defaultSelections} from './specialization.ts';
 import {floorCatalog,categoryOf,nextDungeonFloor} from './rooms.ts';
 import {enduranceMaximum,roomEfficiency} from './rooms.ts';
@@ -30,17 +31,28 @@ function validateMember(m: Member) {
  requireValue(m.soulAccess==='none','member Soul access');
  if(m.origin==='recruit')requireValue(m.stats.soul.current===1&&m.stats.soul.max===1&&m.stats.soul.affinity===1&&!m.selections!.attributes.includes('soul'),'inert recruit Soul');
  requireValue(['legacy','recruit','arya','clyde'].includes(m.origin)&&integer(m.carryCapacity,1,1000000)&&integer(m.bestRoom)&&Array.isArray(m.equipped)&&new Set(m.equipped).size===m.equipped.length&&m.equipped.every(id=>EQUIPMENT.some(item=>item.id===id)),'member equipment');
- if(m.origin!=='legacy')requireValue(STATS.reduce((sum,stat)=>sum+m.stats[stat].affinity,0)<=tierBudget(m.tier)+1e-7,'tier stat budget');
+ if(m.affinityModel==='skills'){if(m.tier===1&&m.rarity===0)requireValue(Math.abs(ATTRIBUTES.filter(a=>a.parent&&ownsSkill(m,a.id)).reduce((n,a)=>n+m.specializations[a.id].affinity,0)-10)<1e-7,'Common T1 Skill affinity budget');}
+ else if(m.origin!=='legacy')requireValue(STATS.reduce((sum,stat)=>sum+m.stats[stat].affinity,0)<=tierBudget(m.tier)+1e-7,'tier stat budget');
  requireValue(object(m.dungeonHistory)&&Object.entries(m.dungeonHistory).every(([id,h])=>DUNGEONS.some(d=>d.id===id)&&object(h)&&integer(h.bestRoom,0,1000000)&&(h.lastReturn===null||(object(h.lastReturn)&&integer(h.lastReturn.room,0,h.bestRoom)&&text(h.lastReturn.reason)&&text(h.lastReturn.detail,500)&&integer(h.lastReturn.day,1)&&integer(h.lastReturn.time,0,DAY_SECONDS-1)))),'dungeon history');
  validateRoute(m.queue);
  requireValue(integer(m.queueIndex,0,Math.max(0,m.queue.length-1)) && integer(m.cooldown,0,86400) && integer(m.resetSeconds,1,86400) && typeof m.enabled==='boolean', 'member schedule');
 }
-function validateProfile(m:Pick<Member,'stats'|'specializations'|'skills'|'selections'|'constitutionExperience'>){
+function validateProfile(m:Pick<Member,'stats'|'specializations'|'skills'|'selections'|'constitutionExperience'|'affinityModel'>){
  requireValue(object(m.selections)&&Array.isArray(m.selections.attributes)&&m.selections.attributes.length===5&&new Set(m.selections.attributes).size===5&&m.selections.attributes.every(s=>STATS.includes(s))&&Array.isArray(m.selections.disciplines)&&m.selections.disciplines.length===5&&new Set(m.selections.disciplines).size===5&&m.selections.disciplines.every(d=>ACTIVITY_GROUPS.some(g=>g.id===d)),'five Attribute and Discipline selections');
+ requireValue(m.affinityModel===undefined||m.affinityModel==='skills','affinity model');
  requireValue(integer(m.constitutionExperience,0,1e9),'Constitution XP');
  requireValue(object(m.stats)&&Object.keys(m.stats).length===STATS.length, 'member stats');
- for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,.001,1e12) && num(v.max,.001,v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
- requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,.001,1e12)&&num(v.value,0,v.affinity);}), 'specialization values');
+ for (const s of STATS) { const v = m.stats[s]; requireValue(object(v) && num(v.affinity,m.affinityModel==='skills'?0:.001,1e12) && num(v.max,m.affinityModel==='skills'?0:.001,m.affinityModel==='skills'?1e12:v.affinity) && num(v.current,0,v.max), `${s} stat bounds`); }
+ requireValue(object(m.specializations)&&Object.keys(m.specializations).length===ATTRIBUTES.filter(a=>a.parent).length&&ATTRIBUTES.filter(a=>a.parent).every(a=>{const v=m.specializations[a.id];return object(v)&&num(v.affinity,m.affinityModel==='skills'?0:.001,1e12)&&num(v.value,0,m.affinityModel==='skills'?1e12:v.affinity);}), 'specialization values');
+ if(m.affinityModel==='skills'){
+  requireValue(m.constitutionExperience===0,'obsolete Constitution bonus');
+  for(const a of ATTRIBUTES.filter(a=>a.parent)){if(ownsSkill(m,a.id))requireValue(m.specializations[a.id].affinity>=.1,'minimum Skill affinity');else requireValue(m.specializations[a.id].affinity===0&&m.specializations[a.id].value===0,'unowned Skill values');}
+  for(const stat of STATS){
+   if(stat==='soul'&&!m.selections!.attributes.includes(stat))continue;
+   const owned=ATTRIBUTES.filter(a=>a.parent===stat&&ownsSkill(m,a.id));
+   requireValue(Math.abs(m.stats[stat].max-owned.reduce((n,a)=>n+m.specializations[a.id].value,0))<1e-7&&Math.abs(m.stats[stat].affinity-owned.reduce((n,a)=>n+m.specializations[a.id].affinity,0))<1e-7,'derived Attribute totals');
+  }
+ }
  requireValue(object(m.skills)&&Object.keys(m.skills).length===SKILLS.length&&SKILLS.every(d=>{const v=m.skills[d.id];return object(v)&&(v.discovered===undefined||typeof v.discovered==='boolean')&&integer(v.level,0,99)&&num(v.experience,0,v.level===99?0:10*(v.level+1)-1e-9)&&(v.lastUsedAt===null||integer(v.lastUsedAt));}), 'learned skills');
 }
 function validateRoute(route: Assignment[]) { requireValue(Array.isArray(route) && route.length <= 1 && route.every(e => object(e) && DUNGEONS.some(d=>d.id===e.dungeonId) && !Object.hasOwn(e,'maxDepth')), 'dungeon queue'); }
@@ -87,6 +99,7 @@ export function validateGame(input: unknown): Game {
  for (const r of g.active) {
   requireValue(object(r) && g.members.some(m=>m.id===r.memberId) && DUNGEONS.some(d=>d.id===r.dungeonId), 'active member or dungeon');
   requireValue(integer(r.reachedRoom,0,r.floor)&&!Object.hasOwn(r,'personalLimit')&&integer(r.floor,1,1000000)&&integer(r.elapsed,0,r.stage==='returning'?WARP_SECONDS:WARP_SECONDS-1), 'run position');
+  requireValue(r.skillPractice===undefined||(Array.isArray(r.skillPractice)&&r.skillPractice.length<=10000&&r.skillPractice.every(p=>object(p)&&typeof p.id==='string'&&ATTRIBUTES.some(a=>a.id===p.id&&a.parent)&&num(p.xp)&&num(p.activity)&&(p.source===undefined||p.source==='floor'))),'pending Skill practice');
   requireValue(object(r.specializationTraining)&&Object.entries(r.specializationTraining).every(([id,n])=>ATTRIBUTES.some(a=>a.id===id&&a.parent)&&num(n)), 'pending specialization training');
   requireValue(r.rules==='tasks'||r.rules==='checks'||r.rules==='rooms', 'run rules');
   requireValue(object(r.endurance)&&num(r.endurance.max)&&num(r.endurance.current,0,r.endurance.max)&&integer(r.successfulFloorRooms,0,9),'run endurance or floor progress');
@@ -156,7 +169,7 @@ export function parseSave(raw: string): Game {
  requireValue(raw.length<=2_000_000,'file exceeds 2 MB');
  let data: unknown; try { data=JSON.parse(raw); } catch { throw new Error('This file is not valid JSON. Your current game was not changed.'); }
  requireValue(object(data)&&data.format==='guild-loops','not a Guild Loops save');
- requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===5||data.version===6||data.version===7||data.version===8||data.version===9||data.version===VERSION,'unsupported version; this save may need a newer game');
+ requireValue(data.version===0||data.version===1||data.version===2||data.version===3||data.version===4||data.version===5||data.version===6||data.version===7||data.version===8||data.version===9||data.version===10||data.version===VERSION,'unsupported version; this save may need a newer game');
  if(typeof data.version==='number'&&data.version<6){
   requireValue(object(data.game)&&object(data.game.guild)&&Array.isArray(data.game.active),'legacy currency');const game=data.game;
   for(const holder of [game.guild,...(game.active as unknown[]),...(Array.isArray(game.trades)?game.trades:[])]){requireValue(object(holder),'legacy currency holder');if(Object.hasOwn(holder,'gold')&&!Object.hasOwn(holder,'chips'))holder.chips=holder.gold;delete holder.gold;}
@@ -300,6 +313,7 @@ export function parseSave(raw: string): Game {
   for(const run of g.active)run.floorState=null;
   g.version=10;
  }
+ if(typeof data.version==='number'&&data.version<11){const g=data.game as unknown as Game;requireValue(g.version===10,'v10 affinity migration');g.version=11;}
  return validateGame(data.game);
 }
 export function saveLocal(storage: StorageLike, g: Game) {

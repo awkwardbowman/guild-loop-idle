@@ -16,7 +16,7 @@ test('NM01 unowned stats are exactly zero; minimum rate applies only to eligible
  assert.equal(formatNumber(skillValue(clyde,'power')),'0');
  assert.equal(attributeValue(clyde,'strength'),0);
  assert.equal(attributeValue(g.guildmaster,'soul'),8);
- assert.equal(skillValue(clyde,'finesse'),1);
+ assert.equal(skillValue(clyde,'finesse'),attributeValue(clyde,'dexterity'));
  const actor={...clyde,gear:0};
  const combat=roomById('wood','crypt_scavenger').checks[0];
  const zeroPowerCheck={...combat,attributes:[{attribute:'power',weight:1}]};

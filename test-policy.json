@@ -48,7 +48,8 @@
     "FD12",
     "FD13",
     "FD14",
-    "FD15"
+    "FD15",
+    "UP06"
   ],
   "smokeIds": [
     "C02",
@@ -434,7 +435,8 @@
         "CP01",
         "CP02",
         "CP03",
-        "CP04"
+        "CP04",
+        "CP05"
       ]
     },
     "tests/member-probability.test.ts": {
@@ -446,6 +448,23 @@
       ],
       "ids": [
         "MP01"
+      ]
+    },
+    "tests/unit-potential.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "checks",
+        "dungeon",
+        "save",
+        "recruitment"
+      ],
+      "ids": [
+        "UP01",
+        "UP02",
+        "UP03",
+        "UP04",
+        "UP05",
+        "UP06"
       ]
     }
   },

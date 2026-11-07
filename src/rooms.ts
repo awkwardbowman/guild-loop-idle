@@ -10,7 +10,7 @@ import {skillValue,ownsSkill,canLearnComposite} from './specialization.ts';
 import {MIN_PROGRESS_RATE} from './numbers.ts';
 export const ROOM_GROUPS=['neutral','combat','trap','puzzle','boss','treasure'] as const;
 export type RoomGroup=typeof ROOM_GROUPS[number];
-export type RoomCheck={id:string;name:string;skill:string;requiredLevel:number;attributes:{attribute:string;weight:number}[];work:number;loot:LootEntry[];harvest?:boolean;guaranteed?:{id:string;amount:number}[]};
+export type RoomCheck={activityLevel?:number;id:string;name:string;skill:string;requiredLevel:number;attributes:{attribute:string;weight:number}[];work:number;loot:LootEntry[];harvest?:boolean;guaranteed?:{id:string;amount:number}[]};
 export type DungeonRoom={id:string;name:string;group:RoomGroup;rarity:number;weight:number;mandatory:boolean;failure:'injury'|'return';referenceRate:number;checks:RoomCheck[]};
 export type RoomDungeon={dungeonId:string;groups:Record<RoomGroup,number>;rooms:DungeonRoom[]};
 export type GeneratedRoom={id:string;index:number;work:number;attempts:number};

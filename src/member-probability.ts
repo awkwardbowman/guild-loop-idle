@@ -1,3 +1,4 @@
+import {atAffinity} from './unit-potential.ts';
 /** Adapter for current authored dungeons; generic Diplomacy scenarios use challenge-probability. */
 import type {Member} from './engine.ts';
 import type {DungeonRoom} from './rooms.ts';
@@ -38,3 +39,6 @@ export function bestMemberLoadout(member:Member,dungeonId:string,floor:number,av
  };
  visit(0,[]);results.sort((a,b)=>b.chance-a.chance);return {best:results[0],evaluated:results.length,results};
 }
+
+/** Standard fully trained benchmark, over every supplied legal available loadout. */
+export const maximumMemberChance=(member:Member,dungeonId:string,floor:number,available:string[])=>bestMemberLoadout(atAffinity(member),dungeonId,floor,available);

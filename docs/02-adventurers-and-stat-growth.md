@@ -1,3 +1,41 @@
+# Skill affinity generation and training — November 7, 2026 · save v11
+
+This section supersedes the earlier copied-root budgets, implicit Skill baseline and unlimited Constitution bonus for **new Common T1** profiles. Historical saved profiles, the Guildmaster and provisional higher-tier generation retain their prior rules; broader recruitment budgets remain deferred. `affinityModel: skills` identifies the new model. Arya and Clyde are Common T1 and each has exactly 10 total owned base-Skill affinity.
+
+## Generation
+
+1. Select five Attributes and five Disciplines, then identify only their authored base-Skill intersections. Composite Skills do not consume this budget.
+2. Give each owned base Skill 0.1 affinity and subtract that total from the pool.
+3. Shuffle Skill identities so the order does not favor a particular Skill. For each except the last, draw `u` uniformly from `[0,1)` and allocate `u × remainingPool`; give the final Skill the remainder. Total allocated affinity equals the declared budget. Unowned pairs have zero allocated affinity/value.
+4. For each owned Skill with affinity `A`, draw an independent uniform `u` and set starting level to `A × [-ln(1 − u × (1 − exp(−λ))) / λ]`, where `λ = 2 ln(10)`. This is a truncated exponential on `[0,A)`. Its probability of starting below `A/2` is `0.9/0.99 = 90.909…%`.
+5. Attributes are row totals of owned Skill levels; Disciplines are column totals. Attribute affinity is the corresponding total of owned Skill affinities. There is no extra +1 Skill baseline or separately trained root pool. Unselected roots contribute zero. Inert Soul metadata remains 1 outside the allocated Skill budget and does not grant capability.
+
+Named story friends keep explicit role allocations, rather than random archetypes. Arya: Power 2, Force 0.5, Hauling 0.3, Precision 0.3, Finesse 0.6, Handiwork 0.2, Toughness 2, Endurance 1.5, Agility 1, Scouting 0.5, Movement 0.5, Observation 0.6. Clyde: Handiwork 2, Vitality 2, Observation 1, Diagnosis 0.5, Design 1, Appraisal 0.5, Planning 1, Discovery 0.8, Opportunity 1.2. Each totals 10. Their reproducible authored starting values use the same decay function at quantile 0.9, about 48.1% of affinity; random recruits draw each quantile independently.
+
+## Training
+
+Affinity is a **soft cap**, not a permanent maximum level. Units can reach and exceed it; future affinity increases remain deferred.
+
+For current base-Skill level `L`, affinity `A`, and authored activity level `D`:
+
+- Base XP cost density: `C(L) = 1.03^L` (one base XP unit at level zero; 3% slow exponential growth).
+- XP multiplier: `M(L,A,D) = 0.9^[max(0,L−A) + max(0,L−D)]`.
+- Spend raw practice XP by integrating `dXP/dL = C(L) / M(L,A,D)`. `trainSkill` integrates this exactly across the `A` and `D` breakpoints, so batch size does not alter progress and affinity is reachable in finite XP. Fractional levels are retained.
+
+The requested example, Power level 15 / affinity 10 / activity 5, receives `0.9^10 × 0.9^5 = 0.9^15 ≈ 20.59%` of base XP effectiveness, before the base level cost. This means a 10% reduction per excess level, not multiplying by 0.1 per level.
+
+Successful checks queue `0.01 × contributionWeight` raw XP for owned contributing base Skills. Activity level can be explicitly authored on a check; otherwise it is the floor number. Ten successful standards plus the boss additionally queue 0.01 raw XP per owned Constitution Skill at that floor’s activity level. All new-model base-Skill practice settles on return. Derived totals update together; departure capacity remains snapshotted and is never refilled by training. Composite learning/XP keeps its separate existing rules.
+
+## Standard balance benchmark
+
+Use `atAffinity(member)` and `maximumMemberChance(member, dungeonId, floor, availableItemIds)` to test every owned base Skill exactly at affinity against every supplied legal gear combination. Above-affinity training is excluded by this declared benchmark; it is **not** a proof against unlimited grinding. A genuinely absolute progression gate would need a separate authored unlock requirement.
+
+Implementation: `src/unit-potential.ts`, current-member challenge adapter `src/member-probability.ts`, and the general class procedure in [04](04-dungeons-and-expeditions.md). UP01–UP06 verify generation, the analytic decay percentile, reachable/over-affinity training, batch invariance, floor practice and return/save behavior, best legal gear, the floor-11 benchmark barrier, migration and corruption rejection.
+
+Save v11 preserves v0–v10 historical profiles and active outing numbers, with no reroll or silent reset. New-model saves validate their 10-point Common T1 budget, non-owned zeros, derived totals and pending practice; trained values may exceed affinity. Existing historical profiles are not silently relabeled as new-model recruits.
+
+---
+
 # True-zero unselected stats and minimum eligible work — November 6, 2026
 
 **Current implementation:** Non-selected and unknown Attributes have **effective value 0**. Missing weighted components contribute zero, without renormalizing other weights. A valid room check with a final computed rate below **0.001** receives **0.001 work per tick**; an ineligible check gets **no work**. This floor applies to the final room work rate, not each missing stat, and does not grant Skill ownership, Constitution entry, Soul eligibility or Composite prerequisites. Selected Attribute fallback remains `max(1, stored maximum)`; owned Skills and existing training stay unchanged. Visible numeric values are formatted to **at most two decimal places**, with full internal precision retained. These decisions supersede outdated historical baseline proposals below.

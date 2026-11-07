@@ -1,3 +1,7 @@
+# Numeric presentation and baseline correction — November 6, 2026
+
+Non-selected Attributes now use **0.001** as the real gameplay fallback instead of 0.01, including unidentified Attribute references. It is not rounded before weighted calculations. The shared `src/numbers.ts` display helper rounds all stat/Skill/endurance and related fractional figures to **at most two decimal places** with no padding; displayed 0 corresponds to internal 0.001. Selected root fallback (`max(1, maximum)`) and Constitution/Soul eligibility rules remain unchanged. This change does not alter the separate 0.01 historical check-speed minimum or Constitution floor XP increment. Regression assertions cover work-rate changes and number formatting.
+
 # Current PR #7 / save v9 contract — November 6, 2026
 
 The full specialization/endurance/settings scope is implemented. Maya authorized provisional choices for character axes, growth, Composite prerequisites, gear stacking and recall failure. Leather crafting recipe execution stays deferred. Earlier contracts below describe historical versions only where they conflict with this section.
@@ -6,7 +10,7 @@ The full specialization/endurance/settings scope is implemented. Maya authorized
 
 `specialization.ts` owns persisted five/five selections, authored Skill ownership, missing-Skill fallback, Potential, matrix/totals, discipline sums and Composite prerequisites. Fixed picks are listed in [02](02-adventurers-and-stat-growth.md). Recruits choose strongest-five root affinities and densest-five authored Disciplines deterministically without extra RNG, guaranteeing a Constitution Skill when Constitution is chosen. Picks do not change during normal play.
 
-Owned Skill Value = `1 + saved specialized training`; Potential = `1 + saved specialized affinity`. Selected root fallback = `max(1, saved root.max)`; unselected fallback = `0.01`. No weight renormalization. On success, only owned pairwise Skills and selected roots earn 0.01×contribution-weight pending training, applied through the existing capped growth function on home arrival. Composite XP (2 per success) and new lessons require all authored component Skills; existing learned abilities remain stored and usable. No action gains eligibility from gear.
+Owned Skill Value = `1 + saved specialized training`; Potential = `1 + saved specialized affinity`. Selected root fallback = `max(1, saved root.max)`; unselected fallback = `0.001`. No weight renormalization. On success, only owned pairwise Skills and selected roots earn 0.01×contribution-weight pending training, applied through the existing capped growth function on home arrival. Composite XP (2 per success) and new lessons require all authored component Skills; existing learned abilities remain stored and usable. No action gains eligibility from gear.
 
 One general Constitution XP per successfully completed canonical floor (ten rooms, no skips) adds `0.01 × total XP` to each owned Constitution Skill's Value and Potential. It is committed once at the boundary and survives reload, increases future derived capacity, and grants neither Skill XP nor root-stat consumption. A migrated partial floor starts its success counter at zero, preventing retroactive bonuses.
 

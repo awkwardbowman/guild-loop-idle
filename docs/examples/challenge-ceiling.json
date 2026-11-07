@@ -1,0 +1,111 @@
+{
+  "challenge": {
+    "id": "diplomacy-test-fixture",
+    "normal": [
+      {
+        "weight": 1,
+        "checks": [
+          {
+            "work": 50,
+            "rate": {
+              "weights": {
+                "influence": 0.5,
+                "insight": 0.5
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "bonus": [
+      {
+        "weight": 1,
+        "requires": [
+          "gift"
+        ],
+        "checks": [
+          {
+            "work": 1,
+            "rate": {
+              "base": 1
+            }
+          }
+        ]
+      }
+    ],
+    "boss": [
+      {
+        "weight": 1,
+        "checks": [
+          {
+            "work": 50,
+            "rate": {
+              "weights": {
+                "influence": 0.5,
+                "insight": 0.5
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "bonusChance": 0,
+    "rooms": 10,
+    "capacity": {
+      "weights": {
+        "influence": 1
+      }
+    },
+    "drain": 1,
+    "timeLimit": 300
+  },
+  "scopes": [
+    {
+      "id": "illustrative-budget-14",
+      "budget": 14,
+      "bounds": {
+        "charisma": {
+          "min": 1,
+          "max": 14
+        },
+        "intelligence": {
+          "min": 1,
+          "max": 14
+        },
+        "other1": {
+          "min": 1,
+          "max": 14
+        },
+        "other2": {
+          "min": 1,
+          "max": 14
+        },
+        "other3": {
+          "min": 1,
+          "max": 14
+        }
+      },
+      "channels": {
+        "influence": {
+          "weights": {
+            "charisma": 1
+          }
+        },
+        "insight": {
+          "weights": {
+            "intelligence": 1
+          }
+        }
+      },
+      "traits": [],
+      "loadouts": [
+        {
+          "id": "bare",
+          "modifiers": []
+        }
+      ]
+    }
+  ],
+  "threshold": 0.01,
+  "maxEvaluations": 256
+}

@@ -1,3 +1,49 @@
+# Reusable unit and class-ceiling procedure — November 7, 2026
+
+The calculator now separates an individual profile from the strongest legal member of a declared class. It is independent of dungeon theme: Diplomacy can use Influence/Insight and a different capacity expression while retaining the same encounter sequence and probability recurrence.
+
+**Confirmed ceiling policy:** tests use Skills trained to their generated affinity ceilings and the best available legal equipment combinations. Common T1 (including Arya and Clyde) has a total affinity budget of 10. Broader recruitment budgets are deferred. The allocation of those 10 points and the diminishing-returns/floor-reward implementation are awaiting clarification; the existing uncapped Constitution XP mechanic does not yet implement that policy. The old first-ten worksheet below remains an explicitly frozen, pre-change scenario until that is reconciled.
+
+## Inputs and exact individual odds
+
+`src/challenge-probability.ts` defines:
+
+- **Profile:** allocation values, nonnegative weighted expressions mapping them into named stat/Skill channels, and fixed capability/unlock traits. A maximum-profile test supplies affinity values, rather than starting trained values. Attributes/Disciplines that are derived totals must be expressions of the underlying Skills, rather than independent extra budget.
+- **Equipment:** one explicitly legal loadout; each channel applies strongest catchup, then additive flats, then additive percentages. Equipment does not grant traits. Negative modifiers, conditional equipment and consumables need an extended model before use.
+- **Challenge:** independently weighted standard, optional bonus and final-checkpoint encounter categories; count of standard slots; bonus chance; ordered work checks; required traits; optional encounter deadlines; capacity expression; drain and total exploration-time limit. Fixed positive work rates are computed from the declared channels. Missing required traits skip an optional bonus in one second; missing standard/boss traits fail the all-standards-plus-boss objective. Zero work rate cannot complete an eligible encounter.
+
+Convert every check to tick-rounded time, sum ordered checks, and calculate the available funded time. Convolve the categories using the recurrence below, dropping probability mass as soon as it fails a requirement/deadline or exceeds the time budget. Final surviving mass is the clear probability. This is exact for the declared frozen model, subject to ordinary floating-point precision; it does not sample runs. The current 300-second ward bounds the elapsed-time state to at most 301 values.
+
+`src/member-probability.ts` adapts **any existing Member** and an explicit current loadout to the authored dungeon/floor rules. `memberFloorChance(member, dungeonId, floor, loadout)` computes all-ten-success-plus-boss odds. `bestMemberLoadout(member, dungeonId, floor, availableItemIds)` enumerates bare plus every legal slot combination from the explicitly supplied available pool, up to 256 combinations. This does not assume that a tier-2 item is unavailable to a tier-1 unit: current game rules restrict slot count, not item tier. Item access must be supplied correctly by the caller.
+
+The live adapter freezes training at entry, validates slot counts/duplicates/item IDs, includes current check eligibility and low-skill deadlines, and rejects scenarios whose maximum cargo could bind. It does not forecast unlock acquisition or invent a potion strategy. The older first-ten Arya worksheet and the new member adapter agree on the floor-10 result.
+
+## Strongest legal member of a class
+
+`classCeiling(challenge, scopes, threshold, maxEvaluations = 256)` tests integer allocation domains. Each scope declares the total affinity budget, a minimum/maximum per allocation dimension, fixed selections/capability traits, channel expressions and the complete allowed loadout list. Include every allowed selection/unlock variant to make a claim about the entire rarity/tier class; a single selection preset proves only that preset. Fractional generation must first be expressed in integer affinity quanta, with corresponding channel weights. Current positive-only expressions/modifiers make clear odds monotone inside each fixed scope.
+
+1. Validate that legal allocations sum to the budget and obey all bounds. Using the maximum total from a generated budget range is safe only when lower-total legal profiles can be increased to that maximum under the same constraints; otherwise declare separate scopes.
+2. Evaluate a componentwise upper vector to obtain an optimistic probability bound. It may exceed the total budget; **never label it a recruit or a counterexample**.
+3. Evaluate an actual budget-respecting allocation to obtain an attainable lower bound and witness.
+4. If the upper bound is strictly below the target, that whole allocation box is proven below it. Otherwise split the widest allocation interval, tighten it using the total-budget constraint, and repeat.
+5. Stop at the evaluation budget and report the remaining interval. No random search or simulated expeditions are used.
+
+Results:
+
+- `proven-below`: every declared legal allocation/loadout has a pass rate **strictly below** the target.
+- `counterexample`: an explicit legal allocation/loadout reaches or exceeds the target. This refutes the proposed restriction; it does not necessarily identify the absolute best build.
+- `inconclusive`: the remaining upper bound still reaches the target when the calculation budget expires. Increase the budget, narrow the declared scope, or revise the gate; never report this as a pass.
+
+The result includes lower/upper probability bounds, number of evaluations, and the best legal witness found. A 1% rule uses `threshold: 0.01`. Rarity/tier labels do not secretly supply budgets, progression, unlocks or item access.
+
+## Runnable example and verification
+
+Run `node scripts/check-challenge.ts docs/examples/challenge-ceiling.json`. This Diplomacy-shaped **test fixture** proves the declared five-attribute budget-14 scope below 1% in two profile evaluations; it is not a live Tier-5 recruitment rule. The same fixture with budget 50 produces a legal counterexample. A JSON input can instead contain `challenge`, `profile`, and `loadout` for individual odds.
+
+CP01–CP04 verify class certificates, legal witnesses, a bounded inconclusive result, tradeoff branching against exhaustive legal allocations, weighted failure mass, optional skips, gear, deadlines and ordered checks. MP01 verifies agreement with the existing Arya worksheet, all supplied legal current gear combinations, input immutability and unsupported-cargo rejection. Repeatable progression, retries, damage, conditional stats, consumables or cargo that affect later choices require extra probability-state dimensions before the tool can certify those scenarios.
+
+---
+
 # Floor clear probability procedure
 
 **Current method, November 6, 2026:** use an analytic probability calculation to balance floors 1–10. Maya requested a defined, reusable calculation rather than large simulations. Stillmere upgrades remain deferred. Earlier simulation results below are historical validation, not the procedure to repeat for routine balance changes.

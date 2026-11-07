@@ -1,3 +1,9 @@
+# Affinity ceilings and reusable challenge tests — November 7, 2026
+
+Implemented a theme-independent profile calculator, bounded class-ceiling proofs and a current-member/current-gear dungeon adapter; see the reusable procedure at the top of [04](04-dungeons-and-expeditions.md). Common T1 has a total affinity ceiling of 10; broader recruitment budgets remain deferred. The player-facing training change is pending the allocation and diminishing-returns decisions. Until resolved, do not treat the current uncapped Constitution XP system as an affinity-capped maximum.
+
+---
+
 # Current scope clarification — November 6, 2026
 
 **Stillmere upgrades are deferred at Maya's request.** Finish and maintain the floors 1–10 balance using the defined probability procedure in [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure), rather than large simulation matrices. The current first-ten curve passes that calculation without new numerical changes. Future Stillmere/Leech/crafting decisions below remain queued, not questions blocking this pass.

@@ -423,6 +423,30 @@
         "FP01",
         "FP02"
       ]
+    },
+    "tests/challenge-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks"
+      ],
+      "ids": [
+        "CP01",
+        "CP02",
+        "CP03",
+        "CP04"
+      ]
+    },
+    "tests/member-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks",
+        "equipment"
+      ],
+      "ids": [
+        "MP01"
+      ]
     }
   },
   "extraGroups": {

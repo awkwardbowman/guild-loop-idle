@@ -1,3 +1,13 @@
+# Reusable challenge/class-ceiling verification — November 7, 2026
+
+The deterministic challenge calculator now accepts named stat channels, fixed profile traits, explicit gear modifiers, weighted encounter categories, ordered checks and capacity/deadline rules. A bounded class search returns a strict below-target certificate, a legal counterexample, or an inconclusive probability interval. The current-member adapter compares every supplied legal loadout (maximum 256), and rejects binding cargo rather than ignoring it.
+
+Executed: `node --test tests/challenge-probability.test.ts tests/member-probability.test.ts` passed **5/5**; `npm run test:full` passed **184/184**, zero failed or unselected; `npm run build` passed TypeScript/Vite; `git diff --check` passed. The example `node scripts/check-challenge.ts docs/examples/challenge-ceiling.json` returned `proven-below`, upper probability 0, in two profile evaluations. This budget-14 Diplomacy example is a test fixture, not a recruitment or live dungeon rule.
+
+CP01–CP04 cover certificates, attainable witnesses, bounded inconclusive results, allocation tradeoff branching checked against exhaustive legal allocations, weighted failures, optional skips, gear, ordered checks and deadlines. MP01 reproduces existing floor-10 Arya odds and checks every supplied current gear combination, immutability and invalid-loadout/cargo guards. Browser UI and engine training behavior were not changed; the previously executed browser results below remain historical evidence for those flows. Common T1’s total affinity ceiling of 10 is confirmed; live training/cap allocation changes await clarification, so this does not yet certify a final affinity-capped Arya balance.
+
+---
+
 # Probability-based first-ten balance check — November 6, 2026
 
 Maya requested a simpler, defined probability procedure instead of large simulations. The procedure is now the leading section of [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure), implemented in `src/floor-probability.ts` and reproduced by `node scripts/balance-floors.ts`. The large multi-seed balance matrix has been removed from the script.

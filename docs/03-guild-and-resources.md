@@ -1,6 +1,12 @@
+# Small UI and lore polish — November 6, 2026
+
+Global dungeon controls now live in top-level **Settings** (after Info), not Guild → Settings. Current guild upgrade presentation names are **Wayfarer's Dispatch Table**, **Guild Bunkhouse**, **Reclaimed Supply Stores** and **Emberveil Workroom**. Their existing stable IDs, costs and mechanical effects are unchanged. These labels are purely cosmetic and should not be confused with future equipment crafting.
+
+---
+
 # Current PR #7 implementation — shared settings (November 6, 2026)
 
-Guild → Settings → Dungeon Defaults provides a global Depth Limit (initially Unlimited) and Insufficient Skill Threshold (initially 1%, 0% Off). Each expanded dungeon card can inherit or override both independently; explicit Unlimited differs from inheritance. Limits count rooms and apply at room boundaries. Assignment/member caps are removed from current saves and UI. A default change affects all inheriting dungeons, including active trips at their next boundary/room entry.
+Top-level Settings → Dungeon Defaults provides a global Depth Limit (initially Unlimited) and Insufficient Skill Threshold (initially 1%, 0% Off). Each expanded dungeon card can inherit or override both independently; explicit Unlimited differs from inheritance. Limits count rooms and apply at room boundaries. Assignment/member caps are removed from current saves and UI. A default change affects all inheriting dungeons, including active trips at their next boundary/room entry.
 
 Armor's Constitution bonus now increases owned Constitution Skills' check effectiveness and the separate Endurance Capacity maximum. Equipment order is strongest Catchup → sum flat bonuses → sum percentages. Equipment never grants capability or eligibility. Existing raw stats, materials, prices, carrying limits and storage remain intact. Recipe execution, other resource chains and final balance remain deferred.
 

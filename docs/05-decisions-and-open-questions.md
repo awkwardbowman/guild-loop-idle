@@ -1,3 +1,11 @@
+# Small Threadless/Hollow presentation pass — November 6, 2026
+
+**Implemented display-only updates:** The Old Quarter is now called **Old Highwoven District** (internal location ID remains `old_quarter`); the Emberveil shop includes **The Loomlight Hearth** name; the Stillmere herbologist is displayed as **Oakley Ash**, a working later bearer of Elder Ash's name. Gavin remains **Gavin Wess**. The four guild upgrade labels now use the agreed Wayfarer's/Guild Bunkhouse/Reclaimed Stores/Emberveil Workroom names. Existing shop/request, dungeon, location and upgrade IDs, mechanics and numerical values were not changed. Oakley's exact ancestry and the modern Hearth's genealogy remain **unwritten**, not newly established canon.
+
+The previous statements below that Oakley's name is not implemented refer to an older revision. No secret Skill reveal, crafting, Soul-gated discovery, or 100-floor content was implemented by this cleanup.
+
+---
+
 # Accepted correction: 100-floor main campaign, Soul eligibility and discovery — November 6, 2026
 
 **This is the authoritative latest decision section; it supersedes prior open questions below. Current gameplay does not yet implement 100-floor authored dungeons, secret-by-discovery previews, fixed Soul Leeches or new processing rules.**

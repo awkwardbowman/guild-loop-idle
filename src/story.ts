@@ -24,7 +24,7 @@ export const EVENT_TEXT:Record<EventId,{title:string;description:string;location
  leather_crafting_learned:{title:'We can outfit the guild',description:'Gavin has taught one ally Leather Crafting. Now we know how to make it, we can outfit everyone with gear! Equipment purchases and the Leather Crafting assignment are available.',locations:[shops,{tab:'Activities',label:'Activities → Guild assignments'},skills]},
  first_herb:{title:'Useful herbs',description:'Clyde’s Herbology skill can recover delicate plants. Perhaps someone in town knows a buyer.',locations:[goalsLocation,storage]},
  herbs_discussed:{title:'Gavin does not buy herbs',description:'Bring together five herbs and Gavin will tell you where to find a buyer. The five herbs are consumed on referral.',locations:[goalsLocation,storage]},
- stillmere_unlocked:{title:'The road to Stillmere',description:'The nearby town has an herbalist. Herbs can now be sold through a 15-second trade, with Elder Ash.',locations:[{tab:'Shops',label:'Shops → Stillmere Herbalist'},{tab:'Guild',label:'Guild → Storage → Trade'}]},
+ stillmere_unlocked:{title:'The road to Stillmere',description:'The nearby town has an herbalist. Herbs can now be sold through a 15-second trade, with Oakley Ash.',locations:[{tab:'Shops',label:'Shops → Stillmere Herbalist'},{tab:'Guild',label:'Guild → Storage → Trade'}]},
  archive_discovered:{title:'Forgotten Highwoven Annex is discovered',description:'A new dungeon with more traps and puzzles is available.',locations:[memberQueue,dungeonCatalog,skills]},
  archive_floor_cleared:{title:'An archive room is cleared',description:'A new lead points toward the old ridge workings.',locations:[goalsLocation]},
  quarry_discovered:{title:'Emberstone Delve is discovered',description:'The delve is available for assignment.',locations:[memberQueue,dungeonCatalog]},
@@ -35,7 +35,7 @@ export const EVENT_TEXT:Record<EventId,{title:string;description:string;location
 export function currentGoals(p:Progression,inventory?:Record<string,number>):StoryGoal[]{
  const goals:StoryGoal[]=availableStoryActions(p,inventory).map(action=>({id:action.id,title:action.title,description:action.description,action:action.id,location:goalsLocation}));
  if(hasEvent(p,'trail_discovered')&&!hasEvent(p,'first_floor_cleared'))goals.push({id:'clear_trail',title:'Explore your first rooms',description:'Assign Arya or Clyde to the Catacombs of the Wound and Wish. Compare their capabilities and finds; the trip takes 15 seconds each way.',location:memberQueue});
- if(hasEvent(p,'first_floor_cleared')&&!hasEvent(p,'first_return'))goals.push({id:'return_home',title:'Bring your finds home',description:'Let a member return or select Return home. Loot is stored only on arrival.',location:memberQueue});
+ if(hasEvent(p,'first_floor_cleared')&&!hasEvent(p,'first_return'))goals.push({id:'return_home',title:'Bring your finds home',description:'Let an expedition return normally, or request Recall in Members → Assignments. Loot is stored only on arrival home; Recall usually waits for a full-floor boundary.',location:memberQueue});
  if(hasEvent(p,'first_return')&&!hasEvent(p,'first_leather'))goals.push({id:'find_leather',title:'Collect Leather Scraps',description:'Explore catacomb rooms and bring Leather Scraps home.',location:dungeonCatalog});
 
  return goals;

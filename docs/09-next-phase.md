@@ -34,6 +34,10 @@ Before implementing: settle first dungeon-clear milestone, Soul gating, current 
 
 Implemented: unselected/unknown Attributes provide a genuine effective **0**. Calculate full weighted work without renormalizing missing components; only an **eligible** check's final work rate gets a **0.001** minimum. Ineligible checks remain blocked. Consolidate display formatting to at most two decimal places without rounding internal game state, changing prerequisites or erasing training. Added regression tests. See [02](02-adventurers-and-stat-growth.md) and [11](11-progression-and-check-foundations.md).
 
+## Small backlog cleanup — November 6, 2026
+
+Implemented safe UI/lore fixes: the Members activity count overview is noninteractive rather than seven dead buttons (sidebar counts still navigate); Info/Settings expose current-page semantics; the empty Guild roster guidance names the real Guild Hall path; the rarity legend no longer presents rarity rank as material tier; the guild metric counts traversed rooms including skipped encounters; Story references the actual Recall control. Applied Old Highwoven District, The Loomlight Hearth, Oakley Ash (working name), and approved guild upgrade display names without changing IDs, drops, lore reveal or economy. Added regression tests (QS01–QS04) and classified the previously unregistered NM01–NM02 and ST07 cases for selective testing. The 100-floor redesign, discovery percentages and Soul script remain reserved for later work.
+
 ## Small content slice — November 6, 2026
 
 The Whispering Archive and Emberstone Delve now have individually authored names for all eight existing room templates instead of prefixed Catacombs room titles. This is **flavor only**: room IDs, check skills and weights, drop tables, failure outcomes, difficulty and save semantics are unchanged. Existing O03 tests now guard distinct names and preserved mechanics. Additional specialized checks, location-specific room structures and balance remain future work.

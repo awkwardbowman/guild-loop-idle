@@ -5,7 +5,6 @@ import {DUNGEONS,UPGRADE_INFO} from '../src/content.ts';
 import {LOCATIONS} from '../src/locations.ts';
 import {RESOURCES} from '../src/resources.ts';
 import {REQUESTS} from '../src/requests.ts';
-import {currentGoals,EVENT_TEXT} from '../src/story.ts';
 import {initialGame,completeStoryAction} from '../src/engine.ts';
 
 const source=(path:string)=>readFileSync(new URL(`../src/${path}`,import.meta.url),'utf8');

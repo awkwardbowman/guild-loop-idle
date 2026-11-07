@@ -32,7 +32,7 @@ Before implementing: settle first dungeon-clear milestone, Soul gating, current 
 
 ## Presentation precision — November 6, 2026
 
-Implemented: change unselected/unknown Attribute fallback from 0.01 to 0.001, so missing competencies still contribute tiny weighted work while displaying zero. Consolidate numeric formatting to at most two fractional places without changing internal precision, eligibility or saved training; add regression tests. See [02](02-adventurers-and-stat-growth.md) and [11](11-progression-and-check-foundations.md).
+Implemented: unselected/unknown Attributes provide a genuine effective **0**. Calculate full weighted work without renormalizing missing components; only an **eligible** check's final work rate gets a **0.001** minimum. Ineligible checks remain blocked. Consolidate display formatting to at most two decimal places without rounding internal game state, changing prerequisites or erasing training. Added regression tests. See [02](02-adventurers-and-stat-growth.md) and [11](11-progression-and-check-foundations.md).
 
 ## Small content slice — November 6, 2026
 

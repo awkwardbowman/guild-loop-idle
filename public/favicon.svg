@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Guild Loops">
+  <rect width="64" height="64" rx="13" fill="#142b2b"/>
+  <path d="M32 8 51 16v15c0 12-7 20-19 25-12-5-19-13-19-25V16Z" fill="#214b46" stroke="#d8bc7c" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M22 27a11 11 0 0 1 19-4" fill="none" stroke="#f3e4bd" stroke-width="4" stroke-linecap="round"/>
+  <path d="m40 16 3 9-9-1" fill="none" stroke="#f3e4bd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M42 37a11 11 0 0 1-19 4" fill="none" stroke="#f3e4bd" stroke-width="4" stroke-linecap="round"/>
+  <path d="m24 48-3-9 9 1" fill="none" stroke="#f3e4bd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

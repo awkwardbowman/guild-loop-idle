@@ -1,3 +1,4 @@
+import {firstTenClearChance} from '../src/floor-probability.ts';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {initialGame,completeStoryAction,startDay,advance,recall,setDungeonLimit,recruit,dungeonWaiting,memberActivities} from '../src/engine.ts';
@@ -92,9 +93,16 @@ test('FD17 difficulty steps exponentially at floors, remains finite in endless d
  assert.equal(floorDifficulty('wood',1),1);assert.ok(floorDifficulty('wood',2)>1);assert.ok(floorDifficulty('wood',100)>floorDifficulty('ruins',100));assert.ok(Number.isFinite(floorDifficulty('ruins',100000)));assert.ok(Math.abs(floorDifficulty('wood',10)/floorDifficulty('wood',9)-1.035)<1e-9);
 });
 
-test('FD18 Arya can clear floors one through ten with starter stats and earned training, without potions or equipment',()=>{
- for(const seed of [1,9,23]){let g=opening();g.seed=seed;g.dungeonDefaults.depthLimit=100;g=startDay(g);for(let seconds=0;seconds<1200&&!g.dungeonKnowledge.wood?.[10]?.bossCleared;seconds+=10)g=advance(g,10);assert.ok(g.dungeonKnowledge.wood?.[10]?.bossCleared,`starter Arya seed ${seed}`);assert.equal(g.members[0].equipped.length,0);assert.deepEqual(parseSave(exportSave(g)),g);}
+test('FD18 the first-ten probability gate keeps Arya viable without potions and makes existing armor useful',()=>{
+ let previous=1;for(let floor=1;floor<=10;floor++){
+  const bare=firstTenClearChance(floor),armored=firstTenClearChance(floor,true);
+  assert.ok(bare.chance>=.65&&bare.chance<=previous+1e-9,`floor ${floor} beginner curve`);
+  assert.ok(armored.chance+1e-9>=bare.chance);assert.ok(Math.abs(bare.mass-1)<1e-9);previous=bare.chance;
+ }
+ assert.ok(firstTenClearChance(10,true).chance>=.9);assert.ok(firstTenClearChance(10,true).chance-firstTenClearChance(10).chance>=.15);
+ assert.throws(()=>firstTenClearChance(11));
 });
+
 test('FD19 floor eleven is a current-kit barrier even for fully trained Arya with existing best armor',()=>{
  let g=opening(),m=g.members[0];for(const stat of Object.values(m.stats))stat.current=stat.max=stat.affinity;for(const skill of Object.values(m.specializations))skill.value=skill.affinity;m.constitutionExperience=10;g.equipment.unlocked=['reinforced_armor'];m.equipped=['reinforced_armor'];g.dungeonKnowledge.wood={};for(let f=1;f<=10;f++)g.dungeonKnowledge.wood[f]={known:[`f${f}-boss-0`],bossCleared:true};g=startDay(g);g.members[0].enabled=false;g=advance(g,350);assert.equal(g.dungeonKnowledge.wood[11]?.bossCleared,false);assert.equal(g.members[0].runs,1);assert.ok(floorDifficulty('wood',11)>floorDifficulty('wood',10)*20);
 });

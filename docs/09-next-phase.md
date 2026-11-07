@@ -1,3 +1,9 @@
+# Current scope clarification — November 6, 2026
+
+**Stillmere upgrades are deferred at Maya's request.** Finish and maintain the floors 1–10 balance using the defined probability procedure in [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure), rather than large simulation matrices. The current first-ten curve passes that calculation without new numerical changes. Future Stillmere/Leech/crafting decisions below remain queued, not questions blocking this pass.
+
+---
+
 # Combined floor/UI implementation — November 6, 2026 · review branch
 
 Implemented: ten random counted encounters from stable floor catalogs plus a separate mandatory boss; non-counting/non-consecutive treasure; durable checkpoint/restart selection; discovery-only per-floor/category previews; individual-plus-boss secret-name reveals; 100-floor Catacombs endpoint; inert generated Soul and explicit capability flags; modern obsolete-Quarry suppression; version-10 save validation/legacy continuation; shared UI controls, mobile shell, keyboard navigation, numeric drafts, modal behavior and real browser regression.

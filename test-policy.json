@@ -412,6 +412,17 @@
         "FD22",
         "FD23"
       ]
+    },
+    "tests/floor-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks"
+      ],
+      "ids": [
+        "FP01",
+        "FP02"
+      ]
     }
   },
   "extraGroups": {

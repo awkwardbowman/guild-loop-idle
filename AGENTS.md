@@ -8,3 +8,5 @@ Source of truth for risk-based testing: [docs/12-testing-policy.md](docs/12-test
 - For a PR, run the relevant tests and `npm run build`; for a major release, run `npm run test:release` and separately verify actual browser flows.
 - Record test commands and results precisely. **Skipped/not selected does not mean passed.** Do not claim visual acceptance without real browser verification.
 - Avoid duplicating design docs. Keep durable documentation in the Guild Loops Drive folder with source copies under `docs/`. Do not overwrite concurrent feature PR changes without reconciling them.
+
+- **Balance procedure:** Follow [Floor clear probability procedure](docs/04-dungeons-and-expeditions.md#floor-clear-probability-procedure). Freeze the scenario, derive weighted encounter durations, convolve the counted rooms/optional treasure/boss, and sum the paths within the endurance budget. Use `node scripts/balance-floors.ts` for the first-ten worksheet. Prefer this defined calculation to large simulation matrices; keep short engine boundary tests for implementation correctness and extend the mathematical state when another mechanic can bind.

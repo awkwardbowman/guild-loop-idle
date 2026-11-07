@@ -1,3 +1,17 @@
+# Probability-based first-ten balance check — November 6, 2026
+
+Maya requested a simpler, defined probability procedure instead of large simulations. The procedure is now the leading section of [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure), implemented in `src/floor-probability.ts` and reproduced by `node scripts/balance-floors.ts`. The large multi-seed balance matrix has been removed from the script.
+
+The calculation uses actual room/category weights, tick-rounded weighted check times, ten independent counted slots with optional non-consecutive treasure, a separate mandatory boss, and the inclusive endurance budget. It sums successful probability mass rather than comparing average duration with capacity. The declared beginner profile has earned prior-floor Constitution bonuses but no ordinary practice. Cargo, ward and low-skill limits are checked for non-binding behavior; unsupported mechanics require extending the model.
+
+Result: no-equipment odds remain near 100% early, then 95.59% / 87.60% / 71.67% on floors 8 / 9 / 10. Rough Leather Armor raises those to 99.69% / 98.71% / 95.59%. The first-ten curve is retained: no potion or Stillmere upgrade is required for this calculation. Stillmere is explicitly deferred.
+
+FP01 independently validates a hand-counted example: six of sixteen paths fit the budget, even though average time alone would reject the floor. FP02 covers exact final-tick funding, invalid distributions and probability conservation. FD18 now protects the analytic first-ten balance gate instead of running seed-based campaign simulations. Existing short engine tests continue to cover real boss/recall/reward/save behavior.
+
+Earlier simulation results below are retained as historical checks, not routine balance requirements. Executed verification for this probability change: `npm run test:full` passed **179 tests, 0 failed, 0 not selected**; `npm run build` passed TypeScript and Vite; `git diff --check` passed. The mathematical worksheet reproduced the percentages above without any simulation run. Browser behavior is unchanged by this calculation-only addition; the existing browser suite remains a separate CI gate.
+
+---
+
 # Combined floor/UI branch verification — November 6, 2026 · save v10
 
 **Review implementation, not merged/deployed production.** Latest executed local gates:

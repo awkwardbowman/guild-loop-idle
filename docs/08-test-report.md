@@ -1,3 +1,62 @@
+# Skill-affinity and generalized ceiling verification — November 7, 2026 · save v11
+
+Implemented the confirmed new Common T1 10-point base-Skill allocation, analytic truncated-exponential starting distribution, derived totals, 3% exponential training cost, separate 10% penalties above affinity/activity, and floor Constitution practice. Historical saves/profiles retain their numbers and earlier model. The balance benchmark uses exact affinity plus every supplied legal loadout; above-affinity grinding is outside that benchmark.
+
+Executed final checks: `npm run test:full` passed **191/191**, zero failed or unselected; TypeScript/Vite production build passed; `git diff --check` passed. The real Chromium browser suite passed **13/13** on the new training/profile implementation before the final reference-copy clarification; no browser structure or flow changed afterward. CP01–CP05 cover continuous class bounds, union proofs across 300 selection scopes, legal witnesses, explicit inconclusive results and small exhaustive allocation comparisons. UP01–UP06 cover generation, the exact 90.909% starting percentile, reachable/over-affinity training, XP batch invariance, floor practice, pending return/save continuation, gear benchmarks, historical migration and corruption rejection.
+
+Current `node scripts/balance-floors.ts` results at exact affinity: Arya floor 10 **99.78% bare / 99.96% Rough Armor**. `maximumMemberChance` compares all four supplied legal current combinations (bare or one of three items); Reinforced Armor gives **99.999%**. Floor 11 remains **0%** with the best current armor. These supersede the old copied-root/Constitution-bonus beginner worksheet below. No new Stillmere upgrades or broad rarity/tier budgets were introduced.
+
+The runnable Diplomacy-shaped budget-14 fixture certifies below 1% with one optimistic probability evaluation. It is a mathematical fixture, not a live recruitment budget or authored Diplomacy encounter. Binding cargo, consumables and other unsupported stateful mechanics must still be modeled before certification; the calculator rejects the current member scenarios where cargo can bind.
+
+---
+
+# Reusable challenge/class-ceiling verification — November 7, 2026
+
+The deterministic challenge calculator now accepts named stat channels, fixed profile traits, explicit gear modifiers, weighted encounter categories, ordered checks and capacity/deadline rules. A bounded class search returns a strict below-target certificate, a legal counterexample, or an inconclusive probability interval. The current-member adapter compares every supplied legal loadout (maximum 256), and rejects binding cargo rather than ignoring it.
+
+Executed: `node --test tests/challenge-probability.test.ts tests/member-probability.test.ts` passed **5/5**; `npm run test:full` passed **184/184**, zero failed or unselected; `npm run build` passed TypeScript/Vite; `git diff --check` passed. The example `node scripts/check-challenge.ts docs/examples/challenge-ceiling.json` returned `proven-below`, upper probability 0, in one optimistic profile evaluation. This budget-14 Diplomacy example is a test fixture, not a recruitment or live dungeon rule.
+
+CP01–CP05 cover certificates, attainable witnesses, bounded inconclusive results, allocation tradeoff branching checked against exhaustive legal allocations, weighted failures, optional skips, gear, ordered checks and deadlines. MP01 reproduces existing floor-10 Arya odds and checks every supplied current gear combination, immutability and invalid-loadout/cargo guards. Browser UI and engine training behavior were not changed; the previously executed browser results below remain historical evidence for those flows. Common T1’s total affinity ceiling of 10 is confirmed; live training/cap allocation changes await clarification, so this does not yet certify a final affinity-capped Arya balance.
+
+---
+
+# Probability-based first-ten balance check — November 6, 2026
+
+Maya requested a simpler, defined probability procedure instead of large simulations. The procedure is now the leading section of [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure), implemented in `src/floor-probability.ts` and reproduced by `node scripts/balance-floors.ts`. The large multi-seed balance matrix has been removed from the script.
+
+The calculation uses actual room/category weights, tick-rounded weighted check times, ten independent counted slots with optional non-consecutive treasure, a separate mandatory boss, and the inclusive endurance budget. It sums successful probability mass rather than comparing average duration with capacity. The declared beginner profile has earned prior-floor Constitution bonuses but no ordinary practice. Cargo, ward and low-skill limits are checked for non-binding behavior; unsupported mechanics require extending the model.
+
+Result: no-equipment odds remain near 100% early, then 95.59% / 87.60% / 71.67% on floors 8 / 9 / 10. Rough Leather Armor raises those to 99.69% / 98.71% / 95.59%. The first-ten curve is retained: no potion or Stillmere upgrade is required for this calculation. Stillmere is explicitly deferred.
+
+FP01 independently validates a hand-counted example: six of sixteen paths fit the budget, even though average time alone would reject the floor. FP02 covers exact final-tick funding, invalid distributions and probability conservation. FD18 now protects the analytic first-ten balance gate instead of running seed-based campaign simulations. Existing short engine tests continue to cover real boss/recall/reward/save behavior.
+
+Earlier simulation results below are retained as historical checks, not routine balance requirements. Executed verification for this probability change: `npm run test:full` passed **179 tests, 0 failed, 0 not selected**; `npm run build` passed TypeScript and Vite; `git diff --check` passed. The mathematical worksheet reproduced the percentages above without any simulation run. Browser behavior is unchanged by this calculation-only addition; the existing browser suite remains a separate CI gate.
+
+---
+
+# Combined floor/UI branch verification — November 6, 2026 · save v10
+
+**Review implementation, not merged/deployed production.** Latest executed local gates:
+
+| Command / scope | Passed | Failed | Not selected |
+| --- | ---: | ---: | ---: |
+| `npm run test:full` | 177 | 0 | 0 |
+| `npm run build` | TypeScript + Vite passed | 0 | — |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser` | 13 | 0 | 0 |
+| `node scripts/balance-floors.ts` | 30/30 starter-Arya seeds clear floor 10; 0/30 current-best-kit probes clear floor 11 | No acceptance failures | Later chapter/economy balance |
+
+An earlier targeted dungeon/save iteration passed 118 selected tests with 58 not selected; the later full run above covers all 177 current registered engine tests. No skipped tests are reported as passed. FD01–FD23 cover floor catalogs, random repeats, mandatory boss placement, independent treasure, successful-only discovery, category isolation, individual/boss Skill reveals, recall/limits/XP, final checkpoint, save roundtrips/corruption/migration, inert Soul, first-ten balance, repeat farming and the obsolete Quarry route.
+
+Browser acceptance exercises fresh founding, real timed engine progress into persistent discovery, exact outing/RNG state after reload, keyboard tab navigation, numeric drafts/no invalid writes, modal focus loop/Escape/cancel/reset, city reset-to-Shop behavior, teaching eligibility, actual purchase/capacity feedback and timed sale payout. Five width cases run at 320/375/768/1024/1440px, with screenshots and axe WCAG A/AA checks across Story/Guild/Members/Activities/Shops/Info/Settings, including the Skill matrix and expanded dungeon/category controls. A separate 200% CSS zoom reflow case passed. No JavaScript page errors were captured in the successful browser suite. Axe reported no selected-rule violations in those tested page states; this is not a universal WCAG certification.
+
+Browser testing found and fixed a modal keyboard loop, tablet character tabs positioned outside their pane, invalid unlabeled-group ARIA and insufficient contrast on several text/glyph labels. Functional regressions also caught early-material farming becoming inaccessible when only the latest checkpoint was allowed; the shared Starting floor override and farming playthrough now cover that path. Historical v9 room-counter test fixtures explicitly retain historical outing rules; they are not used as evidence for new boss/floor behavior. Final review also corrected friendly discovered-find labels and stopped completed/limit-blocked assignments from appearing in the ready queue. The old Quarry-unlock assertion was replaced with the deliberate future-Soul-site boundary, while historical save/read coverage remains.
+
+Only floors **1–10** are currently balanced. The 30-seed starter probe uses normal earned practice without equipment or potions, reaching ten boss checkpoints in 460–600 simulated seconds (mean 496). The floor-11 probe uses fully capped Arya roots/Skills, ten floor XP and reinforced armor, and clears zero bosses. The large floor-11 work step is temporary pending Stillmere consumable/support design. These numbers do not establish human pacing, indefinite-grind balance, potion effects or floor-11–100 economic balance.
+
+Artifacts: `test-results/` contains the generated page/width screenshots, JSON report and failure-only traces. Browser CI uploads this directory as `browser-evidence`; local files are not user saves. The reproducible balance script never reads or edits a player's data. GitHub validation/build and browser CI passed on the published review branch, and Vercel automatically created its protected preview. Production was not promoted. Preview metadata/access checks and independent screen-reader/hardware testing are separate from the local/CI browser suite.
+
+---
+
 # PR #7 / save v9 validation — November 6, 2026
 
 Executed in the managed workspace against the complete review tree:

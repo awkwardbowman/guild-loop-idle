@@ -1,3 +1,177 @@
+# Reusable unit and class-ceiling procedure — November 7, 2026
+
+The calculator now separates an individual profile from the strongest legal member of a declared class. It is independent of dungeon theme: Diplomacy can use Influence/Insight and a different capacity expression while retaining the same encounter sequence and probability recurrence.
+
+**Confirmed and implemented ceiling policy:** the standard benchmark uses owned base Skills exactly at affinity and the best available legal equipment combinations. New Common T1 (including Arya and Clyde) has a total owned Skill affinity budget of 10, with Attributes/Disciplines derived from Skills. The generation and soft-cap training formulas are in [02](02-adventurers-and-stat-growth.md). Broader recruitment budgets and Stillmere upgrades remain deferred. Above-affinity training remains possible, so a benchmark certificate does not forbid eventual progress through unlimited grinding. Historical saved profiles keep their original rules and are not silently converted.
+
+## Inputs and exact individual odds
+
+`src/challenge-probability.ts` defines:
+
+- **Profile:** allocation values, nonnegative weighted expressions mapping them into named stat/Skill channels, and fixed capability/unlock traits. A maximum-profile test supplies affinity values, rather than starting trained values. Attributes/Disciplines that are derived totals must be expressions of the underlying Skills, rather than independent extra budget.
+- **Equipment:** one explicitly legal loadout; each channel applies strongest catchup, then additive flats, then additive percentages. Equipment does not grant traits. Negative modifiers, conditional equipment and consumables need an extended model before use.
+- **Challenge:** independently weighted standard, optional bonus and final-checkpoint encounter categories; count of standard slots; bonus chance; ordered work checks; required traits; optional encounter deadlines; capacity expression; drain and total exploration-time limit. Fixed positive work rates are computed from the declared channels. Missing required traits skip an optional bonus in one second; missing standard/boss traits fail the all-standards-plus-boss objective. Zero work rate cannot complete an eligible encounter.
+
+Convert every check to tick-rounded time, sum ordered checks, and calculate the available funded time. Convolve the categories using the recurrence below, dropping probability mass as soon as it fails a requirement/deadline or exceeds the time budget. Final surviving mass is the clear probability. This is exact for the declared frozen model, subject to ordinary floating-point precision; it does not sample runs. The current 300-second ward bounds the elapsed-time state to at most 301 values.
+
+`src/member-probability.ts` adapts **any existing Member** and an explicit current loadout to the authored dungeon/floor rules. `memberFloorChance(member, dungeonId, floor, loadout)` computes all-ten-success-plus-boss odds. `maximumMemberChance(member, dungeonId, floor, availableItemIds)` uses the exact-affinity benchmark; `bestMemberLoadout(member, dungeonId, floor, availableItemIds)` preserves actual trained values and enumerates bare plus every legal slot combination from the explicitly supplied available pool, up to 256 combinations. This does not assume that a tier-2 item is unavailable to a tier-1 unit: current game rules restrict slot count, not item tier. Item access must be supplied correctly by the caller.
+
+The live adapter freezes training at entry, validates slot counts/duplicates/item IDs, includes current check eligibility and low-skill deadlines, and rejects scenarios whose maximum cargo could bind. It does not forecast unlock acquisition or invent a potion strategy. The older first-ten Arya worksheet and the new member adapter agree on the floor-10 result.
+
+## Strongest legal member of a class
+
+`classCeiling(challenge, scopes, threshold, maxEvaluations = 256)` tests continuous allocation domains, including fractional affinity. Each scope declares the total affinity budget, a minimum/maximum per allocation dimension, fixed selections/capability traits, channel expressions and the complete allowed loadout list. Include every allowed selection/unlock variant to make a claim about the entire rarity/tier class; a single selection preset proves only that preset. Current positive-only expressions/modifiers make clear odds monotone inside each fixed scope.
+
+1. Validate that legal allocations sum to the budget and obey all bounds. First combine optimistic effective channels/capabilities across scopes and gear, relaxing optional bonus cost to one second. If this single union profile is below target, the whole declared family is certified without a probability calculation per selection/loadout. This is an upper bound, never a legal recruit. Using the maximum total from a generated budget range is safe only when lower-total legal profiles can be increased to that maximum under the same constraints; otherwise declare separate scopes.
+2. Evaluate a componentwise upper vector to obtain an optimistic probability bound. It may exceed the total budget; **never label it a recruit or a counterexample**.
+3. Evaluate an actual budget-respecting allocation to obtain an attainable lower bound and witness.
+4. If the upper bound is strictly below the target, that whole allocation box is proven below it. Otherwise split the widest allocation interval, tighten it using the total-budget constraint, and repeat.
+5. Stop at the evaluation budget and report the remaining interval. No random search or simulated expeditions are used.
+
+Results:
+
+- `proven-below`: every declared legal allocation/loadout has a pass rate **strictly below** the target.
+- `counterexample`: an explicit legal allocation/loadout reaches or exceeds the target. This refutes the proposed restriction; it does not necessarily identify the absolute best build.
+- `inconclusive`: the remaining upper bound still reaches the target when the calculation budget expires. Increase the budget, narrow the declared scope, or revise the gate; never report this as a pass.
+
+The result includes lower/upper probability bounds, number of evaluations, and the best legal witness found. A 1% rule uses `threshold: 0.01`. Rarity/tier labels do not secretly supply budgets, progression, unlocks or item access.
+
+## Runnable example and verification
+
+Run `node scripts/check-member.ts docs/examples/arya-affinity.json` for the complete Arya benchmark and every supplied legal item combination; replace `role` with a full `member` profile to check any new-model unit, or set `benchmark` to `current` to use actual trained values. Item availability is an explicit comparison input, not an assumption that all items have been acquired.
+
+Run `node scripts/check-challenge.ts docs/examples/challenge-ceiling.json`. This Diplomacy-shaped **test fixture** proves the declared five-attribute budget-14 scope below 1% in one optimistic profile evaluation; it is not a live Tier-5 recruitment rule. The same fixture with budget 50 produces a legal counterexample. A JSON input can instead contain `challenge`, `profile`, and `loadout` for individual odds.
+
+CP01–CP05 verify class certificates, legal witnesses, a bounded inconclusive result, tradeoff branching against exhaustive legal allocations, weighted failure mass, optional skips, gear, deadlines and ordered checks. MP01 verifies agreement with the existing Arya worksheet, all supplied legal current gear combinations, input immutability and unsupported-cargo rejection. Repeatable progression, retries, damage, conditional stats, consumables or cargo that affect later choices require extra probability-state dimensions before the tool can certify those scenarios.
+
+---
+
+# Floor clear probability procedure
+
+**Updated November 7, 2026:** `node scripts/balance-floors.ts` now evaluates Common T1 Arya’s owned Skills exactly at affinity (total budget 10), without a separate Constitution XP bonus. Bare / Rough Armor floor-10 clear odds are **99.78% / 99.96%**; best existing Reinforced Armor gives **99.999%**. The same maximum-profile adapter gives **0%** on floor 11. These are conditional fresh-floor benchmark odds, not starting-level or unlimited-training guarantees. Existing tier-1 armor slot rules allow a Reinforced Armor item if it is available. UP05 verifies the best-loadout/floor-11 comparison.
+
+The weighted-time, funded-budget and convolution procedure below still applies. Its earlier starter-Arya numeric table and Constitution-XP equations are preserved as **historical November 6 results**, superseded by this affinity benchmark. The current worksheet uses capacity 3.5 bare / 3.85 Rough Armor / 4.375 Reinforced Armor at floor 10, drain 0.14, and funded budgets 25 / 27 / 31 seconds. No Stillmere effect is assumed.
+
+**Current method, November 6, 2026:** use an analytic probability calculation to balance floors 1–10. Maya requested a defined, reusable calculation rather than large simulations. Stillmere upgrades remain deferred. Earlier simulation results below are historical validation, not the procedure to repeat for routine balance changes.
+
+**Implementation:** `src/floor-probability.ts`; worksheet command: `node scripts/balance-floors.ts`. This command advances no game time, samples no RNG and reads no player saves. `firstTenClearChance(floor, armor, constitutionXP)` supplies the current beginner-Arya worksheet; `floorClearProbability(...)` supplies the general distribution calculation.
+
+## 1. Define the event and freeze the inputs
+
+Calculate **the probability of clearing one floor's ten standard encounters and its separate boss before endurance runs out**, starting at that floor with a full meter. Do not conflate this with discovery coverage, a whole outing containing several floors, or total campaign completion time.
+
+Record the floor, actor's selected/owned Skills, actual trained values, Constitution XP, loadout and starting endurance. The default worksheet uses starter Arya, no ordinary practice, and one Constitution XP per preceding floor; compare no equipment with Rough Leather Armor. If a different member earned some earlier floor bonuses, use Arya's actual XP instead of automatically granting those bonuses. This is a conservative fixed-profile comparison, not a claim that equipment has already been purchased.
+
+Confirm entry eligibility and the meaning of success first. Current Arya can attempt every standard/boss check, so boss checkpoint victory and a successful full-floor XP clear have the same event. If optional standard skips become possible, track that success flag separately when calculating XP odds. An ineligible mandatory encounter must be a failure branch, never assigned minimum progress as if it were eligible.
+
+## 2. Enumerate the random choices and normalize their weights
+
+Use the actual generation rules:
+
+- A standard room identity has probability `p_i = w_i / sum(w)`, where the current floor generator uses `w_i = groupWeight_i × roomWeight_i` **inside the standard category**. Repeats are allowed. Do not substitute unique-discovery percentages for encounter probabilities.
+- Before each of the ten standard encounters, there is either **no treasure** with probability `0.85`, or **one treasure** with probability `0.15`. Select its identity using its normalized category weights. The treasure is followed by a standard room, which enforces no consecutive treasure rooms.
+- After standard encounter ten, the boss is mandatory. Normalize any choices **within the boss category**; its old random group weight is not its probability of appearing. There is no extra treasure draw before this boss.
+- Each selected category's probabilities must sum to 1. Treat these weighted draws as independent for planning odds; this is not a seed-specific forecast.
+
+## 3. Convert each outcome into funded game seconds
+
+For each eligible check, use the live weighted work rate after the agreed fallback and equipment rules:
+
+`checkSeconds = max(1, ceil((requiredWork − 1e−9) / effectiveWorkPerSecond))`
+
+`requiredWork = authoredWork × floorDifficulty`
+
+Current checks take one work step per game second. Add ordered check times for a room only when every required check is eligible and the relevant failure/deadline rules have been included. A currently unavailable optional treasure consumes one funded attempt second and is skipped. The current worksheet deliberately rejects unsupported multi-check/ineligible-standard/deadline cases rather than producing a misleading number.
+
+Group the room outcomes by duration to obtain three distributions: `N(t)` for a standard room, `T(t)` for treasure, and `B(t)` for the final boss. Outcomes with the same duration combine their probabilities.
+
+## 4. Calculate the endurance budget
+
+Use the engine's owned Constitution Skill values and the actual gear order to compute capacity `C`; do not substitute the root Constitution Attribute.
+
+For the current beginner worksheet on floor `f`:
+
+- No equipment: `C = 2 + 0.02 × ConstitutionXP`.
+- Rough Leather Armor: multiply that capacity by `1.10`.
+- Per-second drain: `d_f = 0.05 × (1 + 0.2 × (f − 1))`.
+- Funded seconds: `budget = floor((C + 1e−9) / d_f)`.
+
+The inclusive budget matters: completing the boss on the last funded second counts as a clear. Travel and later recovery affect pacing, but do not consume this floor's endurance.
+
+## 5. Sum successful paths, not just average time
+
+Let `*` mean convolution: `(A * B)(t) = sum_s A(s) × B(t − s)`.
+
+1. Optional-bonus distribution: `O(0) = 0.85`; positive durations receive `O(t) = 0.15 × T(t)`.
+2. One counted slot including its possible bonus: `U = O * N`.
+3. Start with `P_0(0) = 1`; calculate `P_(n+1) = P_n * U` for `n = 0…9`.
+4. Add the mandatory boss: `F = P_10 * B`.
+5. **Clear probability:** `Pr(clear) = sum_(t ≤ budget) F(t)`.
+
+This is a short finite probability calculation, not repeated simulated playthroughs. Do not decide success by comparing mean time to capacity: that loses the chance of unusually easy or difficult encounter combinations.
+
+## 6. Check assumptions and validate the calculation
+
+Require nonnegative probabilities, positive integer encounter durations, finite capacity/drain, and total probability mass 1. Check a hand-enumerated small example and exact-last-second funding. Those checks are covered by FP01/FP02.
+
+Before using the simplified time-only model, prove that other mechanics cannot bind. Current beginner Arya's slowest possible first-ten floor is 32 exploration seconds, below the 300-second ward. Her maximum possible floor cargo is 22, below her 72 capacity; her locked herb encounter is skipped. The current low-skill threshold does not interrupt any eligible check. The worksheet checks these boundaries. No Recall is assumed.
+
+If cargo, injury, retries inside a room, changing skills, consumables or a deadline can change later outcomes, **extend the mathematical state** to carry those quantities and an absorbing failure state before reporting odds. Do not silently ignore them or replace the procedure with a large simulation matrix. Only round displayed percentages, not intermediate math.
+
+## 7. Record the result and make the balance decision
+
+| Floor | Arya, no equipment | With Rough Leather Armor |
+| --- | ---: | ---: |
+| 1–5 | approximately 100% | approximately 100% |
+| 6 | 99.99% | approximately 100% |
+| 7 | 99.69% | 99.99% |
+| 8 | 95.59% | 99.69% |
+| 9 | 87.60% | 98.71% |
+| 10 | **71.67%** | **95.59%** |
+
+These are **fresh single-floor attempt** probabilities with the declared XP and no ordinary practice. The first two floors fit even the slowest encounter combination; later rounded `100%` values need not mean a guarantee. Floor 10 is accessible without a potion, while existing armor significantly reduces retries. Ordinary earned practice improves the real profile beyond this worksheet. The current 3.5% work steps and increasing endurance drain therefore remain suitable for the first ten floors; no numeric retuning is required in this pass.
+
+### Worked example: floor 10
+
+With nine prior floor XP, Arya has `C = 2.18`, drain `d = 0.14`, and 15 funded seconds. Normal encounters take one or two seconds; the slow-room probability is `4/33`. A bonus treasure takes one second with probability `0.15`; the boss takes two seconds. Thus:
+
+`totalSeconds = 12 + Binomial(10, 4/33) + Binomial(10, 0.15)`
+
+`Pr(clear) = Pr(totalSeconds ≤ 15) = 71.67%`.
+
+Rough Leather Armor raises capacity to `2.398` and the budget to 17 seconds, giving **95.59%**. For an unchanged profile, odds of succeeding within `k` independent fresh attempts are `1 − (1 − p)^k`; when practice changes the profile, recompute each attempt's probability instead of promising a fixed campaign duration.
+
+---
+
+# Floor/checkpoint implementation for review — November 6, 2026 · save v10
+
+**Branch implementation, not a production deployment.** This section supersedes the older open boss-placement, identity, reveal and scaling questions below. Maya approved both the UI and gameplay roadmaps, then clarified that only floors 1–10 need current balance: Arya must clear them now, while the next ten require future Stillmere potions and other support.
+
+- A floor is **ten counted standard encounters followed by a separate mandatory boss**. Standard room selection is random **with replacement** from ten distinct, stable floor-specific identities. Encounter counts and unique discoveries are independent: ten repeated successes can clear a floor while revealing only one of its normal room identities.
+- Treasure is a 15% bonus opportunity between standard encounters, never consecutive, never counted toward the ten. Once the tenth standard encounter resolves, the next encounter is the boss. Treasure has two catalog identities and bosses one per floor, with independent discovery denominators.
+- Boss victory records a durable guild checkpoint. Future outings default to the first uncleared floor. **Starting floor** may instead select an earlier unlocked checkpoint for repeat material/training runs; active outings keep their current state. Unfinished standard-room counters restart on a new outing, while learned rooms and completed bosses persist.
+- Successful encounter clears alone reveal their room's stat requirements. Each normal identity contributes one tenth of the floor's normal preview; repeat, failed or skipped rooms add no coverage. Boss victory reveals remaining **Composite Skill names** for that floor, without fabricating uncleared room stat coverage. Individual successful encounters also reveal their own Skill names. Global character browsers respect these secret-name rules.
+- Normal, Treasure and Boss filters may be combined, with equal identity weighting and truthful known/total denominators. Dungeon summaries aggregate **explored floors only**. Undiscovered checks, possible finds and special Skill names are not exposed through summaries, tooltips, sidebars, assignment cards or failure messages.
+- General Constitution XP requires ten successful standard encounters plus boss victory in that outing's floor. Bonus treasure does not contribute. Skipped standard rooms invalidate the XP, while a boss checkpoint can still be secured. Existing work practice, current outing capacity snapshots, injury outcomes and 30-game-second recall/low-skill clocks remain.
+- Ordinary Recall waits for the defeated boss, including when requested at standard room ten. Exact completion wins a simultaneous timeout. Limits count standard rooms; a cap at a multiple of ten includes the separate boss. A lower mid-floor cap returns without full-floor XP. Bonus treasure does not advance the cap.
+- The Catacombs have exactly **100 floors**. Defeating floor 100's boss records a single completion event, returns/banks cargo normally and prevents a floor-101 departure. Other dungeons have no authored campaign ending. Their numerical work scale is bounded for finite simulation math.
+
+## Current balance boundary
+
+Only Catacombs floors **1–10** are tuned: work multiplier `1.035^(floor-1)`, base normal check work 0.5 and separate boss check work 1.5. Existing linear per-floor endurance drain remains. Thirty seeded engine runs using starter Arya, earned practice and no equipment/potions cleared ten floors in 460–600 game seconds (mean 496). These are simulation results, not elapsed human playtests or guaranteed first-attempt clears.
+
+Floor **11** begins a deliberately large **provisional** work step at 32×, followed by provisional 3.5% steps. Thirty probes using stronger-than-current Arya (capped roots and Skills, ten floor XP, best existing armor) produced zero floor-11 boss clears. This preserves a current-kit barrier while Stillmere support is undefined. **Do not treat the floor-11 constant, floors 11–100, potion strengths or total campaign pacing as finalized balance.** Revisit this boundary together with Stillmere consumables, equipment and training. No potion effect has been invented or enabled in this PR. Reproduce with `node scripts/balance-floors.ts`.
+
+The 100-floor topology uses stable room catalogs and provisional reusable threat bands. One hundred unique lore scenes, special story gates and bespoke boss mechanics have not been authored merely by creating those catalogs.
+
+## Soul and save boundary
+
+Generated recruits have inert Soul current/max/affinity **exactly 1**, never select Soul and always carry explicit `soulAccess: none`. Guildmaster alone has `soulAccess: guildmaster` and cannot dungeon. Arya/Clyde keep Constitution entry; neither gains true Soul. Modern progression no longer offers the obsolete Quarry discovery or new departures there. Historical legacy access/outings remain readable. A Soul-discoverable replacement, fixed named Leeches, their unlock sequence and magic still need authored content.
+
+Save v10 validates checkpoint/catalog IDs, categories, counters, campaign completion and Soul access. v0–v9 saves remain readable. Existing outings retain their historical room/work rules through return, with no retroactive checkpoint or discovery credit; later departures use the new model. Old random recruits are normalized to inert Soul and non-Soul selections; if necessary their root budget and active snapshots are reconciled without erasing trained Skill records. A beta reset is still available, but import does not silently wipe the guild.
+
+---
+
 # Approved main-campaign and dungeon discovery direction — November 6, 2026
 
 **STATUS: Future gameplay redesign, not implemented in the current v9 dungeon engine.** This section supersedes conflicting older floor, endpoint, and discovery assumptions below. See [05](05-decisions-and-open-questions.md) for decision log and unresolved thresholds.

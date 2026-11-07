@@ -1,0 +1,7 @@
+{
+  "role": "arya",
+  "benchmark": "affinity",
+  "dungeonId": "wood",
+  "floor": 10,
+  "availableItemIds": ["leather_armor", "reinforced_armor", "leather_pack"]
+}

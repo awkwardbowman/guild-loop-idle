@@ -42,7 +42,14 @@
     "SE10",
     "SE13",
     "SE14",
-    "SE18"
+    "SE18",
+    "FD04",
+    "FD09",
+    "FD12",
+    "FD13",
+    "FD14",
+    "FD15",
+    "UP06"
   ],
   "smokeIds": [
     "C02",
@@ -371,6 +378,93 @@
         "QS02",
         "QS03",
         "QS04"
+      ]
+    },
+    "tests/floor-discovery.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks",
+        "progression",
+        "save"
+      ],
+      "ids": [
+        "FD01",
+        "FD02",
+        "FD03",
+        "FD04",
+        "FD05",
+        "FD06",
+        "FD07",
+        "FD08",
+        "FD09",
+        "FD10",
+        "FD11",
+        "FD12",
+        "FD13",
+        "FD14",
+        "FD15",
+        "FD16",
+        "FD17",
+        "FD18",
+        "FD19",
+        "FD20",
+        "FD21",
+        "FD22",
+        "FD23"
+      ]
+    },
+    "tests/floor-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks"
+      ],
+      "ids": [
+        "FP01",
+        "FP02"
+      ]
+    },
+    "tests/challenge-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks"
+      ],
+      "ids": [
+        "CP01",
+        "CP02",
+        "CP03",
+        "CP04",
+        "CP05"
+      ]
+    },
+    "tests/member-probability.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "dungeon",
+        "checks",
+        "equipment"
+      ],
+      "ids": [
+        "MP01"
+      ]
+    },
+    "tests/unit-potential.test.ts": {
+      "priority": "P1",
+      "groups": [
+        "checks",
+        "dungeon",
+        "save",
+        "recruitment"
+      ],
+      "ids": [
+        "UP01",
+        "UP02",
+        "UP03",
+        "UP04",
+        "UP05",
+        "UP06"
       ]
     }
   },

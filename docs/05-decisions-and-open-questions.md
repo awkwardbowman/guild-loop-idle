@@ -1,3 +1,28 @@
+# Confirmed affinity and balance-test decisions — November 7, 2026
+
+Maya specified: choose five Attributes/five Disciplines; allocate affinity to owned base Skills with 0.1 minimum each, then sequential random shares and a final remainder; derive Attributes/Disciplines from Skill totals. New Common T1, including Arya/Clyde, has total affinity 10. Broader recruitment budgets remain deferred.
+
+Starting levels use a truncated exponential with at least 90% below half affinity. Training can reach and exceed affinity; use a slow exponential base cost and separate multiplicative 10% penalties for each level above affinity and above the activity. Full floors train owned Constitution Skills without increasing affinity. Implemented formulas and authored story-friend allocations are in [02](02-adventurers-and-stat-growth.md).
+
+Tests use exact Skill affinity plus the best available legal equipment as the **reasonable maximum** benchmark. Because above-affinity training is allowed, a below-1% certificate applies to that benchmark and its declared unlock/gear scopes, not unlimited grinding. Diplomacy and other dungeon-like challenges use the same deterministic probability model with different stat channels. Class checks return proven-below, a legal counterexample, or inconclusive under a fixed evaluation budget.
+
+---
+
+# Confirmed implementation decisions — November 6, 2026 · floor/UI review branch
+
+Maya requested **both** the UI/UX roadmap and the larger dungeon gameplay work. Direct clarifications:
+
+1. **Boss:** ten standard rooms, then a separate boss. Award the floor's Constitution bonus only after the boss, and only with ten successful standard clears.
+2. **Identity and randomness:** ten stable distinct catalog identities per floor; what the adventurer encounters remains random, including repeats. Successful unique discoveries and ten traversed standard encounters are different counters.
+3. **Secret names:** use **both** triggers: successful individual encounters reveal their own Skill names; defeating the floor boss reveals that floor's remaining Skill names. Boss victory does not mark unseen room statistics discovered.
+4. **Tuning:** provisional numerical experiments are authorized. Later clarification narrows current acceptance to **Arya clearing floors 1–10 now, with floors 11–20 requiring future potions and other support from Stillmere**. Do not spend this pass balancing a full 100-floor economy.
+
+Implemented technical decisions and measured probes are in [04](04-dungeons-and-expeditions.md); UI contracts are in [10](10-game-interface.md); executed checks are in [08](08-test-report.md). These sections describe a review branch, not a merged or deployed release.
+
+Next authored decisions remain Stillmere's potion/support effects and acquisition, fixed named Leech identities/unlocks/capabilities, Soul-specific processing tables, actual crafting recipes/ownership and full campaign narrative checkpoints. The new technical support does not invent these rules or campaign canon.
+
+---
+
 # Small Threadless/Hollow presentation pass — November 6, 2026
 
 **Implemented display-only updates:** The Old Quarter is now called **Old Highwoven District** (internal location ID remains `old_quarter`); the Emberveil shop includes **The Loomlight Hearth** name; the Stillmere herbologist is displayed as **Oakley Ash**, a working later bearer of Elder Ash's name. Gavin remains **Gavin Wess**. The four guild upgrade labels now use the agreed Wayfarer's/Guild Bunkhouse/Reclaimed Stores/Emberveil Workroom names. Existing shop/request, dungeon, location and upgrade IDs, mechanics and numerical values were not changed. Oakley's exact ancestry and the modern Hearth's genealogy remain **unwritten**, not newly established canon.

@@ -1,3 +1,4 @@
+import {dungeonPreview} from './discovery.ts';
 import {AttentionSymbol} from './Indicators.tsx';
 import React from 'react';
 import type {Game} from './engine.ts';
@@ -10,7 +11,7 @@ const duration=(n:number)=>n>=60?`${Math.ceil(n/60)}m`:`${n}s`;
 export function ExpeditionSidebar({game,onOpen}:{game:Game;onOpen:()=>void}){
  return <details open><summary><b>Expeditions</b><small>{game.active.length} underway</small></summary><div className="segment">{DUNGEONS.filter(d=>dungeonUnlocked(game.progression,d.id)).map(dungeon=>{
  const occupants=dungeonOccupants(game,dungeon.id),next=occupants.length?Math.min(...occupants.map(run=>Math.max(1,returnETA(game,run)-run.returnSeconds))):null;
- return <button className="active-tile dungeon-tile" key={dungeon.id} onClick={onOpen}><div><b>{dungeon.name}</b><StatSymbols mix={dungeonStatMix(dungeon.id)}/></div><span>{occupants.length}/{dungeon.maxConcurrent} {dungeon.maxConcurrent===1?'slot':'slots'} · {dungeonWaiting(game,dungeon.id).length} queued · {next===null?'Available':`~${duration(next)}`}</span></button>;
+ return <button className="active-tile dungeon-tile" key={dungeon.id} onClick={onOpen}><div><b>{dungeon.name}</b><StatSymbols mix={dungeonPreview(game.dungeonKnowledge,dungeon.id).mix}/></div><span>{occupants.length}/{dungeon.maxConcurrent} {dungeon.maxConcurrent===1?'slot':'slots'} · {dungeonWaiting(game,dungeon.id).length} queued · {next===null?'Available':`~${duration(next)}`}</span></button>;
  })}</div></details>;
 }
 export function MemberActivitySidebar({game,onOpen}:{game:Game;onOpen:()=>void}){

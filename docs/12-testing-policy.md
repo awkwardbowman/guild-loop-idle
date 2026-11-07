@@ -1,3 +1,13 @@
+# Browser and floor acceptance extension — November 6, 2026 · review branch
+
+The existing smoke/targeted/full policy below remains in effect. Central engine, schema and dependency changes in this combined pass require full regression plus build. FD01–FD23 register floor/catalog, discovery, checkpoint, secret-name, recall, migration, Soul, farming and first-ten balance invariants; FP01–FP02 validate the probability procedure with hand-enumerated paths and boundary checks; P0 checkpoint/save/award cases are explicitly classified in `test-policy.json`.
+
+`npm run test:browser` is a separate Playwright suite (UI01–UI09, with UI06 parameterized over five widths). Install Chromium with `npx playwright install chromium`, or point `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` at an existing Chromium. It tests real DOM/keyboard/modal/settings/discovery/shop/trade/save interactions, 320/375/768/1024/1440px layouts, axe WCAG A/AA rules and 200% CSS zoom reflow. It does not replace engine tests or establish universal device/screen-reader conformance. Browser CI uploads screenshots, JSON results and failure traces as `browser-evidence` for 14 days.
+
+`node scripts/balance-floors.ts` follows the analytic floor-clear probability procedure in [04](04-dungeons-and-expeditions.md#floor-clear-probability-procedure). It calculates weighted encounter times and sums probability mass within endurance budgets, without RNG sampling, clock advancement or player saves. Use this defined calculation for routine first-ten balance work instead of large simulation matrices. Stillmere upgrades are deferred. Exact verification results and assumptions belong in [08](08-test-report.md).
+
+---
+
 # Guild Loops — Risk-based test and release policy
 Updated 2026-11-06 (reconciled after gameplay PR #7 merge). Authoritative implementation: `test-policy.json`, `scripts/test-policy.mjs`, and `.github/workflows/validate.yml`.
 

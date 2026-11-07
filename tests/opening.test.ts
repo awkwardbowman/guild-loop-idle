@@ -15,9 +15,9 @@ function oneTrip(seed:number,name:string,maxed=false,armor=false){let game=found
 }
 test('O01 fixed friends are reproducible with starting totals <=10 and tier potential 10^tier',()=>{
  const game=found(1),other=found(999);assert.deepEqual(game.members,other.members);assert.deepEqual(game.members.map(member=>member.name),['Arya','Clyde']);
- for(const member of game.members){assert.ok(STATS.reduce((sum,stat)=>sum+member.stats[stat].max,0)<=10);assert.ok(Math.abs(STATS.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-10)<1e-9);assert.ok(Object.values(member.skills).every(skill=>skill.level<=5));}
+ for(const member of game.members){assert.ok(STATS.reduce((sum,stat)=>sum+member.stats[stat].max,0)<=10);assert.ok(Math.abs(member.selections!.attributes.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-10)<1e-9);assert.ok(Object.values(member.skills).every(skill=>skill.level<=5));}
  assert.equal(tierBudget(1),10);assert.equal(tierBudget(2),100);assert.equal(tierBudget(3),1000);
- for(let i=0;i<100;i++){const member=recruit(game);assert.ok(Math.abs(STATS.reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-tierBudget(member.tier))<1e-7);}
+ for(let i=0;i<100;i++){const member=recruit(game);assert.ok(Math.abs(STATS.filter(stat=>member.affinityModel!=='skills'||stat!=='soul').reduce((sum,stat)=>sum+member.stats[stat].affinity,0)-tierBudget(member.tier))<1e-7);}
  assert.equal(game.guild.gearRegen,0);
 });
 test('O02 Endurance Capacity bounds starter outings while role-specific work remains deterministic',()=>{
@@ -58,11 +58,11 @@ test('O04 budget rolls re-evaluate eligible sizes after every draw and always re
 test('O05 herbs require authored Herbology; no Perception threshold or random success gate',()=>{
  const game=found(),check=roomById('wood','crypt_garden').checks[0],state={id:'crypt_garden',index:0,work:0,attempts:0};
  assert.equal(roomCheckStep({...game.members[0],gear:0},check,state,1,[],()=>0,1).outcome,'ineligible');
- const result=roomCheckStep({...game.members[1],gear:0},check,state,1,[],()=>{throw Error('No success roll');},1);assert.equal(result.outcome,'success');assert.equal(result.actor.skills.herbology.experience,2);
+ const result=roomCheckStep({...game.members[1],gear:0},{...check,work:.01},state,1,[],()=>{throw Error('No success roll');},1);assert.equal(result.outcome,'success');assert.equal(result.actor.skills.herbology.experience,2);
 });
 
 test('O06 optional missing skills skip; mandatory checks progress deterministically and resource shortages stop them',()=>{
- let game=startDay(found());game.members.forEach(member=>member.enabled=false);game=advance(game,15);const run=game.active[0];run.generated={id:'crypt_garden',index:0,work:0,attempts:0};game=advance(game,1);assert.equal(game.active[0].floor,2);
+ let game=startDay(found());game.members.forEach(member=>member.enabled=false);game=advance(game,15);const run=game.active[0];run.generated={id:'f1-treasure-1',index:0,work:0,attempts:0};game=advance(game,1);assert.equal(game.active[0].floor,1);assert.equal(game.active[0].floorState?.counted,0);
  const check=roomById('wood','crypt_scavenger').checks[0],member=found().members[0];const result=roomCheckStep({...member,gear:0},check,{id:'crypt_scavenger',index:0,work:0,attempts:0},1,[],()=>{throw Error('No success roll');},1);assert.equal(result.outcome,'success');result.actor.stats.strength.current=.001;assert.equal(roomCheckStep(result.actor,check,result.state,1,[],()=>0,2).outcome,'success');
 });
 
@@ -86,7 +86,7 @@ test('O11 mid-room rolls, partial work and both cargo/trade timers resume determ
  let game=startDay(found(7));game=advance(game,33);const restored=parseSave(exportSave(game));assert.deepEqual(advance(restored,100),advance(game,100));
 });
 test('O12 malformed storage, room indexes, equipment ownership, tier budgets and carry snapshots reject imports',()=>{
- const game=advance(startDay(found()),15);game.active[0].generated={id:'crypt_guardian',index:0,work:0,attempts:0};game.active[0].roomStartedAt=0;game.active[0].roomEfficiency=1;for(const mutate of [(g:any)=>g.storage.herb.cap=0,(g:any)=>g.equipment.unlocked=['missing'],(g:any)=>g.members[0].stats.strength.affinity=100,(g:any)=>g.active[0].generated.index=99,(g:any)=>g.active[0].carryCapacity=-1]){const data=JSON.parse(exportSave(game));mutate(data.game);assert.throws(()=>parseSave(JSON.stringify(data)));}
+ const game=advance(startDay(found()),15);game.active[0].floorState=null;game.active[0].generated={id:'crypt_guardian',index:0,work:0,attempts:0};game.active[0].roomStartedAt=0;game.active[0].roomEfficiency=1;for(const mutate of [(g:any)=>g.storage.herb.cap=0,(g:any)=>g.equipment.unlocked=['missing'],(g:any)=>g.members[0].stats.strength.affinity=100,(g:any)=>g.active[0].generated.index=99,(g:any)=>g.active[0].carryCapacity=-1]){const data=JSON.parse(exportSave(game));mutate(data.game);assert.throws(()=>parseSave(JSON.stringify(data)));}
 });
 
 test('O13 a real released v5 save migrates Gold balances, pending sales and pins to Chips without resetting trips',async()=>{
@@ -96,6 +96,6 @@ test('O13 a real released v5 save migrates Gold balances, pending sales and pins
  const game=parseSave(JSON.stringify(raw));assert.equal(game.guild.chips,balance);assert.equal(game.seed,seed);assert.equal(game.trades[0].chips,2);assert.equal(game.trades[0].remaining,8);assert.ok(game.pinnedResources.includes('chips'));assert.ok(!('gold' in game.guild));assert.deepEqual(game.active.map(run=>({memberId:run.memberId,stage:run.stage,floor:run.floor,progress:run.progress,travelRemaining:run.travelRemaining})),active);assert.ok(game.members.every(member=>member.origin==='legacy'));assert.deepEqual(parseSave(exportSave(game)),game);
 });
 test('O14 seeded opening reaches teaching, equips Clyde and refers to Elder Ash with consumed herbs',()=>{
- let game=startDay(found(73129));for(let seconds=0;seconds<5000&&!game.progression.completed.stillmere_unlocked;seconds+=10){game=advance(game,10);game=completeStoryAction(game,'open_tanner');game=completeRequest(game,'gavin_leather_lesson',game.members[1].id);game=completeRequest(game,'gavin_herb_referral');game=unlockEquipment(game,'leather_armor');const clyde=game.members[1];if(game.equipment.unlocked.includes('leather_armor')&&!clyde.equipped.length)game=equip(game,clyde.id,'leather_armor');}
+ let game=found(73129);game.dungeonStarts.wood=1;game=startDay(game);for(let seconds=0;seconds<5000&&!game.progression.completed.stillmere_unlocked;seconds+=10){game=advance(game,10);game=completeStoryAction(game,'open_tanner');game=completeRequest(game,'gavin_leather_lesson',game.members[1].id);game=completeRequest(game,'gavin_herb_referral');game=unlockEquipment(game,'leather_armor');const clyde=game.members[1];if(game.equipment.unlocked.includes('leather_armor')&&!clyde.equipped.length)game=equip(game,clyde.id,'leather_armor');}
  assert.ok(game.progression.completed.stillmere_unlocked);assert.ok(game.progression.completed.leather_crafting_learned);assert.equal(game.inventory.herb,0);assert.equal(game.members[1].skills.leather_crafting.discovered,true);assert.equal(game.members[0].skills.herbology.discovered,false);assert.deepEqual(parseSave(exportSave(game)),game);
 });

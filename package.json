@@ -16,13 +16,16 @@
     "test:full": "node scripts/test-policy.mjs full",
     "test:release": "node scripts/test-policy.mjs release",
     "test:version": "node scripts/test-policy.mjs version",
-    "test:catalog": "node scripts/test-policy.mjs catalog"
+    "test:catalog": "node scripts/test-policy.mjs catalog",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.9",
     "typescript": "^5.9.2",

@@ -27,7 +27,7 @@ export const dungeonById = (id: string) => DUNGEONS.find(d => d.id === id)!;
 export const DAY_SECONDS = 86400;
 export const WARP_SECONDS = 300;
 export const RESET_SECONDS = 12;
-export const VERSION = 9;
+export const VERSION = 11;
 export type Upgrade = 'slots' | 'quarters' | 'gear' | 'regen';
 export const UPGRADE_INFO: Record<Upgrade, { name: string; description: string; chips: number; materials: number }> = {
  slots: { name: "Wayfarer's Dispatch Table", description: '+1 simultaneous expedition', chips: 24, materials: 2 },

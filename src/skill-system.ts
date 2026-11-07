@@ -1,4 +1,5 @@
 import type { Pools, Stat } from './content.ts';
+import {MIN_PROGRESS_RATE} from './numbers.ts';
 import {ATTRIBUTES,STATS,STAT_INFO,zeroPools} from './attributes.ts';
 import type {AttributeDefinition} from './attributes.ts';
 export {ATTRIBUTES} from './attributes.ts';
@@ -44,7 +45,7 @@ export type RoomState={index:number;work:number;cooldown:number;attempts:number;
 export const newRoomState=():RoomState=>({index:0,work:0,cooldown:0,attempts:0,status:'active',lastOutcome:null});
 function skillPower(actor:CheckActor,id:string){const d=SKILLS.find(s=>s.id===id);if(!d)throw Error(`Unknown skill ${id}`);const level=actor.skills[id]?.level??0;return {level:level/99,attribute:d.affinities.reduce((n,c)=>n+c.weight*effectiveAttribute(actor,c.attribute,d.specialization)/100,0)};}
 function channel(actor:CheckActor,c:Channel){let attributes=0,levels=0;for(const x of c.skills){const p=skillPower(actor,x.skill);attributes+=p.attribute*x.weight;levels+=p.level*x.weight;}return c.base+attributes*c.attributeFactor+levels*c.levelFactor;}
-export function checkMetrics(actor:CheckActor,check:CheckDefinition){return {speed:Math.max(.01,channel(actor,check.speed)),chance:Math.min(check.chanceMax,Math.max(check.chanceMin,channel(actor,check.success))),efficiency:Math.max(1,channel(actor,check.efficiency))};}
+export function checkMetrics(actor:CheckActor,check:CheckDefinition){return {speed:Math.max(MIN_PROGRESS_RATE,channel(actor,check.speed)),chance:Math.min(check.chanceMax,Math.max(check.chanceMin,channel(actor,check.success))),efficiency:Math.max(1,channel(actor,check.efficiency))};}
 export function resourceCost(actor:CheckActor,check:CheckDefinition,scale=1):Pools {
  const costs=zeroPools();const efficiency=checkMetrics(actor,check).efficiency;
  for(const c of check.cost.distribution){const pool=rootPool(c.attribute);if(!STAT_INFO[pool].consumable)throw Error('Non-consumable stat cannot fund a cost');costs[pool]+=check.cost.amount*scale*c.weight/efficiency;}

@@ -25,7 +25,7 @@ test('NM01 unowned stats are exactly zero; minimum rate applies only to eligible
  const work=roomCheckStep(actor,zeroPowerCheck,{id:'crypt_scavenger',index:0,work:0,attempts:0},1,[],()=>0,1);
  assert.equal(work.outcome,'working');
  assert.equal(work.state.work,.001);
- const invalidCheck={...zeroPowerCheck,skill:'scavenging'};
+ const invalidCheck={...zeroPowerCheck,skill:'crypt_lore',requiredLevel:1};
  assert.equal(checkProgressRate(actor,invalidCheck,[]),0);
  const invalid=roomCheckStep(actor,invalidCheck,{id:'crypt_scavenger',index:0,work:0,attempts:0},1,[],()=>0,1);
  assert.equal(invalid.outcome,'ineligible');

@@ -7,7 +7,7 @@ export type Task = { name: string; duration: number; cost: Pools; training: Pool
 export type Dungeon = { id: string; locationId: LocationId; name: string; subtitle: string; maxConcurrent: number; description: string; gear: number; chips: number; accent: string; tasks: Task[]; loot: { id: string; name: string; weight: number }[] };
 const p = (strength:number,dexterity:number,intelligence:number):Pools=>({...zeroPools(),strength,dexterity,intelligence});
 export const DUNGEONS: Dungeon[] = [
- { id: 'wood', locationId: 'catacombs', name: 'Catacombs of the Wound and Wish', subtitle: 'NEAR EMBERVEIL', maxConcurrent: 1, description: 'Beneath Emberveil's ancient Wound and Wish shrine, broken wards and weathered steps lead into catacombs that have outlasted a thousand years of history. The first passages shelter small creatures, abandoned keepsakes and forgotten gardens; the greater depths remain unknown.', gear: 2, chips: 8, accent: 'green', tasks: [
+ { id: 'wood', locationId: 'catacombs', name: 'Catacombs of the Wound and Wish', subtitle: 'NEAR EMBERVEIL', maxConcurrent: 1, description: 'Beneath the ancient Wound and Wish shrine, broken wards and weathered steps lead into catacombs that have outlasted a thousand years of history. The first passages shelter small creatures, abandoned keepsakes and forgotten gardens; the greater depths remain unknown.', gear: 2, chips: 8, accent: 'green', tasks: [
   { name: 'Shift the fallen masonry', duration: 3, cost: p(3,1,1), training: p(2,.5,.5) },
   { name: 'Cross the broken crypt', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
   { name: 'Track the crypt scavenger', duration: 4, cost: p(2,2,3), training: p(1,1,2) }

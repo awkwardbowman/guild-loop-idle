@@ -1,3 +1,48 @@
+# Threadless / Hollow reskin direction — November 6, 2026
+
+## Accepted direction (design only; not implemented in this documentation change)
+
+- **World and chronology:** Guild Loops is set thousands of years after the Threadless campaign and uses **the Hollow's surviving architecture/geography** as its setting. Ruins of Emberveil exist in both periods. The original Threadless campaign geography is historical reference, not proof that every current travel distance/settlement is unchanged. Do not assert that modern Emberveil and original Spellreach Emberveil are identical without reconciling the Hollow's history.
+- **Arya and Clyde:** They **predate Threadless**, with important lore intentionally reserved for much later. Do not describe them as newly invented post-Threadless characters, replace their identities, or expose their origins prematurely.
+- **Catacombs:** Retain the historically grounded ruins/catacombs of Emberveil, linked to the *Ruins of the Wound and the Wish*. This is a **long-term story dungeon**, not an easy dungeon intended for deep early clears. Later levels should become significantly more difficult and reveal progressively more dangerous creatures. Depth scaling, enemy tiers and story gates need dedicated balancing; preserve current mechanics until designed.
+- **Archive:** Rename/display the current Whispering Archive as **The Forgotten Highwoven Annex** (working accepted direction from the immediately prior naming proposal), a future lore-oriented exploration site for Clyde. The historical Highwoven Hall/Emberveil material is the basis, not an automatic copy of its original state. Stable internal dungeon ID `ruins` must not change for a display rename.
+- **Quarry/Delve:** The current Emberstone Delve concept does not fit. Later, design a simple Weave-related hidden site; it should only be **discoverable by someone with Soul**. No present playable adventurer is intended to meet the combined expedition and Soul prerequisites. Do not activate or try to balance this site yet; exact place/name, Soul eligibility, who discovers it and unlock rules are deferred.
+- **Secret dungeon abilities:** Do **not display the names** of dungeon-specific special Skills before that dungeon has been completed at least once. Keep secret metadata out of pre-clear dungeon panels, skill lists, tooltips and similar disclosures. Because dungeons are bottomless, the exact definition of the first valid "completion" is **unresolved** (e.g. first complete canonical ten-room floor and safe return, or another explicit milestone). Ordinary non-secret skills may remain visible; identify what counts as dungeon-specific when implementing.
+- **Shops:** Favor renaming/flavoring the shopping establishment in an Emberveil/Hollow style, with a link to historic **The Loomlight Hearth** where appropriate. Distinguish a building/name surviving from an original proprietor still living. Keep navigation and backend IDs stable until scope is specified.
+- **Resources/materials:** Early loot should be **generic Common materials and artifacts**, suitable as inputs for later processing into named, specialized, and/or higher-tier resources. Inkwell Reach is **not** to be used as the source of ink/loot flavor. Soul-enabled adventurers will later be able to recognize/find specific resources; adventurers without Soul find generic material whose conversion may fail or return lesser products. Recovery, processing, probabilities, Soul definition and specific outputs need separate design; no present loot curve changes are approved.
+- **Equipment progression:** Gavin/the leather mentor is to **teach how to use/craft each tier**, but that does not directly give equipment. Each gear item must actually be crafted; multiple equipment types are planned. This supersedes current immediate-purchase template behavior **as a future redesign**, not an immediate migration. Recipes, distinct training and crafting permissions, tiers, costs, and legacy purchases remain deferred.
+- **Guild building names:** The proposed guild-room/upgrade names are acceptable as flavor, but existing upgrade functions and capacities remain unchanged.
+- **Characters:** Rename/recast current Elder Ash as a **later successor/descendant** such as *Oakley Ash* (working name); do not treat the original Elder Ash as the merchant. Original Ash's Weave Leech nature makes an asserted biological descent a lore question; family name, adopted lineage, institutional succession or narrative relationship should be defined before asserting a genetic link.
+- **Rooms:** Current room names are acceptable. Additional atmospheric snippets may be added later, with no need to change room mechanics now.
+
+## Lore-reference correction — Gavin / the Loomlight Hearth
+
+The Threadless source `Festival Day 0.md` calls Emberveil's inn **The Loomlight Hearth** and names its innkeeper **Marven Wess**. `Marven.md` also calls the establishment the **Emberveil Hearth**. **Gavin is not verified as the original innkeeper in these files**; the existing Guild Loops Gavin is its tanner and barkeep. Make him the new proprietor/associated craftsperson in the far-future successor establishment if desired, but do not silently substitute him for Marven. References:
+
+- [Threadless Festival Day 0](https://drive.google.com/file/d/11rUfMcIDCK1ySp9UfEsZMhuh9yLiDMgO/view)
+- [Marven Wess](https://drive.google.com/file/d/18xoQGeP8fqvhwPwcndztu9WEeSbT8cjB/view)
+- [Ruins of the Wound and Wish](https://drive.google.com/file/d/1TK9F9owsH6tsmTvcGpCw3-7FcoIlI9CE/view)
+- [Emberveil](https://drive.google.com/file/d/1la0MH7qbwYTlPj_Rxk4vmf8omYmB-xrE/view)
+- [Elder Ash](https://drive.google.com/file/d/1wuOKuWdx6OU2SCsESA7Firja14o83YRk/view)
+- [The Hollow](https://drive.google.com/file/d/1cajQH7PIiViBhEB0rv7KkpB7EJ_sTkHp/view)
+
+## Open requirements before implementation
+
+1. **First completion trigger for hidden dungeon Skill names:** Bottomless dungeons do not have a natural final clear. Pick an explicit per-dungeon durable milestone, likely a completed canonical floor and successful return, and define whether discovery in another UI view may reveal a Skill sooner.
+2. **Soul classification and perception/processing rules:** Does "has Soul" mean innate capacity, a selected Soul Attribute/Skill, effective Soul above a threshold, or a combination? Differentiate *finding specific loot* from *identifying generic finds* and *successfully refining* them. Don't accidentally grant Soul eligibility to every recruit who merely has a numerical Soul stat.
+3. **Catacomb progression:** Outline the depth bands, early safe rewards vs intentionally dangerous deeper creatures, escalating monsters, and story revelations, without blocking ordinary beginner runs.
+4. **Archive role:** Define which lore discoveries are Clyde-oriented without restricting the dungeon to Clyde unless intentionally approved. Confirm its exact display name and discovery progression.
+5. **Quarry replacement:** Define whether to hide the current discoverable Delve entirely until the Soul-access site is designed and how existing saves/assignments transition.
+6. **Equipment economy migration:** Current equipment "purchases" unlock reusable templates; switching to actual crafting affects recipes, material consumption, per-member equipment ownership, old unlocked gear, and later tier teaching.
+7. **Merchant lineage/name:** Confirm Gavin's relationship to the old Hearth and whether Oakley Ash is a family member, an adopted successor, or otherwise inherits the title. Do not invent original Threadless lineage.
+8. **Time and setting continuity:** How the Hollow survived/evolved for millennia (including the White Wall and altered magic) is a long-term story question; keep the game from revealing campaign-ending facts prematurely.
+
+## Engineering boundary
+
+This document records accepted narrative direction and explicit unknowns, **not implemented gameplay**. Preserve stable identifiers for resources/dungeons/shops/events and save-compatible history when editing presentation names. No new Soul drops, dungeon difficulty, hidden-skill unlock, cooking/crafting, or Soul-only location is live as a result of this decision log.
+
+---
+
 # Implementation decisions for PR #7 — November 6, 2026
 
 Maya explicitly authorized choosing and documenting provisional defaults and implementing the full scope. Implemented: five/five specialization and sparse Skills matrix/totals; 0.01 fallback without weight renormalization; owned-Constitution-Skill entry gate; separate Endurance Capacity; successful ten-room floor Constitution XP that raises future capacity; Catchup → Flat → Percent; queued recall and independent room-grace timer; global/per-dungeon settings; retirement of assignment caps; v9 migration and Info explanations.

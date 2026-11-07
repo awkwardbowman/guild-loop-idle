@@ -2,6 +2,22 @@
 
 The full five/five specialization, Skills grid/totals, separate endurance, full-floor Constitution growth, queued recall, insufficient-skill room grace and shared dungeon settings scope is implemented for review in save v9. Maya authorized the provisional details. See [11](11-progression-and-check-foundations.md) for formulas/migration and [08](08-test-report.md) for executed validation.
 
+## Threadless / Hollow lore reskin — design decisions recorded November 6, 2026
+
+See [05 — Threadless / Hollow reskin direction](05-decisions-and-open-questions.md) for accepted scope, verified source references and blockers. **This is design only**, not deployed gameplay.
+
+- Prioritize the **Catacombs of the Wound and Wish** as a long-term, progressively dangerous story dungeon rather than making deep progress easy.
+- Rebrand the Whispering Archive as the **Forgotten Highwoven Annex**, a future Clyde-focused lore location; existing in-game ID stays `ruins`.
+- Defer/rethink the simple Weave-associated Soul-discoverable quarry site until expedition-capable Soul adventurers exist. Do not add it as accessible early content.
+- Hide special dungeon Skills' names until the dungeon's first qualifying completion; define completion for bottomless dungeons before coding.
+- Adopt historically linked Loomlight Hearth retail presentation, verifying **Marven Wess** as the original innkeeper and treating modern Gavin as a distinct character.
+- Make Common finds generic precursors, later split into recognized Soul-specific items and uncertain non-Soul conversion. Do not use Inkwell Reach as an item source.
+- Later shift equipment to learned per-tier techniques and **actual crafting**, with multiple gear forms; do not imply current template unlocks already perform crafting.
+- Maintain Arya and Clyde's pre-Threadless identity as a deferred long-term mystery. Propose **Oakley Ash** as successor to historic Elder Ash, with lineage unspecified.
+- Preserve accepted guild room names; add room flavor snippets later. Keep stable IDs/save continuity.
+
+Before implementing: settle first dungeon-clear milestone, Soul gating, current Delve handling for existing saves, and equipment ownership/recipe migration. Distinguish approved direction from proposed concrete names and new mechanics.
+
 ## Small content slice — November 6, 2026
 
 The Whispering Archive and Emberstone Delve now have individually authored names for all eight existing room templates instead of prefixed Catacombs room titles. This is **flavor only**: room IDs, check skills and weights, drop tables, failure outcomes, difficulty and save semantics are unchanged. Existing O03 tests now guard distinct names and preserved mechanics. Additional specialized checks, location-specific room structures and balance remain future work.

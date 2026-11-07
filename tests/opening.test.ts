@@ -30,6 +30,22 @@ test('O03 weighted category and within-category selection remain separate; trap 
  const random=(seed:number)=>()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
  let ordinary=0,doubled=0;const a=random(4),b=random(4);for(let i=0;i<10000;i++){if(roomById('wood',rollRoom('wood',a).id).group==='trap')ordinary++;if(roomById('wood',rollRoom('wood',b,{trap:2}).id).group==='trap')doubled++;}
  assert.ok(doubled>ordinary*1.5);for(const dungeon of ROOM_DUNGEONS)validateRoomDungeon(dungeon);
+ // Later locations have their own room flavor, without quietly changing shared early-room mechanics.
+ for(const [dungeonId,prefix] of [['ruins','archive_'],['quarry','delve_']] as const){
+  const version=roomDungeon(dungeonId);
+  assert.equal(version.rooms.length,route.rooms.length);
+  assert.equal(new Set(version.rooms.map(room=>room.name)).size,version.rooms.length);
+  for(let i=0;i<route.rooms.length;i++){
+   const source=route.rooms[i],renamed=version.rooms[i];
+   assert.equal(renamed.id,prefix+source.id);
+   assert.notEqual(renamed.name,source.name);
+   assert.ok(!/^(Archive|Delve): /.test(renamed.name));
+   assert.equal(renamed.group,source.group);
+   assert.equal(renamed.weight,source.weight);
+   assert.equal(renamed.failure,source.failure);
+   assert.deepEqual(renamed.checks.map(check=>[check.skill,check.requiredLevel,check.attributes]),source.checks.map(check=>[check.skill,check.requiredLevel,check.attributes]));
+  }
+ }
  const bad=structuredClone(route);bad.groups.trap=-1;assert.throws(()=>validateRoomDungeon(bad));
 });
 test('O04 budget rolls re-evaluate eligible sizes after every draw and always retain the Chips fallback',()=>{

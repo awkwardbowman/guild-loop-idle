@@ -1,3 +1,13 @@
+# Global Settings and discovery UI direction — November 6, 2026
+
+**Implemented in the associated UI slice:** top-level **Settings** appears immediately after **Info** on the main tab strip, with global Dungeon Defaults (formerly Guild → Settings), save export/import and a danger-zone **Reset guild** action. Reset opens the existing Cancel/Confirm modal, and successful confirmation replaces the current guild with a fresh game and returns navigation to Story. Settings is visible before guild founding so broken beta saves can still be replaced; Info remains gated by opening the guild. Guild's old Settings subtab is removed to prevent competing defaults menus. New Settings navigation gets a functional regression assertion.
+
+**Planned, not implemented yet — discovery UI:** Each dungeon expands into per-floor inspection; 10 counted rooms per floor. Show `known/10` for successfully cleared distinct authored counted rooms. Each unknown counted room contributes its share to **Unknown** (e.g. 1 of 10 known → 90% Unknown). Known room's stats contribute only to that revealed share. Expand floor to show **Normal / Treasure / Boss** filter selections, each with its own stat mix and known/unknown coverage. Treasure rooms do not advance counted rooms; two treasure rooms cannot appear consecutively. Boss at each floor end. User can ignore Treasure, avoiding distortion of Normal view. Aggregate per-dungeon discovery without showing unvisited future-floor stats or hidden special Skills. The 100-floor Emberveil story dungeon has controlled checkpoints, deeper difficulty and a final game-ending boss. UI should not label the whole dungeon "completed" after its first floor.
+
+**Open UI specification:** whether the boss is included in the ten room slots; how optional room discovery denominators and weighted aggregates work; stable authored per-floor room identities vs procedural repetition; when secret Skill names unlock in endless dungeons. Treat the user's 1/10 example as an exact requirement for counted room discovery, not a justification for prematurely revealing entire authored mixes.
+
+---
+
 # Current PR #7 interface (November 6, 2026)
 
 Character Skills shows five selected Attributes by five selected Disciplines, exactly 25 positions. Only catalog-authored pairs populate cells; other positions are empty. Five row totals, five column totals and a grand total count each populated Skill once. Discipline header glyphs are black on a light backing; Skill glyphs use Attribute colors. Only numeric Value text uses red/yellow/green training colors. Keyboard focus/hover expose a text description, and tapping/clicking selects persistent details. Potential remains unknown pending a future reveal unlock. Composite Skills has its own tab and browser.

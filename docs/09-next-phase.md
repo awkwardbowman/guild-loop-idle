@@ -2,6 +2,18 @@
 
 The full five/five specialization, Skills grid/totals, separate endurance, full-floor Constitution growth, queued recall, insufficient-skill room grace and shared dungeon settings scope is implemented for review in save v9. Maya authorized the provisional details. See [11](11-progression-and-check-foundations.md) for formulas/migration and [08](08-test-report.md) for executed validation.
 
+## Main-story floor architecture and discovery — November 6, 2026
+
+**Accepted and queued for later implementation** (see [04](04-dungeons-and-expeditions.md) and latest [05](05-decisions-and-open-questions.md)); current PR only implements the top-level Settings UI and safe display-name changes.
+
+1. Replace generic room counter model with **ten counted rooms per floor**, floor boss checkpoint, non-counting treasure rooms (never twice consecutively), and durable per-floor progress. Main Emberveil Catacombs have **100 floors** and completion is required for game ending; other dungeons usually remain endless.
+2. Add controlled Emberveil exponential-style floor difficulty, more dangerous creatures/encounter bands, milestones and story checkpoints; test room-budget/endurance/reward balance before selecting the numeric multiplier.
+3. Persist **known authored rooms**, with unknown portions masked until a successful first clear. Expand dungeon cards to show **per-floor** known/total coverage, stat mix, Unknown share, and Normal/Treasure/Boss filters; provide dungeon-wide aggregates without leaking unseen content.
+4. Keep special dungeon Skill names hidden until a future-specific checkpoint that also works for endless dungeons; choose milestone before implementing.
+5. Enforce fixed unique Soul-bearing Threadless Leeches as scripted recruits, inert Soul=1 for randomized recruits, and explicit functional Soul eligibility only for guildmaster and these future Leeches. Guildmaster cannot dungeon; entry remains Constitution-based.
+6. Later replace Quarry with an expedition-Soul-gated simple Weave site, implement generic Common finds vs Soul-specific discoveries and uncertain processing, and redesign taught gear tiers + actual crafted gear.
+7. Closed-beta test saves can be discarded rather than migrated; Settings now holds confirmed reset and save transfer actions.
+
 ## Threadless / Hollow lore reskin — design decisions recorded November 6, 2026
 
 See [05 — Threadless / Hollow reskin direction](05-decisions-and-open-questions.md) for accepted scope, verified source references and blockers. **This is design only**, not deployed gameplay.

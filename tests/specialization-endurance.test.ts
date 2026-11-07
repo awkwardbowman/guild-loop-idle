@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {initialGame,completeStoryAction,startDay,advance,recall,setDungeonDefaults,setDungeonLimit,inheritDungeonLimit,setDungeonThreshold,effectiveLimit,effectiveThreshold,setQueue,completeRequest,recruit,returnETA} from '../src/engine.ts';
 import {skillMatrix,skillValue,skillPotential,ownsSkill,canDungeon,canLearnComposite,trainingBand,defaultSelections} from '../src/specialization.ts';
-import {enduranceMaximum,enduranceDrain,roomById,roomEfficiency,checkRating,roomCheckStep,ROOM_DUNGEONS,validateRoomDungeon} from '../src/rooms.ts';
+import {enduranceMaximum,enduranceDrain,roomById,roomEfficiency,checkRating,checkProgressRate,roomCheckStep,ROOM_DUNGEONS,validateRoomDungeon} from '../src/rooms.ts';
 import {modifiedValue} from '../src/equipment.ts';
 import {exportSave,parseSave} from '../src/persistence.ts';
 import {STATS} from '../src/attributes.ts';
@@ -18,10 +18,10 @@ test('SE01 fixed roles satisfy the agreed selections, sparse 25 cells and totals
  assert.equal(trainingBand(.7499,1),'red');assert.equal(trainingBand(.75,1),'yellow');assert.equal(trainingBand(.9,1),'green');
  for(let i=0;i<100;i++){const m=recruit(g);assert.deepEqual(m.selections,defaultSelections(m));assert.equal(new Set(m.selections!.attributes).size,5);assert.equal(new Set(m.selections!.disciplines).size,5);}
 });
-test('SE02 missing Skill uses selected Attribute, absent Attribute contributes 0.01 without renormalization',()=>{
+test('SE02 missing Skill uses selected Attribute, absent Attribute is zero with minimum eligible work',()=>{
  const g=opening(),arya={...g.members[0],gear:0},clyde={...g.members[1],gear:0};const check={...roomById('wood','crypt_scavenger').checks[0],attributes:[{attribute:'power',weight:.9},{attribute:'finesse',weight:.1}]};
- assert.equal(skillValue(clyde,'power'),.01);assert.equal(skillValue(clyde,'finesse'),1);assert.ok(Math.abs(checkRating(clyde,check,[])-.109)<1e-10);assert.equal(checkRating(arya,check,[]),1);assert.ok(checkRating(clyde,check,[])>0);
- const unweighted=roomCheckStep(clyde,{...check,work:1}, {id:'crypt_scavenger',index:0,work:0,attempts:0},1,[],()=>{throw Error('no success RNG');},1);assert.equal(unweighted.outcome,'working');assert.equal(unweighted.state.work,.10900000000000001);
+ assert.equal(skillValue(clyde,'power'),0);assert.equal(skillValue(clyde,'finesse'),1);assert.ok(Math.abs(checkRating(clyde,check,[])-.1)<1e-10);assert.equal(checkRating(arya,check,[]),1);assert.ok(checkRating(clyde,check,[])>0);
+ const unweighted=roomCheckStep(clyde,{...check,work:1}, {id:'crypt_scavenger',index:0,work:0,attempts:0},1,[],()=>{throw Error('no success RNG');},1);assert.equal(unweighted.outcome,'working');assert.ok(Math.abs(unweighted.state.work-.1)<1e-10);
  const geared=checkRating(clyde,check,[]);assert.equal(geared,checkRating({...clyde,stats:{...clyde.stats,strength:{...clyde.stats.strength,current:0}}},check,[]));
 });
 test('SE03 gear order and stacking are deterministic; bonuses never create eligibility',()=>{

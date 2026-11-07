@@ -30,6 +30,10 @@ See [05 — Threadless / Hollow reskin direction](05-decisions-and-open-question
 
 Before implementing: settle first dungeon-clear milestone, Soul gating, current Delve handling for existing saves, and equipment ownership/recipe migration. Distinguish approved direction from proposed concrete names and new mechanics.
 
+## Presentation precision — November 6, 2026
+
+Implemented: unselected/unknown Attributes provide a genuine effective **0**. Calculate full weighted work without renormalizing missing components; only an **eligible** check's final work rate gets a **0.001** minimum. Ineligible checks remain blocked. Consolidate display formatting to at most two decimal places without rounding internal game state, changing prerequisites or erasing training. Added regression tests. See [02](02-adventurers-and-stat-growth.md) and [11](11-progression-and-check-foundations.md).
+
 ## Small content slice — November 6, 2026
 
 The Whispering Archive and Emberstone Delve now have individually authored names for all eight existing room templates instead of prefixed Catacombs room titles. This is **flavor only**: room IDs, check skills and weights, drop tables, failure outcomes, difficulty and save semantics are unchanged. Existing O03 tests now guard distinct names and preserved mechanics. Additional specialized checks, location-specific room structures and balance remain future work.

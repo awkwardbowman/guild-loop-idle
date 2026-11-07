@@ -21,10 +21,10 @@ export function ownsSkill(actor:SpecializedProfile,id:string):boolean{
  const skill=SPECIALIZATIONS.find(s=>s.id===id);return !!skill&&!!actor.selections?.attributes.includes(skill.parent)&&actor.selections.disciplines.includes(skill.group);
 }
 export const canDungeon=(actor:SpecializedProfile)=>SPECIALIZATIONS.some(s=>s.parent==='constitution'&&ownsSkill(actor,s.id));
-export function attributeValue(actor:Pick<SpecializedProfile,'stats'|'selections'>,stat:Stat){return actor.selections?.attributes.includes(stat)?Math.max(1,actor.stats[stat].max):.01;}
+export function attributeValue(actor:Pick<SpecializedProfile,'stats'|'selections'>,stat:Stat){return actor.selections?.attributes.includes(stat)?Math.max(1,actor.stats[stat].max):0;}
 export function skillValue(actor:SpecializedProfile,id:string):number{
  const skill=SPECIALIZATIONS.find(s=>s.id===id);
- if(!skill)return STATS.includes(id as Stat)?attributeValue(actor,id as Stat):.01;
+ if(!skill)return STATS.includes(id as Stat)?attributeValue(actor,id as Stat):0;
  if(!ownsSkill(actor,id))return attributeValue(actor,skill.parent);
  return 1+actor.specializations[id].value+(skill.parent==='constitution'?(actor.constitutionExperience??0)*.01:0);
 }

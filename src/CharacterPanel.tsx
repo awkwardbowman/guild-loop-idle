@@ -1,10 +1,11 @@
 import {attributeValue} from './specialization.ts';
+import {formatNumber} from './numbers.ts';
 import React,{useState} from 'react';
 import type {Member} from './engine.ts';
 import {STATS} from './attributes.ts';
 import {StatSymbol} from './StatSymbols.tsx';
 import {AttributesPanel,LearnedSkillsPanel} from './SkillPanel.tsx';
-const fmt=(value:number)=>value.toLocaleString(undefined,{maximumFractionDigits:2});
+const fmt=formatNumber;
 export type CharacterTab={id:string;label:string;content:React.ReactNode};
 export function CharacterHeader({name,member,tags,known=true}:{name:string;member:Pick<Member,'stats'|'selections'>;tags?:React.ReactNode;known?:boolean}){
  return <header className="character-header"><h3>{name}</h3><div className="compact-stats" aria-label={`${name} maximum stats`}>{STATS.map(stat=><StatSymbol key={stat} stat={stat} value={known?fmt(attributeValue(member,stat)):'???'}/>)}</div>{tags&&<div className="character-tags">{tags}</div>}</header>;

@@ -7,6 +7,7 @@ import {difficultyAtRoom,rollLoot,resourceById,cargoSize} from './resources.ts';
 import type {LootEntry} from './resources.ts';
 import {equipmentValue} from './equipment.ts';
 import {skillValue,ownsSkill,canLearnComposite} from './specialization.ts';
+import {MIN_PROGRESS_RATE} from './numbers.ts';
 export const ROOM_GROUPS=['neutral','combat','trap','puzzle','boss','treasure'] as const;
 export type RoomGroup=typeof ROOM_GROUPS[number];
 export type RoomCheck={id:string;name:string;skill:string;requiredLevel:number;attributes:{attribute:string;weight:number}[];work:number;loot:LootEntry[];harvest?:boolean;guaranteed?:{id:string;amount:number}[]};
@@ -63,13 +64,21 @@ export function rollRoom(dungeonId:string,random:()=>number,multipliers:Partial<
 }
 export const roomLootBudget=(depth:number,random:()=>number)=>1+Math.floor((depth-1)/4)+(random()<.5?0:1);
 export const checkRating=(actor:CheckActor,check:RoomCheck,loadout:string[])=>check.attributes.reduce((rating,entry)=>rating+entry.weight*equipmentValue(skillValue(actor,entry.attribute),loadout,rootPool(entry.attribute)),0);
+/** Eligibility remains independent from effective work; no minimum bypasses prerequisites. */
+export function canAttemptRoomCheck(actor:CheckActor,check:RoomCheck):boolean{
+ if(check.skill==='scavenging'&&!actor.selections?.attributes.includes('perception'))return false;
+ if(check.requiredLevel>0&&check.skill!=='combat'&&(!isSkillDiscovered(actor.skills[check.skill])||actor.skills[check.skill].level<check.requiredLevel))return false;
+ return true;
+}
+/** Missing stats contribute exactly zero; only the final eligible work rate has a floor. */
+export const checkProgressRate=(actor:CheckActor,check:RoomCheck,loadout:string[])=>canAttemptRoomCheck(actor,check)?Math.max(MIN_PROGRESS_RATE,checkRating(actor,check,loadout)):0;
 export const canonicalFloor=(room:number)=>Math.floor((room-1)/10)+1;
 export const enduranceDrain=(room:number)=>.05*(1+(canonicalFloor(room)-1)*.2);
 export const enduranceMaximum=(actor:CheckActor,loadout:string[])=>SPECIALIZATIONS.filter(s=>s.parent==='constitution'&&ownsSkill(actor,s.id)).reduce((sum,s)=>sum+equipmentValue(skillValue(actor,s.id),loadout,'constitution'),0);
 /** Seconds needed at the current check values, divided into total authored work. */
 export function roomEfficiency(actor:CheckActor,room:DungeonRoom,loadout:string[]){
  const work=room.checks.reduce((n,c)=>n+c.work,0);
- const seconds=room.checks.reduce((n,c)=>n+c.work/checkRating(actor,c,loadout),0);
+ const seconds=room.checks.reduce((n,c)=>n+c.work/checkProgressRate(actor,c,loadout),0);
  return work/seconds/(room.referenceRate??1);
 }
 export function roomCheckCosts(_check:RoomCheck,depth=1):Pools{const costs=zeroPools();costs.constitution=enduranceDrain(depth);return costs;}
@@ -77,9 +86,8 @@ export function roomCheckCosts(_check:RoomCheck,depth=1):Pools{const costs=zeroP
 export function roomCheckStep(input:CheckActor,check:RoomCheck,state:GeneratedRoom,depth:number,loadout:string[],_random:()=>number,now:number){
  const actor=structuredClone(input),next=structuredClone(state),training=zeroPools(),specializationTraining:Record<string,number>={};
  // Generic danger checks use weighted work; only specific Composite activities have hard gates.
- if(check.skill==='scavenging'&&!actor.selections?.attributes.includes('perception'))return {actor,state:next,outcome:'ineligible' as const,training,specializationTraining};
- if(check.requiredLevel>0&&check.skill!=='combat'&&(!isSkillDiscovered(actor.skills[check.skill])||actor.skills[check.skill].level<check.requiredLevel))return {actor,state:next,outcome:'ineligible' as const,training,specializationTraining};
- next.work+=checkRating(actor,check,loadout);next.attempts++;
+ if(!canAttemptRoomCheck(actor,check))return {actor,state:next,outcome:'ineligible' as const,training,specializationTraining};
+ next.work+=checkProgressRate(actor,check,loadout);next.attempts++;
  if(next.work+1e-9<check.work*difficultyAtRoom(depth))return {actor,state:next,outcome:'working' as const,training,specializationTraining};
  next.work=0;
  if(canLearnComposite(actor,check.skill))gainSkillExperience(actor.skills[check.skill],2,now);

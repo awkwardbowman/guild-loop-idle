@@ -1,4 +1,5 @@
 import {skillMatrix,skillValue,skillPotential,trainingBand} from './specialization.ts';
+import {formatNumber} from './numbers.ts';
 import React,{useState} from 'react';
 import {STAT_VISUALS} from './stat-presentation.ts';
 import type {Member} from './engine.ts';
@@ -19,7 +20,7 @@ export function LearnedSkillsPanel({member}:{member:Profile}){
 }
 export function AttributesPanel({member,revealPotential=false}:{member:Profile;revealPotential?:boolean}){
  const matrix=skillMatrix(member),[selected,setSelected]=useState('');
- const fmt=(v:number)=>v.toLocaleString(undefined,{maximumFractionDigits:2});
+ const fmt=formatNumber;
  const selectedSkill=SPECIALIZATIONS.find(s=>s.id===selected);
  const describe=(id:string)=>{const value=skillValue(member,id),potential=skillPotential(member,id);return `${SPECIALIZATIONS.find(s=>s.id===id)!.name}: Value ${fmt(value)}; Potential ${revealPotential?fmt(potential):'unknown'}; ${trainingBand(value,potential)} training band${revealPotential?`; ${Math.round(value/potential*100)}%`:''}.`;};
  return <><p className="muted">Five Attributes × five Disciplines. Empty intersections have no authored Skill. Select a Value for details.</p><div className="attribute-table-scroll"><table className="skill-matrix"><caption>Skills · Value and totals</caption><thead><tr><th scope="col">Attribute / Discipline</th>{matrix.selections.disciplines.map(group=><th scope="col" key={group}><ActivitySymbol group={group}/></th>)}<th scope="col">Total</th></tr></thead><tbody>{matrix.cells.map((row,i)=><tr key={matrix.selections.attributes[i]}><th scope="row"><StatSymbol stat={matrix.selections.attributes[i]} label/></th>{row.map((skill,j)=><td key={j}>{skill&&<button type="button" className="skill-cell" title={describe(skill.id)} aria-label={describe(skill.id)} onClick={()=>setSelected(skill.id)}><ActivitySymbol group={skill.group} stat={skill.parent}/><span className={`skill-value training-${trainingBand(skillValue(member,skill.id),skillPotential(member,skill.id))}`}>{fmt(skillValue(member,skill.id))}</span></button>}</td>)}<td className="numeric">{fmt(matrix.rows[i])}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total</th>{matrix.columns.map((value,i)=><td key={i} className="numeric">{fmt(value)}</td>)}<td className="numeric">{fmt(matrix.total)}</td></tr></tfoot></table></div>{selectedSkill&&<p role="status">{describe(selectedSkill.id)}</p>}<p className="muted">Red: below 75% · Yellow: 75–&lt;90% · Green: 90%+. Constitution floor XP: {member.constitutionExperience??0}. Composite Skills are shown separately.</p></>;

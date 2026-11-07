@@ -1,3 +1,66 @@
+# Guild Loops UI/UX heuristic audit and consistency contract — November 6, 2026
+
+**Audit scope / limitations:** Review of latest `main` TypeScript/React components, CSS, navigation logic, and documented mechanics. **No current-commit browser rendering, screen-reader session, mobile-device run, contrast automation, or interaction E2E was performed.** This is an implementation plan, not a verified WCAG conformance or usability-test result. The live Vercel deployment may lag current GitHub.
+
+**Evaluation references:** Nielsen Norman Group [10 usability heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/); W3C [ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/); WCAG 2.2 [Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum), [Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum), [Focus Visible](https://www.w3.org/WAI/WCAG22/Understanding/focus-visible). These are design/evaluation targets, not certifications.
+
+## What should be preserved
+
+- Dark, compact fantasy-adventure aesthetic; resource/rarity/attribute color and icon language; restrained dashboard density on wide screens.
+- Story/Shop/Dungeon progressive disclosure using native `<details>` elements instead of enormous permanently expanded content blocks.
+- Event history and resource status without forcing the player into a separate page.
+- Cancel/Confirm for guild reset, import and member dismissal; escape-key behavior and an existing focus trap inside the dialog; clear autosave status.
+- Existing `:focus-visible` styling and semantic labels on many inputs and progress meters; do not regress these.
+- Accessibility symbols contain meaningful `aria-label` text; preserve semantic text alternatives when restyling.
+
+## Findings (ranked by impact; actual compliance requires rendering and testing)
+
+| ID | Severity | Estimate | Evidence in current source | Concrete recommendation / acceptance criterion |
+| --- | --- | --- | --- | --- |
+| UX-01 | P1 | M | `main.tsx` top tabs use ordinary buttons and `aria-current`; `StoryPanel.tsx` and `CharacterPanel.tsx` declare `role=tablist/tab/tabpanel` without corresponding Left/Right arrow keyboard behavior; `GuildPanel.tsx` uses `aria-pressed` as a nav indicator; `ShopsPanel.tsx` uses only class `selected`. | Create shared, documented **navigation patterns**. For ARIA tabs, implement roving focus + arrow/Enter/Space behavior and correct associated panel IDs; otherwise use ordinary nav buttons with `aria-current` and no tab roles. Selected state, visible focus, and accessible labels must agree in Story, Character, Guild, Shops, Activities and main tabs. |
+| UX-02 | P1 | L | `style.css` keeps an always-present 170px (<=760px) / 140px (<=440px) sidebar alongside the workspace; event log moves underneath; compact tables need horizontal scrolling. | Design a truly usable 320–440px layout with collapsible drawer or stacked navigation, main content given full viewport width, event log as an optional drawer/panel, and explicit scroll cues for wide stat matrices. Keep the wide-screen three-pane desktop layout. Requires visual design and actual browser/device checks. |
+| UX-03 | P1 | M | CSS root `font-size:13px`; many actionable/status labels are 9–11px (mobile filter labels sometimes 9px), and roster arrow controls use tiny hit areas. | Introduce a typography scale: default body/control text ~14–16px, small metadata ~12px unless truly nonessential, tabular numerals for changing numbers. Target >=24×24 CSS px or sufficient spacing for pointer targets (WCAG 2.2 AA); prefer ~40–44px height for touch controls. Measure computed sizes and text contrast. |
+| UX-04 | P1 / design dependency | L | `DungeonPanel.tsx` and `ExpeditionSidebar.tsx` render full authored `dungeonStatMix` before discovery; `DungeonPanel.tsx` also lists possible finds and opportunity Skills. | Integrate future **known/unknown** previews into the 100-floor exploration rebuild. Do not simply hide a CSS span; use progress-derived filtered aggregates and per-floor Normal/Treasure/Boss categories. Prevent title, tooltip, log, icon and skill-name leaks. |
+| UX-05 | P2 | M | Styles in `style.css` repeat literal colors, font sizes, padding, radii, selectors and responsive overrides; components hand-author page headers, tab rows, panels, controls, empty states and status text. | Define a small shared visual foundation (see below) before adding many more screens. Migrating representative pages first is safer than restyling the full app in one PR. |
+| UX-06 | P2 | S/M | Assignment button has `Added to queue` feedback; purchases, capacity upgrades, story milestones, recruitment and trade rely mostly on changing local values and event logs. Several disabled buttons expose no reason in context. | Consistent action-result feedback: success/blocked/error states with copy naming the action; relevant disabled reason next to the control; no success claim if engine rejects the update. Use inline notices rather than a toast storm for routine automatic progression. |
+| UX-07 | P2 | S/M | `DungeonSettings.tsx` uses controlled numeric inputs writing directly to game state on every keystroke, with `Number('') === 0`, and underlying engine silently rejects invalid depth limits. | Draft controlled numeric values locally, allow temporary empty input, validate ranges, and commit on Blur/Enter/Apply. Show the effective inherited value and keep global vs dungeon-specific overrides visibly distinct. No save mutation on invalid draft. |
+| UX-08 | P2 | S | `ShopsPanel.tsx` retains Shop/Requests view on a city change, so opening Stillmere while in Requests lands on the empty `No requests yet` view; both city and section use the same `subtabs` treatment with little hierarchy. | On city selection default to the Shop section unless there's a reason to persist the last section, and give the city selector a stronger visual distinction from local Shop/Requests tabs. Explicit empty state and discoverable way to return. |
+| UX-09 | P2 | S | `StatSymbol` uses SVG `role=img/aria-label` and optionally repeats visible label text; icon titles depend on hover on touch screens. `ActivitySymbol` and rarity details similarly depend partly on `title`. | Audit icons in context for duplicate announcements and nonhover discovery; label essential statuses and requirements in visible text, not only browser tooltips or colors. Preserve icon shape + label so rarity and state remain understandable independent of color. |
+| UX-10 | P2 | S/M | Main dialog in `main.tsx` handles Escape and a button focus loop, but lacks a shared reusable dialog component and conditional instructional error state; many destructive and stateful actions are individually wired. | Extract a lightweight confirm-dialog pattern (trigger → title → consequence → Cancel → explicit action), preserve Escape and restored focus, and standardize button wording (e.g. **Reset guild**, not generic Confirm in destructive actions). Review modal accessible description and overlay interactions in browser. |
+| UX-11 | P2 | S | `StoryPanel` links, `GuildPanel`, `ShopsPanel`, `RequestPanel`, and `AssignmentsPanel` use different labels for the same concepts (member, ally, student; room, floor, depth; Learn/Unlock/Buy), some because mechanics are transitioning. | Establish a terminology map. **Member** for roster; **assignment** for queued dungeon; **Recall** for return request; **rooms traversed** for old room counter; **floor** only for canonical ten-room grouping; **Skill** for authored Attribute×Discipline, **Composite Skill** for learned abilities. Do not promise crafting before the recipe system is live. |
+| UX-12 | P3 | S | `ShopsPanel` has a bare `h2`, while Guild, Story, Members, Activities, Info, Settings use a page header with an overline; empty states vary from explanatory text to a lone line. | Apply one **PageHeading** and **EmptyState** treatment for every main section: title, optional one-line purpose, contextual action, plain-language reason and next step. |
+| UX-13 | P2 | S/M | `SkillPanel.tsx` has dense 5×5 Skill matrix / separate filter sidebar with horizontal scrolling; the changing totals can be difficult to parse, especially on narrow widths. | Keep the data-dense desktop matrix, but supply keyboard focus semantics, legend/abbreviations, accessible table captions and responsive scroll instructions; validate color status (red/yellow/green) with labels. |
+| UX-14 | P2 | M | No current automated rendered mobile/keyboard acceptance; `test-policy.json` has targeted code tests but not browser accessibility assertions. | Add browser-level smoke for keyboard navigation, open/cancel/reset, input validation, focus restoration and 320/375/768/1440px layouts. Check 200% zoom, focus clipping, contrast, touch target dimensions. Code-source assertions cannot replace user-facing interaction tests. |
+
+## Proposed lightweight design system (adopt incrementally; not yet approved code changes)
+
+**Navigation hierarchy:** main tabs (Story / Guild / Members / Activities / Shops / Info / Settings); within-page secondaries (Guild Hall / Storage, Shop / Requests, etc.); card disclosure as a third level. Do not style all levels identically. Maintain section selection during contextual navigation when helpful; never leave a control that appears actionable but does nothing.
+
+**Tokens:** dark theme surface hierarchy (`canvas`, `sidebar`, `panel`, `raised`, `hover`); semantic text (`primary`, `secondary`, `muted`, `disabled`); semantic status (`success`, `warning`, `danger`, `info`); the existing rarity/attribute colors are separate data-visualization tokens. Introduce spacing increments 4/8/12/16/24/32px; consistent 4/6/8px radii; compact and comfortable density variants rather than per-page pixel exceptions. These are recommendations, not new immutable game rules.
+
+**Reusable view primitives (order suggested):**
+1. `PageHeading` (overline/title/context/action), `SectionTabs` (plain navigation or fully compliant ARIA tabs), `Panel`/`DisclosureCard`.
+2. `StatusText`/`StatusBadge`, `InlineFeedback`, `EmptyState`.
+3. `ActionButton` (primary/secondary/quiet/danger, busy/disabled/explanation) and `ConfirmDialog`.
+4. `FormField`/`NumericDraftField` for settings and trade; `CostBreakdown` for purchase/upgrade/request costs.
+5. `StatValue`/`StatMix` for consistently formatted numeric values and known/unknown distribution; do not expose undiscovered Skill names.
+
+**Interaction contract:** A button implies an action; labels say what it will do; selection state is visually and semantically consistent; every rejected or destructive action explains why; setting edits are valid and predictable; no silent destructive mutation; complete keyboard and touch paths.
+
+**Acceptance gate:** Written UI component contracts + screenshot/interaction examples at 320, 375, 768, 1024 and 1440px, 200% zoom, keyboard-only traversal including dialogs and tabs, computed 4.5:1 small text / 3:1 large text contrast (WCAG exceptions acknowledged), controls >=24px with spacing or explicit exceptions. Prefer 44px mobile hit areas. Verify current production deployment SHA before drawing conclusions from live screenshots.
+
+## Recommended work split
+
+**Small independent PRs:** UX-08 city-switch behavior; UX-12 missing page heading/empty states; UX-11 terminology and stale help text; UX-06 consistent inline feedback/disabled explanations; UX-07 numeric draft/validation; UX-09 accessible icon labels in limited contexts. Each can be tested as an isolated change.
+
+**Medium infrastructure PRs:** UX-01 unified navigation semantics + keyboard; UX-05 tokens/components; UX-10 reusable dialog; UX-13 dense Skill matrix accessibility.
+
+**High-investment UI work:** UX-02 full mobile shell and responsive information architecture; UX-04 discovery-based dungeon screen (coupled to gameplay); UX-14 browser-level acceptance harness. Coordinate these with the next progression/floor engine rebuild. Avoid piecemeal visual patches that will be discarded with the new discovery system.
+
+**Implementation is not included in this audit.** No current style, keyboard interactions, or gameplay behavior changed. Confirm visual decisions from actual rendered screenshots before declaring WCAG or mobile acceptance.
+
+---
+
 # UI navigation and nomenclature cleanup — November 6, 2026
 
 **Implemented:** Members overview activity counts are passive textual statistics; only sidebar summary counts are clickable and navigate to Members. Top-level Info/Settings set `aria-current` on the selected tab, and Reset Guild retains the explicit confirmation. Guild empty-roster guidance now leads to Guild → Guild Hall → Recruitment. The reference rarity table no longer labels the rarity ladder as material tiers; it explicitly distinguishes Common T1–T3 materials. "Rooms traversed" reflects the existing clear counter, which includes skipped rooms. The story return objective references **Recall**, not a nonexistent "Return home" button. Regression tests in `tests/quick-ui-contract.test.ts` protect major static wiring and content IDs; browser acceptance remains separate.

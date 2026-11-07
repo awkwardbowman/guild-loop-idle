@@ -2,6 +2,16 @@
 
 The full five/five specialization, Skills grid/totals, separate endurance, full-floor Constitution growth, queued recall, insufficient-skill room grace and shared dungeon settings scope is implemented for review in save v9. Maya authorized the provisional details. See [11](11-progression-and-check-foundations.md) for formulas/migration and [08](08-test-report.md) for executed validation.
 
+## UI/UX consistency audit — November 6, 2026
+
+Static review of current source; browser/device accessibility has **not** yet been verified. Detailed findings, evidence, suggested design tokens and acceptance criteria: [10-game-interface.md](10-game-interface.md#guild-loops-uiux-heuristic-audit-and-consistency-contract--november-6-2026).
+
+- **Small independent polish:** Shop city switches should show the new city's Shop by default (UX-08); unify page heading and empty-state language (UX-12); standardize terminology (UX-11); consistent feedback and disabled reasons (UX-06); numeric input drafts/validation (UX-07); avoid hover-only essential icon meanings (UX-09).
+- **Medium UI infrastructure:** unify navigation semantics and keyboard behavior (UX-01), introduce reusable tokens and components (UX-05), formalize dialogs (UX-10), improve Skill matrix accessibility (UX-13).
+- **Major coupled work:** redesign 320–440px navigation/shell (UX-02), discover-only dungeon statistics/Skill previews as part of 100-floor mechanics (UX-04), build actual browser/mobile accessibility regression coverage (UX-14).
+- **Keep:** existing dark visual identity, progressive disclosure, compact event log, resource/stat icon system, confirmed destructive actions and focus styling.
+- **Don't claim:** that a CSS-only audit establishes WCAG conformance or that stale Vercel production shows the latest code.
+
 ## Main-story floor architecture and discovery — November 6, 2026
 
 **Accepted and queued for later implementation** (see [04](04-dungeons-and-expeditions.md) and latest [05](05-decisions-and-open-questions.md)); current PR only implements the top-level Settings UI and safe display-name changes.

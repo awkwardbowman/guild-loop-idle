@@ -12,7 +12,7 @@ export const DUNGEONS: Dungeon[] = [
   { name: 'Cross the broken crypt', duration: 3, cost: p(1,3,1), training: p(.5,2,.5) },
   { name: 'Track the crypt scavenger', duration: 4, cost: p(2,2,3), training: p(1,1,2) }
  ], loot: [{ id: 'timber', name: 'Heartwood', weight: 7 }, { id: 'herb', name: 'Silverleaf', weight: 3 }] },
- { id: 'ruins', locationId: 'old_quarter', name: 'Forgotten Highwoven Annex', subtitle: 'THE OLD QUARTER', maxConcurrent: 1, description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
+ { id: 'ruins', locationId: 'old_quarter', name: 'Forgotten Highwoven Annex', subtitle: 'OLD HIGHWOVEN DISTRICT', maxConcurrent: 1, description: 'Read the wards. Keep a steady hand. The shelves still remember their keepers.', gear: 3, chips: 14, accent: 'blue', tasks: [
   { name: 'Decipher the outer seal', duration: 4, cost: p(1,1,5), training: p(.5,.5,3) },
   { name: 'Navigate the shifting shelves', duration: 4, cost: p(1,4,3), training: p(.5,2,2) },
   { name: 'Unbind the keeper', duration: 5, cost: p(3,2,6), training: p(1,1,4) }
@@ -30,10 +30,10 @@ export const RESET_SECONDS = 12;
 export const VERSION = 9;
 export type Upgrade = 'slots' | 'quarters' | 'gear' | 'regen';
 export const UPGRADE_INFO: Record<Upgrade, { name: string; description: string; chips: number; materials: number }> = {
- slots: { name: 'Expedition desk', description: '+1 simultaneous expedition', chips: 24, materials: 2 },
- quarters: { name: 'Guest quarters', description: '+1 member capacity', chips: 18, materials: 1 },
- gear: { name: 'Supply racks', description: '+4 gear capacity', chips: 16, materials: 1 },
- regen: { name: 'Workshop', description: '+0.1 gear regenerated / second', chips: 20, materials: 2 }
+ slots: { name: 'Wayfarer's Dispatch Table', description: '+1 simultaneous expedition', chips: 24, materials: 2 },
+ quarters: { name: 'Guild Bunkhouse', description: '+1 member capacity', chips: 18, materials: 1 },
+ gear: { name: 'Reclaimed Supply Stores', description: '+4 gear capacity', chips: 16, materials: 1 },
+ regen: { name: 'Emberveil Workroom', description: '+0.1 gear regenerated / second', chips: 20, materials: 2 }
 };
 
 /** Temporary sale values, centralized for later shop/economy balancing. */

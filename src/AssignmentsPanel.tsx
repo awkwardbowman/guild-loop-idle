@@ -2,7 +2,7 @@ import {dungeonPreview} from './discovery.ts';
 import type React from 'react';
 import {formatNumber} from './numbers.ts';
 import type {Game,Member} from './engine.ts';
-import {setQueue,recall,memberCanDungeon,toggleMember,runStageLabel,runProgress,effectiveLimit} from './engine.ts';
+import {setQueue,recall,memberCanDungeon,toggleMember,runStageLabel,runProgress,effectiveLimit,canStartDungeon} from './engine.ts';
 import {cargoSize} from './resources.ts';
 import {roomById} from './rooms.ts';
 import {RarityText} from './Indicators.tsx';
@@ -13,6 +13,8 @@ import {dungeonStatMix} from './stat-presentation.ts';
 export function memberStatus(game:Game,member:Member){
  const run=game.active.find(run=>run.memberId===member.id);
  if(!run&&member.queue[0]?.dungeonId==='wood'&&game.progression.completed.campaign_completed)return 'Main dungeon complete';
+ if(!run&&member.queue[0]&&!dungeonUnlocked(game.progression,member.queue[0].dungeonId))return 'Dungeon unavailable: choose another assignment';
+ if(!run&&member.queue[0]&&!canStartDungeon(game,member.queue[0].dungeonId))return 'Assignment blocked: starting floor exceeds the room limit';
  if(!run&&member.queue.length&&!memberCanDungeon(game,member))return 'Cannot enter: needs an owned Constitution Skill';
  return run?`${runStageLabel(run)} · ${dungeonById(run.dungeonId).name}`:member.cooldown?`Healing · ${member.cooldown}s`:!member.enabled?'Assignment paused':member.queue[0]?`Queued · ${dungeonById(member.queue[0].dungeonId).name}`:'Idle';
 }

@@ -116,13 +116,13 @@ function finish(g:Game,run:Run,reason:string,detail:string){
 /** Departing members reserve a dungeon place; homeward travel releases it. */
 export function dungeonOccupants(g:Game,id:string){return g.active.filter(run=>run.dungeonId===id&&run.stage!=='returning');}
 export const memberCanDungeon=(g:Game,m:Member)=>!(hasEvent(g.progression,'friends_introduced')||hasEvent(g.progression,'room_routes_enabled'))||canDungeon(m);
-export function dungeonWaiting(g:Game,id:string){return g.members.filter(member=>member.enabled&&memberCanDungeon(g,member)&&member.cooldown===0&&member.queue[0]?.dungeonId===id&&!g.active.some(run=>run.memberId===member.id));}
+export function dungeonWaiting(g:Game,id:string){if(!canStartDungeon(g,id))return [];return g.members.filter(member=>member.enabled&&memberCanDungeon(g,member)&&member.cooldown===0&&member.queue[0]?.dungeonId===id&&!g.active.some(run=>run.memberId===member.id));}
 export function memberActivities(g:Game){
  const expeditionIds=new Set(g.active.map(run=>run.memberId));
  const expeditions=g.members.filter(member=>expeditionIds.has(member.id)).length;
  const healing=g.members.filter(member=>!expeditionIds.has(member.id)&&member.cooldown>0).length;
  // Trading/crafting currently have no assigned members. Pending sales are guild transactions.
- const queued=g.members.filter(member=>member.enabled&&memberCanDungeon(g,member)&&member.queue.length>0&&member.cooldown===0&&!expeditionIds.has(member.id)).length;
+ const queued=g.members.filter(member=>member.enabled&&memberCanDungeon(g,member)&&member.queue.length>0&&canStartDungeon(g,member.queue[0].dungeonId)&&member.cooldown===0&&!expeditionIds.has(member.id)).length;
  return {expeditions,trading:0,crafting:0,healing,queued,recruits:g.candidate?1:0,idle:g.members.length-expeditions-healing-queued};
 }
 function dispatch(g: Game) {
@@ -462,3 +462,5 @@ export function setDungeonStart(input:Game,id:string,floor:number|undefined):Gam
  if(!DUNGEONS.some(d=>d.id===id)||!dungeonUnlocked(input.progression,id)||(floor!==undefined&&(!Number.isInteger(floor)||floor<1||floor>Math.min(id==='wood'?100:100000,nextDungeonFloor(input.dungeonKnowledge,id)))))return input;
  const g=copy(input);if(floor===undefined)delete g.dungeonStarts[id];else g.dungeonStarts[id]=floor;return g;
 }
+
+export const canStartDungeon=(g:Game,id:string)=>dungeonUnlocked(g.progression,id)&&!(id==='wood'&&hasEvent(g.progression,'campaign_completed'))&&(startingFloor(g,id)-1)*10+1<=effectiveLimit(g,{dungeonId:id});

@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {initialGame,completeStoryAction,startDay,advance,recall,setDungeonLimit,recruit} from '../src/engine.ts';
+import {initialGame,completeStoryAction,startDay,advance,recall,setDungeonLimit,recruit,dungeonWaiting,memberActivities} from '../src/engine.ts';
 import {floorCatalog,rollFloorRoom,roomById,floorDifficulty,nextDungeonFloor,checkProgressRate} from '../src/rooms.ts';
 import {floorPreview,dungeonPreview,revealedDungeonSkills} from '../src/discovery.ts';
 import {parseSave,exportSave} from '../src/persistence.ts';
@@ -71,7 +71,7 @@ test('FD12 floor 100 boss emits one durable ending, banks cargo once, and never 
  let g=exploring();g.active[0].floorState={number:100,counted:10,successful:10,lastTreasure:false};g.dungeonKnowledge.wood={};
  for(let f=1;f<100;f++)g.dungeonKnowledge.wood[f]={bossCleared:true,known:[`f${f}-boss-0`]};
  encounter(g,'boss');g=advance(g,1);assert.equal(g.active[0].outcome?.reason,'Campaign complete');assert.ok(g.progression.completed.campaign_completed);
- g.members[0].enabled=true;g=advance(g,50);assert.equal(g.active.length,0);assert.equal(g.members[0].runs,1);assert.equal(g.reports.filter(r=>r.reason==='Unlock'&&r.detail==='The final checkpoint').length,1);assert.deepEqual(parseSave(exportSave(g)),g);
+ g.members[0].enabled=true;g=advance(g,50);assert.equal(g.active.length,0);assert.equal(g.members[0].runs,1);assert.equal(dungeonWaiting(g,'wood').length,0);assert.equal(memberActivities(g).queued,0);assert.equal(g.reports.filter(r=>r.reason==='Unlock'&&r.detail==='The final checkpoint').length,1);assert.deepEqual(parseSave(exportSave(g)),g);
 });
 test('FD13 mid-floor, treasure history, Recall clocks, RNG, boss checkpoints and revelations roundtrip exactly',()=>{
  let g=exploring();encounter(g,'normal');g=advance(g,1);g=recall(g,g.members[0].id);g=advance(g,1);const restored=parseSave(exportSave(g));assert.deepEqual(restored,g);assert.deepEqual(advance(restored,100),advance(g,100));
@@ -110,5 +110,5 @@ test('FD22 choosing an earlier checkpoint supports farming without erasing disco
 });
 
 test('FD23 modern adventurers cannot discover or dispatch to the obsolete Quarry site before a Soul-enabled replacement is authored',async()=>{
- const {dungeonUnlocked,availableStoryActions}=await import('../src/progression.ts');const g=opening();g.progression.completed.archive_floor_cleared={day:1,time:0};g.progression.completed.quarry_discovered={day:1,time:0};assert.equal(dungeonUnlocked(g.progression,'quarry'),false);assert.equal(availableStoryActions(g.progression).some(a=>a.id==='discover_quarry'),false);
+ const {dungeonUnlocked,availableStoryActions}=await import('../src/progression.ts');const g=opening();g.progression.completed.archive_floor_cleared={day:1,time:0};g.progression.completed.quarry_discovered={day:1,time:0};assert.equal(dungeonUnlocked(g.progression,'quarry'),false);assert.equal(availableStoryActions(g.progression).some(a=>a.id==='discover_quarry'),false);g.members.forEach(m=>m.queue=[{dungeonId:'quarry'}]);assert.equal(memberActivities(g).queued,0);assert.equal(startDay(g).active.length,0);
 });

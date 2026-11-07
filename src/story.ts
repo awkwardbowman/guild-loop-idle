@@ -35,7 +35,7 @@ export const EVENT_TEXT:Record<EventId,{title:string;description:string;location
 export function currentGoals(p:Progression,inventory?:Record<string,number>):StoryGoal[]{
  const goals:StoryGoal[]=availableStoryActions(p,inventory).map(action=>({id:action.id,title:action.title,description:action.description,action:action.id,location:goalsLocation}));
  if(hasEvent(p,'trail_discovered')&&!hasEvent(p,'first_floor_cleared'))goals.push({id:'clear_trail',title:'Explore your first rooms',description:'Assign Arya or Clyde to the Catacombs of the Wound and Wish. Compare their capabilities and finds; the trip takes 15 seconds each way.',location:memberQueue});
- if(hasEvent(p,'first_floor_cleared')&&!hasEvent(p,'first_return'))goals.push({id:'return_home',title:'Bring your finds home',description:'Let a member return or select Return home. Loot is stored only on arrival.',location:memberQueue});
+ if(hasEvent(p,'first_floor_cleared')&&!hasEvent(p,'first_return'))goals.push({id:'return_home',title:'Bring your finds home',description:'Let an expedition return normally, or request Recall in Members → Assignments. Loot is stored only on arrival home; Recall usually waits for a full-floor boundary.',location:memberQueue});
  if(hasEvent(p,'first_return')&&!hasEvent(p,'first_leather'))goals.push({id:'find_leather',title:'Collect Leather Scraps',description:'Explore catacomb rooms and bring Leather Scraps home.',location:dungeonCatalog});
 
  return goals;

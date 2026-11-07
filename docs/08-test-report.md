@@ -1,3 +1,26 @@
+# Combined floor/UI branch verification — November 6, 2026 · save v10
+
+**Review implementation, not merged/deployed production.** Latest executed local gates:
+
+| Command / scope | Passed | Failed | Not selected |
+| --- | ---: | ---: | ---: |
+| `npm run test:full` | 177 | 0 | 0 |
+| `npm run build` | TypeScript + Vite passed | 0 | — |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser` | 13 | 0 | 0 |
+| `node scripts/balance-floors.ts` | 30/30 starter-Arya seeds clear floor 10; 0/30 current-best-kit probes clear floor 11 | No acceptance failures | Later chapter/economy balance |
+
+An earlier targeted dungeon/save iteration passed 118 selected tests with 58 not selected; the later full run above covers all 177 current registered engine tests. No skipped tests are reported as passed. FD01–FD23 cover floor catalogs, random repeats, mandatory boss placement, independent treasure, successful-only discovery, category isolation, individual/boss Skill reveals, recall/limits/XP, final checkpoint, save roundtrips/corruption/migration, inert Soul, first-ten balance, repeat farming and the obsolete Quarry route.
+
+Browser acceptance exercises fresh founding, real timed engine progress into persistent discovery, exact outing/RNG state after reload, keyboard tab navigation, numeric drafts/no invalid writes, modal focus loop/Escape/cancel/reset, city reset-to-Shop behavior, teaching eligibility, actual purchase/capacity feedback and timed sale payout. Five width cases run at 320/375/768/1024/1440px, with screenshots and axe WCAG A/AA checks across Story/Guild/Members/Activities/Shops/Info/Settings, including the Skill matrix and expanded dungeon/category controls. A separate 200% CSS zoom reflow case passed. No JavaScript page errors were captured in the successful browser suite. Axe reported no selected-rule violations in those tested page states; this is not a universal WCAG certification.
+
+Browser testing found and fixed a modal keyboard loop, tablet character tabs positioned outside their pane, invalid unlabeled-group ARIA and insufficient contrast on several text/glyph labels. Functional regressions also caught early-material farming becoming inaccessible when only the latest checkpoint was allowed; the shared Starting floor override and farming playthrough now cover that path. Historical v9 room-counter test fixtures explicitly retain historical outing rules; they are not used as evidence for new boss/floor behavior. The old Quarry-unlock assertion was replaced with the deliberate future-Soul-site boundary, while historical save/read coverage remains.
+
+Only floors **1–10** are currently balanced. The 30-seed starter probe uses normal earned practice without equipment or potions, reaching ten boss checkpoints in 460–600 simulated seconds (mean 496). The floor-11 probe uses fully capped Arya roots/Skills, ten floor XP and reinforced armor, and clears zero bosses. The large floor-11 work step is temporary pending Stillmere consumable/support design. These numbers do not establish human pacing, indefinite-grind balance, potion effects or floor-11–100 economic balance.
+
+Artifacts: `test-results/` contains the generated page/width screenshots, JSON report and failure-only traces. Browser CI uploads this directory as `browser-evidence`; local files are not user saves. The reproducible balance script never reads or edits a player's data. Production/Vercel previews and independent screen-reader/hardware testing remain separate; the prior Vercel deployment was rate-limited and no live deployment is claimed here.
+
+---
+
 # PR #7 / save v9 validation — November 6, 2026
 
 Executed in the managed workspace against the complete review tree:

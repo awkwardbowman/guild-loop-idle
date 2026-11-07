@@ -1,3 +1,22 @@
+# Implemented UI foundation for review — November 6, 2026 · save v10
+
+This implements the combined UI/gameplay pass from the audit below. Current branch behavior supersedes the older audit's descriptions of source problems, while the audit remains historical evidence.
+
+- **UX-01 navigation:** shared `SectionTabs` supplies roving focus, Left/Right/Home/End navigation, native Enter/Space activation, stable tab/panel IDs and inactive panel anchors for Story and characters. Main, Guild, Activities and Shop navigation use ordinary buttons with `aria-current`. Selection styles agree with semantics.
+- **UX-02/03 mobile and typography:** 320–440px layouts give the workspace full width. Guild status and event log are independently expandable stacked panels. Desktop keeps its three panes. Body text is 14px, metadata at least 12px, and mobile controls aim for 44px height. Character tabs wrap when the center pane narrows; wide matrices have their own focusable scroll region.
+- **UX-04 discovery:** dungeon, sidebar and assignment previews use actual per-floor discovery rather than full authored distributions. Normal/Treasure/Boss filters, Unknown percentages and secret Composite names follow successful-clear/boss knowledge. The 100-floor interface never enumerates untouched future content.
+- **UX-05/12 shared foundation:** surface/text/status/spacing/radius tokens, `PageHeading`, `EmptyState`, `InlineFeedback`, `NumericDraftField`, `SectionTabs` and `ConfirmDialog`. Representative pages use these primitives without adding a UI library.
+- **UX-06 feedback:** assignments, requests, equipment unlocks, hall/storage upgrades and sales report an actual engine change before success. Disabled controls explain missing materials, capacity or eligibility. Gavin defaults to an eligible learner; selecting an ineligible member disables teaching and explains why.
+- **UX-07 predictable settings:** numeric drafts allow clearing/replacement, validate without mutating the save, commit only on valid Blur/Enter and restore on Escape. Global defaults can be chosen before founding. Dungeon overrides and inherited effective values remain distinct. Starting floor defaults to Latest checkpoint, with earlier floors available for farming.
+- **UX-08 shop hierarchy:** city changes reset to Shop; city navigation and Shop/Requests navigation have distinct styling and current-state semantics. Stillmere's empty Requests view includes a route back to Shop.
+- **UX-09/11/13 icons, language and matrix:** labeled icons avoid duplicate text announcements; essential discovery/requirements have visible text. Neutral Discipline glyphs stay readable on their light backplates, with visible header names. Matrix caption, row/column totals, keyboard buttons, scroll instructions and training-band descriptions remain. Assignment/Recall/standard room/floor/Composite Skill wording reflects the live model; no placeholder claims that recipes execute.
+- **UX-10 dialogs:** shared native modal dialog, title/consequence description, Cancel first, explicit destructive action text, Escape handling, keyboard focus loop and focus restoration. Reset/import/dismiss use the same pattern.
+- **UX-14 acceptance harness:** Playwright exercises actual opening, keyboard tabs, drafts, reset/cancel/Escape/focus, city switching, discovery, teaching/purchases/capacity/trade and persisted gameplay. Layout/axe checks run at 320/375/768/1024/1440px; separate 200% CSS zoom checks verify reflow. Screenshots/report/traces are generated into `test-results/` and uploaded by the browser CI job.
+
+These browser checks are Chromium evidence, not certification of every screen-reader/device combination or a blanket WCAG conformance claim. Production/Vercel acceptance is separate from current-branch local rendering. See [08](08-test-report.md) for exact commands, outcomes and remaining limits.
+
+---
+
 # Guild Loops UI/UX heuristic audit and consistency contract — November 6, 2026
 
 **Audit scope / limitations:** Review of latest `main` TypeScript/React components, CSS, navigation logic, and documented mechanics. **No current-commit browser rendering, screen-reader session, mobile-device run, contrast automation, or interaction E2E was performed.** This is an implementation plan, not a verified WCAG conformance or usability-test result. The live Vercel deployment may lag current GitHub.

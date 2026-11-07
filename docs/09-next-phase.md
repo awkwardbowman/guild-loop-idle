@@ -1,3 +1,23 @@
+# Combined floor/UI implementation — November 6, 2026 · review branch
+
+Implemented: ten random counted encounters from stable floor catalogs plus a separate mandatory boss; non-counting/non-consecutive treasure; durable checkpoint/restart selection; discovery-only per-floor/category previews; individual-plus-boss secret-name reveals; 100-floor Catacombs endpoint; inert generated Soul and explicit capability flags; modern obsolete-Quarry suppression; version-10 save validation/legacy continuation; shared UI controls, mobile shell, keyboard navigation, numeric drafts, modal behavior and real browser regression.
+
+**Current balance scope is only floors 1–10.** Thirty starter-Arya seeds cleared those floors without equipment/potions; thirty fully trained/current-best-armor probes could not beat floor 11. The next ten floors and their provisional work barrier must be tuned with Stillmere's future consumables/support, not treated as final campaign balance.
+
+The Stillmere material chain remains reachable by selecting an earlier Starting floor for farming. This is important when the newest checkpoint is too difficult for Clyde or the guild needs additional leather/herbs.
+
+**Next decisions / not implemented:**
+
+1. Stillmere potion/support types, costs, effects, duration, ownership and use rules; tune floors 11–20 alongside them.
+2. Fixed named Leech recruits, their story unlock order, expedition capabilities and magic. No random Soul rolls or improvised campaign lore.
+3. Crafting recipes, consumed inputs, output item ownership, per-tier teaching and conversion of current shared equipment templates.
+4. Soul-specific loot recognition/processing, probabilities, generic material families and the future hidden Weave site.
+5. Full authored narrative checkpoints and unique boss mechanics for the later Catacombs bands. Current topology and generic threat labels do not substitute for this content.
+
+Full automated regression/build and browser acceptance are recorded in [08](08-test-report.md). This work is prepared for PR review; do not infer a live deployment from local screenshots.
+
+---
+
 # Next phase after PR #7 — November 6, 2026
 
 The full five/five specialization, Skills grid/totals, separate endurance, full-floor Constitution growth, queued recall, insufficient-skill room grace and shared dungeon settings scope is implemented for review in save v9. Maya authorized the provisional details. See [11](11-progression-and-check-foundations.md) for formulas/migration and [08](08-test-report.md) for executed validation.
@@ -59,3 +79,34 @@ The Whispering Archive and Emberstone Delve now have individually authored names
 5. Define future Speed tick intervals, Scouting and Movement action bonuses, later training/decay, gear variants and magic. Formula hooks support Catchup/Flat/Percent, but no new gear items or tick interval mechanics are implied.
 
 Current storage, shops, request pacing, single assignments, queues/history, discovered Composites and independent rarity/tier data remain. Cross-rarity scaling, depth-aware loot balance, Pebs/Bowls ratios, compression, assigned auto-selling and offline/cloud sync are still future work. Review the PR before updating the live game.
+
+
+---
+
+## Historical Drive planning preserved during reconciliation
+
+The following older notes are superseded by the current sections above. Retained to preserve prior planning and historical test outcomes.
+
+# Backlog implemented — November 6, 2026
+
+Single dungeon assignments, queued statuses/counts/lists, simplified member controls, per-member/dungeon history, newest-first Plot and separate rarity/tier metadata are implemented in save v8. The pending discovered-skills and weighted-engine/shop commits are included in this delivery.
+
+Remaining decisions are crafting recipe inputs/outputs/duration and execution, cross-rarity stat budgets/recruit generation, and a jointly rarity/tier/depth-aware loot curve. Materials beyond existing IDs and Threadless renaming remain later content. None of these blocks the implemented backlog. Current Common stats, prices and drops are retained. Validate balance through playtesting before changing them.
+
+# Immediate next work
+
+The v7 weighted room/shop/storage pass supersedes prior opening balance and global slot purchase plans below. Crafting recipe inputs, outputs and duration are explicitly deferred to Maya’s next pass. The Leather Crafting skill, chosen learner, equipment purchase gate and first activity entry are ready. Next: define that recipe/action, then playtest/tune deterministic work weights, injury incidence, boss frequency, single treasure draws and early quest pacing. Do not reintroduce success RNG or generic Constitution exertion.
+
+# Next Phase — After the Emberveil Opening
+
+November 5, 2026. The Arya/Clyde opening, weighted room engine, budgeted loot, Gavin/Stillmere chain, equipment templates/loadouts, Chips economy, caps and Guild subtabs are implemented on the review branch. Verification is in 08.
+
+1. Playtest pacing: first return, first armor, first herb and five-herb referral. The seeded automated path reached Stillmere in about 56 game minutes; this is a test outcome, not a finalized pacing target.
+2. Tune room/check weights, rarity, work, costs, carrying caps, storage prices and equipment bonuses while preserving the distinct roles of Arya and Clyde.
+3. Refine archive/delve flavor and specialized checks beyond the first dungeon; keep group and room weights independently authored.
+4. Design later training so members can learn currently missing skills without rewarding failed-check spam.
+5. Specify actual death triggers and a governing recovery stat before implementing the 4× to 2× travel revival timer.
+6. Author guildmaster spell actions and storage compression, then worker assignments and per-storage-tab auto-selling. No passive automation or compression is enabled yet.
+7. Choose Pebs/Bowls denomination ratios when needed; current accounting uses Chips only.
+
+Skill decay, traits, equipment resource conversion, guildmaster affinity upgrades, offline progress and optional cloud sync remain future systems. Existing saves are preserved, not force-normalized to the new tier budgets.

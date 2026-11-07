@@ -1,11 +1,11 @@
 /** Shared section identity and palette. Change colors here to restyle every reference. */
 export const SECTIONS = {
- Story: {number:'00',color:'#f08080'},
+ Story: {number:'00',color:'#ffa9a9'},
  Guild: {number:'01',color:'#efad70'},
  Members: {number:'02',color:'#e5ce71'},
  Activities: {number:'03',color:'#83c99a'},
  Resources: {number:'04',color:'#7db9ed'},
- Shops: {number:'05',color:'#ae9aeb'},
+ Shops: {number:'05',color:'#c5b5ff'},
  Info: {number:'06',color:'#d793d1'}
 } as const;
 export type Section = keyof typeof SECTIONS;

@@ -12,7 +12,7 @@ export type SpecializedProfile=SkillProfile & Pick<CheckActor,'stats'>;
 /** Deterministic strongest five roots; recovery guarantees a Constitution Skill when CON is chosen. */
 export function defaultSelections(actor:Pick<CheckActor,'stats'>,role?:string):Selections{
  if(role&&role in ROLE_SELECTIONS)return structuredClone(ROLE_SELECTIONS[role as keyof typeof ROLE_SELECTIONS]);
- const attributes=[...STATS].sort((a,b)=>actor.stats[b].affinity-actor.stats[a].affinity||STATS.indexOf(a)-STATS.indexOf(b)).slice(0,5);
+ const attributes:Stat[]=STATS.filter(s=>s!=='soul').sort((a,b)=>actor.stats[b].affinity-actor.stats[a].affinity||STATS.indexOf(a)-STATS.indexOf(b)).slice(0,5);
  const disciplines=[...ACTIVITY_GROUPS].sort((a,b)=>SPECIALIZATIONS.filter(s=>s.group===b.id&&attributes.includes(s.parent)).length-SPECIALIZATIONS.filter(s=>s.group===a.id&&attributes.includes(s.parent)).length||ACTIVITY_GROUPS.indexOf(a)-ACTIVITY_GROUPS.indexOf(b)).slice(0,5).map(g=>g.id);
  if(attributes.includes('constitution')&&!disciplines.some(d=>['combat','logistics','recovery'].includes(d)))disciplines[4]='recovery';
  return {attributes,disciplines};

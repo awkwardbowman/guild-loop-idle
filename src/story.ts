@@ -11,6 +11,7 @@ const storage:StoryLocation={tab:'Guild',label:'Guild → Storage'};
 const shops:StoryLocation={tab:'Shops',label:'Shops → Gavin Wess, Tanner & Barkeep'};
 const skills:StoryLocation={tab:'Members',label:'Members → select a member → Skills / Attributes'};
 export const EVENT_TEXT:Record<EventId,{title:string;description:string;locations:StoryLocation[]}>= {
+ campaign_completed:{title:'The final checkpoint',description:'The floor 100 boss of the Catacombs of the Wound and Wish has fallen. Your guild has completed the main dungeon.',locations:[dungeonCatalog]},
  history_remembered:{title:'A beginning in Emberveil',description:'Your story begins in a small town rebuilding among ancient memories. Your Soul holds an unusual spark of magic.',locations:[goalsLocation]},
  friends_introduced:{title:'Arya and Clyde',description:'Arya is ready for the dungeon; Clyde has an eye for useful finds. Your friends will be the guild’s first recruits.',locations:[goalsLocation]},
  guild_founded:{title:'The guild is established',description:'Arya and Clyde join as your first two recruits. The nearby Catacombs of the Wound and Wish are open; no gear is needed.',locations:[{tab:'Guild',label:'Guild → Guild Master'},memberQueue,dungeonCatalog]},

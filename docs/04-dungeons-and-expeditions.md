@@ -1,3 +1,32 @@
+# Floor/checkpoint implementation for review — November 6, 2026 · save v10
+
+**Branch implementation, not a production deployment.** This section supersedes the older open boss-placement, identity, reveal and scaling questions below. Maya approved both the UI and gameplay roadmaps, then clarified that only floors 1–10 need current balance: Arya must clear them now, while the next ten require future Stillmere potions and other support.
+
+- A floor is **ten counted standard encounters followed by a separate mandatory boss**. Standard room selection is random **with replacement** from ten distinct, stable floor-specific identities. Encounter counts and unique discoveries are independent: ten repeated successes can clear a floor while revealing only one of its normal room identities.
+- Treasure is a 15% bonus opportunity between standard encounters, never consecutive, never counted toward the ten. Once the tenth standard encounter resolves, the next encounter is the boss. Treasure has two catalog identities and bosses one per floor, with independent discovery denominators.
+- Boss victory records a durable guild checkpoint. Future outings default to the first uncleared floor. **Starting floor** may instead select an earlier unlocked checkpoint for repeat material/training runs; active outings keep their current state. Unfinished standard-room counters restart on a new outing, while learned rooms and completed bosses persist.
+- Successful encounter clears alone reveal their room's stat requirements. Each normal identity contributes one tenth of the floor's normal preview; repeat, failed or skipped rooms add no coverage. Boss victory reveals remaining **Composite Skill names** for that floor, without fabricating uncleared room stat coverage. Individual successful encounters also reveal their own Skill names. Global character browsers respect these secret-name rules.
+- Normal, Treasure and Boss filters may be combined, with equal identity weighting and truthful known/total denominators. Dungeon summaries aggregate **explored floors only**. Undiscovered checks, possible finds and special Skill names are not exposed through summaries, tooltips, sidebars, assignment cards or failure messages.
+- General Constitution XP requires ten successful standard encounters plus boss victory in that outing's floor. Bonus treasure does not contribute. Skipped standard rooms invalidate the XP, while a boss checkpoint can still be secured. Existing work practice, current outing capacity snapshots, injury outcomes and 30-game-second recall/low-skill clocks remain.
+- Ordinary Recall waits for the defeated boss, including when requested at standard room ten. Exact completion wins a simultaneous timeout. Limits count standard rooms; a cap at a multiple of ten includes the separate boss. A lower mid-floor cap returns without full-floor XP. Bonus treasure does not advance the cap.
+- The Catacombs have exactly **100 floors**. Defeating floor 100's boss records a single completion event, returns/banks cargo normally and prevents a floor-101 departure. Other dungeons have no authored campaign ending. Their numerical work scale is bounded for finite simulation math.
+
+## Current balance boundary
+
+Only Catacombs floors **1–10** are tuned: work multiplier `1.035^(floor-1)`, base normal check work 0.5 and separate boss check work 1.5. Existing linear per-floor endurance drain remains. Thirty seeded engine runs using starter Arya, earned practice and no equipment/potions cleared ten floors in 460–600 game seconds (mean 496). These are simulation results, not elapsed human playtests or guaranteed first-attempt clears.
+
+Floor **11** begins a deliberately large **provisional** work step at 32×, followed by provisional 3.5% steps. Thirty probes using stronger-than-current Arya (capped roots and Skills, ten floor XP, best existing armor) produced zero floor-11 boss clears. This preserves a current-kit barrier while Stillmere support is undefined. **Do not treat the floor-11 constant, floors 11–100, potion strengths or total campaign pacing as finalized balance.** Revisit this boundary together with Stillmere consumables, equipment and training. No potion effect has been invented or enabled in this PR. Reproduce with `node scripts/balance-floors.ts`.
+
+The 100-floor topology uses stable room catalogs and provisional reusable threat bands. One hundred unique lore scenes, special story gates and bespoke boss mechanics have not been authored merely by creating those catalogs.
+
+## Soul and save boundary
+
+Generated recruits have inert Soul current/max/affinity **exactly 1**, never select Soul and always carry explicit `soulAccess: none`. Guildmaster alone has `soulAccess: guildmaster` and cannot dungeon. Arya/Clyde keep Constitution entry; neither gains true Soul. Modern progression no longer offers the obsolete Quarry discovery or new departures there. Historical legacy access/outings remain readable. A Soul-discoverable replacement, fixed named Leeches, their unlock sequence and magic still need authored content.
+
+Save v10 validates checkpoint/catalog IDs, categories, counters, campaign completion and Soul access. v0–v9 saves remain readable. Existing outings retain their historical room/work rules through return, with no retroactive checkpoint or discovery credit; later departures use the new model. Old random recruits are normalized to inert Soul and non-Soul selections; if necessary their root budget and active snapshots are reconciled without erasing trained Skill records. A beta reset is still available, but import does not silently wipe the guild.
+
+---
+
 # Approved main-campaign and dungeon discovery direction — November 6, 2026
 
 **STATUS: Future gameplay redesign, not implemented in the current v9 dungeon engine.** This section supersedes conflicting older floor, endpoint, and discovery assumptions below. See [05](05-decisions-and-open-questions.md) for decision log and unresolved thresholds.

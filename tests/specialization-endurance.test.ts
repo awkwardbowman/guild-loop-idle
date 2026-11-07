@@ -10,7 +10,7 @@ function opening(){let g=initialGame(73129);for(const action of ['remember_histo
 function exploring(role:'arya'|'clyde'='arya'){
  let g=opening();g.members.forEach(m=>m.enabled=m.origin===role);g=advance(startDay(g),15);g.members.forEach(m=>m.enabled=false);return g;
 }
-function room(g:ReturnType<typeof exploring>,id:string,depth=1){const r=g.active[0];r.floor=depth;r.generated={id,index:0,work:0,attempts:0};r.progress=0;r.roomStartedAt=null;r.roomEfficiency=null;r.lowSkill=false;return r;}
+function room(g:ReturnType<typeof exploring>,id:string,depth=1){const r=g.active[0];r.floorState=null;r.floor=depth;r.generated={id,index:0,work:0,attempts:0};r.progress=0;r.roomStartedAt=null;r.roomEfficiency=null;r.lowSkill=false;return r;}
 function slow(){const g=exploring('clyde'),r=room(g,'crypt_guardian',100);r.endurance={max:100,current:100};return g;}
 test('SE01 fixed roles satisfy the agreed selections, sparse 25 cells and totals count every Skill once',()=>{
  const g=opening();assert.equal(canDungeon(g.guildmaster),false);assert.equal(ownsSkill(g.members[0],'power'),true);assert.equal(canDungeon(g.members[1]),true);assert.equal(ownsSkill(g.members[1],'power'),false);assert.equal(ownsSkill(g.members[1],'vitality'),true);assert.ok(g.guildmaster.selections!.disciplines.includes('crafting'));

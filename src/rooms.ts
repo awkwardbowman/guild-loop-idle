@@ -53,7 +53,55 @@ export const ROOM_DUNGEONS:RoomDungeon[]=[
  {dungeonId:'quarry',groups:{neutral:3,combat:5,trap:2,puzzle:1,boss:1,treasure:2},rooms:catacombs.map(room=>({...room,id:'delve_'+room.id,name:delveRoomNames[room.id]??room.name,checks:room.checks.map(check=>({...check,id:'delve_'+check.id,work:check.work*2,loot:check.loot.map(entry=>entry.id==='leather'?{id:'ore',weight:entry.weight}:entry.id==='hide'?{id:'crystal',weight:entry.weight}:entry)}))}))}
 ];
 export const roomDungeon=(id:string)=>ROOM_DUNGEONS.find(dungeon=>dungeon.dungeonId===id)!;
-export const roomById=(dungeonId:string,id:string)=>roomDungeon(dungeonId).rooms.find(room=>room.id===id)!;
+export const roomById=(dungeonId:string,id:string):DungeonRoom=>{
+ const match=/^f(\d+)-(normal|treasure|boss)-(\d+)$/.exec(id);
+ return match?floorCatalog(dungeonId,Number(match[1]))[match[2] as EncounterCategory][Number(match[3])]:roomDungeon(dungeonId).rooms.find(room=>room.id===id)!;
+};
+export type EncounterCategory='normal'|'treasure'|'boss';
+export type FloorState={number:number;counted:number;successful:number;lastTreasure:boolean};
+export type FloorKnowledge={known:string[];bossCleared:boolean};
+export type DungeonKnowledge=Record<string,Record<string,FloorKnowledge>>;
+export const CAMPAIGN_FLOORS=100;
+export const categoryOf=(room:DungeonRoom):EncounterCategory=>room.group==='boss'?'boss':room.group==='treasure'?'treasure':'normal';
+// Authored reusable encounter bands. Numbers and threats are provisional balance content.
+const FLOOR_BANDS=[
+ ['Dust and nests','crypt beetle'],['Buried halls','armored crypt beetle'],['Sealed passages','stoneback sentinel'],
+ ['Broken wards','wardbound sentinel'],['Deep chambers','hollow stalker'],['Sunken vaults','vault guardian'],
+ ['Silent galleries','ancient wardkeeper'],['Fractured depths','rift guardian'],['Inner crypts','crypt colossus'],['Final descent','last wardkeeper']
+];
+const EXTRA_NORMALS=[
+ {name:'Fallen masonry',group:'neutral',skill:'athletics',attributes:[['force',.6],['endurance',.4]]},
+ {name:'Narrow broken ledge',group:'trap',skill:'athletics',attributes:[['agility',.6],['observation',.4]]},
+ {name:'Watchful burrow',group:'combat',skill:'combat',attributes:[['power',.6],['precision',.4]]},
+ {name:'Collapsed doorway',group:'neutral',skill:'athletics',attributes:[['force',.7],['constitution',.3]]},
+ {name:'Dust-covered survey marks',group:'puzzle',skill:'crypt_lore',attributes:[['planning',.5],['observation',.5]]}
+] as const;
+export function floorCatalog(dungeonId:string,floor:number):Record<EncounterCategory,DungeonRoom[]>{
+ if(!Number.isInteger(floor)||floor<1||floor>100000||(dungeonId==='wood'&&floor>CAMPAIGN_FLOORS))throw Error('Invalid dungeon floor');
+ const route=roomDungeon(dungeonId),band=FLOOR_BANDS[Math.min(9,Math.floor((floor-1)/10))];
+ const originals=route.rooms.filter(r=>!['boss','treasure'].includes(r.group));
+ const extras=EXTRA_NORMALS.map((r,i):DungeonRoom=>({...originals[0],name:r.name,group:r.group,mandatory:true,failure:r.group==='trap'?'injury':'return',checks:[makeCheck(`extra-${i}`,r.name,r.skill,r.attributes.map(([a,w])=>[a,w]),[])]}));
+ const decorate=(rooms:DungeonRoom[],category:EncounterCategory)=>rooms.map((room,i)=>({...room,id:`f${floor}-${category}-${i}`,name:category==='boss'?`Floor ${floor} · ${band[1]}`:`${room.name} · floor ${floor}`,checks:room.checks.map((check,j)=>({...check,id:`f${floor}-${category}-${i}-${j}`,work:check.work*(category==='boss'?3:1),attributes:check.attributes.map(a=>({...a}))}))}));
+ return {normal:decorate([...originals,...extras],'normal'),treasure:decorate(route.rooms.filter(r=>r.group==='treasure'),'treasure'),boss:decorate(route.rooms.filter(r=>r.group==='boss'),'boss')};
+}
+/** With replacement: ten traversals can encounter the same authored room repeatedly. */
+export function rollFloorRoom(dungeonId:string,state:FloorState,random:()=>number):GeneratedRoom{
+ const catalog=floorCatalog(dungeonId,state.number),route=roomDungeon(dungeonId);
+ const category:EncounterCategory=state.counted===10?'boss':!state.lastTreasure&&random()<.15?'treasure':'normal';
+ const room=weightedPick(catalog[category],r=>route.groups[r.group]*r.weight,random);
+ return {id:room.id,index:0,work:0,attempts:0};
+}
+export function nextDungeonFloor(knowledge:DungeonKnowledge,id:string){
+ let floor=1;while(knowledge[id]?.[floor]?.bossCleared&&floor<100000)floor++;
+ return floor;
+}
+/** Floor-boundary exponential steps; bounded only to keep endless math finite. */
+export const floorDifficulty=(dungeonId:string,floor:number)=>{
+ // Only chapter one is balanced now. Chapter two deliberately requires future Stillmere support.
+ const work=dungeonId==='wood'?(floor<=10?1.035**(floor-1):32*1.035**Math.min(floor-11,990)):1.025**Math.min(floor-1,1000);
+ return Math.min(1e9,work);
+};
+export const generatedDifficulty=(dungeonId:string,id:string,roomNumber:number)=>id.startsWith('f')?floorDifficulty(dungeonId,Number(id.split('-')[0].slice(1))):difficultyAtRoom(roomNumber);
 export function weightedPick<T>(items:readonly T[],weight:(item:T)=>number,random:()=>number):T{
  const value=random();if(!Number.isFinite(value)||value<0||value>=1)throw Error('Invalid room roll');let roll=value*items.reduce((sum,item)=>sum+weight(item),0);
  return items.find(item=>(roll-=weight(item))<0)??items.at(-1)!;
@@ -83,12 +131,12 @@ export function roomEfficiency(actor:CheckActor,room:DungeonRoom,loadout:string[
 }
 export function roomCheckCosts(_check:RoomCheck,depth=1):Pools{const costs=zeroPools();costs.constitution=enduranceDrain(depth);return costs;}
 /** Pure work/training step. The engine pays its separate run-specific endurance meter. */
-export function roomCheckStep(input:CheckActor,check:RoomCheck,state:GeneratedRoom,depth:number,loadout:string[],_random:()=>number,now:number){
+export function roomCheckStep(input:CheckActor,check:RoomCheck,state:GeneratedRoom,depth:number,loadout:string[],_random:()=>number,now:number,generatedDifficultyForStep=difficultyAtRoom(depth)){
  const actor=structuredClone(input),next=structuredClone(state),training=zeroPools(),specializationTraining:Record<string,number>={};
  // Generic danger checks use weighted work; only specific Composite activities have hard gates.
  if(!canAttemptRoomCheck(actor,check))return {actor,state:next,outcome:'ineligible' as const,training,specializationTraining};
  next.work+=checkProgressRate(actor,check,loadout);next.attempts++;
- if(next.work+1e-9<check.work*difficultyAtRoom(depth))return {actor,state:next,outcome:'working' as const,training,specializationTraining};
+ if(next.work+1e-9<check.work*generatedDifficultyForStep)return {actor,state:next,outcome:'working' as const,training,specializationTraining};
  next.work=0;
  if(canLearnComposite(actor,check.skill))gainSkillExperience(actor.skills[check.skill],2,now);
  for(const entry of check.attributes){

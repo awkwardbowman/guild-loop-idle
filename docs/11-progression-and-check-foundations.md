@@ -1,3 +1,11 @@
+# Floor model extension — November 6, 2026 · review save v10
+
+The floor/checkpoint model in [04](04-dungeons-and-expeditions.md) supersedes v9's room-counter grouping for new outings. `Run.floorState` separates floor number, ten counted standard encounters, successful standards and previous treasure; `Run.floor` remains a counted-room ordinal for legacy history and shared room-count limits. `Game.dungeonKnowledge` persists known room IDs/boss checkpoints; `Game.dungeonStarts` optionally selects an earlier unlocked starting floor. Historical outings have `floorState: null` and retain their original work/pool/floor-XP behavior until return.
+
+Successful new boss checkpoints award floor XP only with ten successful standards. Room ten alone does not grant XP or resolve ordinary Recall. Bonus treasure does not advance the counter. Per-floor catalogs and discovery filters are independent of random traversal counts. See 04/05 for the approved reveal triggers and first-ten-floor balance boundary. Old v9 sections below remain historical, not the current new-outing contract.
+
+---
+
 # True-zero Attributes, minimum eligible progress and display precision — November 6, 2026
 
 Non-selected/unknown Attributes now have **real effective value 0**, replacing the former 0.01 fallback. Missing weighted check components are zero; no weight is redistributed. Only **after** calculating the full check's effective rate and verifying its explicit prerequisites, the generated-room engine applies `max(0.001, effectiveRate)`. Ineligible actions remain at zero work and follow the authored skip/failure rules. Legacy check rooms use the same 0.001 minimum check-speed safeguard. The shared `src/numbers.ts` helper formats visible stat/Skill/endurance/efficiency values to **at most two decimal places** (no padded trailing zeros) while preserving full precision in gameplay and saves. Selected root fallback (`max(1, maximum)`), owned Skill Value, Constitution XP increments and Soul/Constitution eligibility remain unchanged.

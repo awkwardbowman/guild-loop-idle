@@ -33,7 +33,8 @@ import { DUNGEONS, dungeonById, UPGRADE_INFO, WARP_SECONDS } from './content.ts'
 import type { Upgrade } from './content.ts';
 import { loadLocal, saveLocal, parseSave, exportSave, SAVE_KEY, BACKUP_KEY } from './persistence.ts';
 import './style.css';
-const fmt=(n:number)=>n.toLocaleString(undefined,{maximumFractionDigits:1});
+import {formatNumber} from './numbers.ts';
+const fmt=formatNumber;
 const duration=(n:number)=>n>=60?`${Math.floor(n/60)}m ${n%60}s`:`${n}s`;
 const resources=RESOURCES.map(resource=>({id:resource.id,name:resource.name}));
 const value=(g:Game,id:string)=>id==='gear'?`${fmt(g.guild.gear)} / ${g.guild.gearCap}`:fmt(id==='chips'?g.guild.chips:id==='materials'?g.guild.materials:g.inventory[id]??0);
